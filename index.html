@@ -50,6 +50,30 @@
     .detail-box { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 16px; padding: 12px; }
     .detail-box span { display: block; color: #94a3b8; font-size: 13px; margin-bottom: 6px; }
     .filters { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+    .pager {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 28px;
+    }
+    .pager button {
+      background: rgba(255,255,255,.06);
+      color: white;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    .pager button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+    .pager-info {
+      color: #cbd5e1;
+      font-size: 14px;
+    }
     input, select {
       background: #0f172a; color: #fff; border: 1px solid rgba(255,255,255,.12); border-radius: 14px; padding: 12px 14px; font-size: 15px; min-width: 190px;
     }
@@ -126,6 +150,11 @@
         </select>
       </div>
       <div id="inventoryCars" class="grid cars-grid"></div>
+      <div class="pager">
+        <button id="nextPageBtn">التالي ←</button>
+        <div id="pagerInfo" class="pager-info"></div>
+        <button id="prevPageBtn">→ السابق</button>
+      </div>
     </div>
   </section>
 
@@ -215,6 +244,8 @@
     let availableCars = [];
     let featuredCars = [];
     let currentModalCar = null;
+    let currentPage = 1;
+    const carsPerPage = 10;
 
     function imageExists(src) {
       return new Promise((resolve) => {
@@ -296,12 +327,21 @@
         return matchesSearch && matchesCategory;
       });
 
+      const totalPages = Math.max(1, Math.ceil(filtered.length / carsPerPage));
+      if (currentPage > totalPages) currentPage = totalPages;
+      const startIndex = (currentPage - 1) * carsPerPage;
+      const paginatedCars = filtered.slice(startIndex, startIndex + carsPerPage);
+
       const container = document.getElementById('inventoryCars');
-      if (!filtered.length) {
+      if (!paginatedCars.length) {
         container.innerHTML = '<div class="empty-state">لا توجد سيارات مطابقة حالياً. إذا أضفت صورة سيارة جديدة وحدثت الصفحة ستظهر تلقائياً.</div>';
-        return;
+      } else {
+        container.innerHTML = paginatedCars.map(createCarCard).join('');
       }
-      container.innerHTML = filtered.map(createCarCard).join('');
+
+      document.getElementById('pagerInfo').textContent = `الصفحة ${currentPage} من ${totalPages}`;
+      document.getElementById('prevPageBtn').disabled = currentPage === 1;
+      document.getElementById('nextPageBtn').disabled = currentPage === totalPages || filtered.length === 0;
     }
 
     function findCarById(id) {
@@ -347,8 +387,24 @@
       currentModalCar = null;
     }
 
-    document.getElementById('searchInput').addEventListener('input', renderInventory);
-    document.getElementById('categoryFilter').addEventListener('change', renderInventory);
+    document.getElementById('searchInput').addEventListener('input', function () {
+      currentPage = 1;
+      renderInventory();
+    });
+    document.getElementById('categoryFilter').addEventListener('change', function () {
+      currentPage = 1;
+      renderInventory();
+    });
+    document.getElementById('prevPageBtn').addEventListener('click', function () {
+      if (currentPage > 1) {
+        currentPage -= 1;
+        renderInventory();
+      }
+    });
+    document.getElementById('nextPageBtn').addEventListener('click', function () {
+      currentPage += 1;
+      renderInventory();
+    });
     document.getElementById('carModal').addEventListener('click', function (e) {
       if (e.target.id === 'carModal') closeModal();
     });
