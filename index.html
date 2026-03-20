@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@500;700;900&display=swap" rel="stylesheet">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Emotion Car & Service UG</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -50,19 +51,7 @@
       padding: 8px;
       border: 1px solid rgba(255,255,255,.18);
       box-shadow: 0 18px 50px rgba(0,0,0,.65), 0 0 24px rgba(59,130,246,.35);
-      opacity: 0;
-      transform: translateY(8px) scale(.92);
-      animation: logoIn .8s ease forwards, logoGlow 3s ease-in-out 1s infinite alternate, logoFloat 4s ease-in-out 1s infinite;
       flex-shrink: 0;
-    }
-    @keyframes logoIn { to { opacity: 1; transform: translateY(0) scale(1); } }
-    @keyframes logoGlow {
-      from { box-shadow: 0 18px 50px rgba(0,0,0,.65), 0 0 12px rgba(59,130,246,.25); }
-      to { box-shadow: 0 20px 54px rgba(0,0,0,.72), 0 0 26px rgba(59,130,246,.48); }
-    }
-    @keyframes logoFloat {
-      0%,100% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-4px) scale(1.02); }
     }
     .brand-text strong {
       display: block;
@@ -86,7 +75,6 @@
       box-shadow: 0 0 10px rgba(255,255,255,.3);
       flex-shrink: 0;
     }
-
     .nav-menu {
       display: flex;
       align-items: center;
@@ -100,8 +88,7 @@
       padding: 8px 0;
       color: #e5e7eb;
       font-size: 15px;
-      font-weight: 500;
-      letter-spacing: .2px;
+      font-weight: 700;
       transition: color .2s ease;
       position: relative;
     }
@@ -117,6 +104,20 @@
     }
     .nav-link:hover { color: #fff; }
     .nav-link:hover::after { width: 100%; }
+    .login-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(15,23,42,.92);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 999px;
+      padding: 12px 16px;
+      font-size: 15px;
+      font-weight: 800;
+      box-shadow: 0 16px 40px rgba(0,0,0,.35);
+      backdrop-filter: blur(10px);
+    }
 
     .hero {
       padding: 34px 0 30px;
@@ -183,6 +184,7 @@
       padding: 12px 14px;
       font-size: 15px;
       min-width: 190px;
+      font-family: inherit;
     }
     .grid { display: grid; gap: 20px; }
     .cars-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
@@ -198,10 +200,7 @@
       transform: translateY(-6px) scale(1.01);
       box-shadow: 0 24px 70px rgba(0,0,0,.75);
     }
-    .car-image-wrap {
-      position: relative;
-      overflow: hidden;
-    }
+    .car-image-wrap { position: relative; overflow: hidden; }
     .car-image {
       width: 100%;
       height: 220px;
@@ -217,19 +216,18 @@
       left: 14px;
       display: inline-flex;
       align-items: center;
-      gap: 0;
-      background: rgba(15, 23, 42, 0.65);
+      justify-content: center;
+      min-width: 34px;
+      height: 34px;
+      background: rgba(15, 23, 42, 0.7);
       color: #fff;
-      border: 1px solid rgba(255,255,255,.12);
-      padding: 6px 10px;
+      border: 1px solid rgba(255,255,255,.14);
+      padding: 0 12px;
       border-radius: 999px;
       font-size: 12px;
-      font-weight: 600;
-      backdrop-filter: blur(6px);
+      font-weight: 700;
+      backdrop-filter: blur(8px);
     }
-
-    
-    
     .car-content { padding: 18px; }
     .car-top {
       display: flex;
@@ -266,7 +264,6 @@
       font-size: 13px;
       margin-bottom: 6px;
     }
-
     .pager {
       display: flex;
       align-items: center;
@@ -284,6 +281,7 @@
       cursor: pointer;
       font-size: 15px;
       font-weight: 700;
+      font-family: inherit;
     }
     .pager button:disabled { opacity: .45; cursor: not-allowed; }
     .pager-info { color: #cbd5e1; font-size: 14px; }
@@ -295,29 +293,17 @@
       align-items: stretch;
     }
     .about-card, .contact-card, .legal-card {
-      font-family: 'Tajawal', sans-serif;
-    }
-
-    .contact-card h3 {
-      font-weight: 800;
-      font-size: 26px;
-      letter-spacing: .3px;
-    }
-
-    .contact-row strong {
-      font-weight: 700;
-    }
-
-    .contact-row span {
-      font-weight: 500;
-    }
-
-    .about-card, .contact-card, .legal-card {
       background: rgba(255,255,255,.04);
       border: 1px solid rgba(255,255,255,.08);
       border-radius: 24px;
       padding: 24px;
     }
+    .contact-card h3 {
+      font-weight: 800;
+      font-size: 26px;
+    }
+    .contact-row strong { font-weight: 700; }
+    .contact-row span { font-weight: 500; }
     .feature-list, .contact-list {
       display: grid;
       gap: 14px;
@@ -329,14 +315,12 @@
       border-radius: 18px;
       padding: 16px;
     }
-    .feature-item strong { display: block; margin-bottom: 6px; }
     .contact-row {
       display: flex;
       justify-content: space-between;
       gap: 12px;
       color: #e2e8f0;
     }
-    .contact-row span { color: #94a3b8; }
     .cta-bar {
       margin-top: 18px;
       display: flex;
@@ -367,16 +351,13 @@
       line-height: 1.9;
       margin-top: 10px;
     }
-
-    .reveal {
-      opacity: 0;
-      transform: translateY(28px);
-      transition: opacity .8s ease, transform .8s ease;
-      will-change: opacity, transform;
-    }
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
+    .loading-box, .empty-box {
+      padding: 28px;
+      text-align: center;
+      color: #cbd5e1;
+      border: 1px dashed rgba(255,255,255,.12);
+      border-radius: 18px;
+      background: rgba(255,255,255,.02);
     }
 
     .modal {
@@ -412,6 +393,7 @@
       padding: 10px 14px;
       cursor: pointer;
       z-index: 2;
+      font-family: inherit;
     }
     .modal-grid {
       display: grid;
@@ -476,169 +458,7 @@
       color: #fff;
     }
 
-    .admin-fab {
-      position: fixed;
-      top: 18px;
-      left: 18px;
-      z-index: 1100;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(15,23,42,.92);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 999px;
-      padding: 12px 16px;
-      font-family: 'Tajawal', Arial, sans-serif;
-      font-size: 15px;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: 0 16px 40px rgba(0,0,0,.35);
-      backdrop-filter: blur(10px);
-    }
-    .admin-fab img {
-      width: 20px;
-      height: 20px;
-      border-radius: 6px;
-      object-fit: cover;
-      flex-shrink: 0;
-    }
-    .admin-panel {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.76);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      z-index: 1200;
-    }
-    .admin-panel.show { display: flex; }
-    .admin-card {
-      width: min(760px, 100%);
-      max-height: 92vh;
-      overflow: auto;
-      background: linear-gradient(180deg,#081224,#0f172a);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 28px;
-      padding: 24px;
-      box-shadow: 0 25px 80px rgba(0,0,0,.65);
-    }
-    .admin-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 18px;
-    }
-    .admin-head h3 {
-      margin: 0;
-      font-size: 28px;
-      font-weight: 800;
-    }
-    .admin-close {
-      background: rgba(255,255,255,.08);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 14px;
-      padding: 10px 14px;
-      cursor: pointer;
-      font-family: inherit;
-    }
-    .admin-stack {
-      display: grid;
-      gap: 14px;
-    }
-    .admin-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
-    }
-    .admin-card label {
-      display: grid;
-      gap: 8px;
-      color: #dbeafe;
-      font-size: 14px;
-      font-weight: 700;
-    }
-    .admin-card textarea,
-    .admin-card input,
-    .admin-card select {
-      width: 100%;
-      min-width: 0;
-      font-family: inherit;
-    }
-    .admin-card textarea {
-      min-height: 110px;
-      resize: vertical;
-      background: #0f172a;
-      color: #fff;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 14px;
-      padding: 12px 14px;
-      font-size: 15px;
-    }
-    .admin-actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 8px;
-    }
-    .admin-btn {
-      border: none;
-      border-radius: 14px;
-      padding: 12px 18px;
-      font-family: inherit;
-      font-weight: 800;
-      cursor: pointer;
-    }
-    .admin-btn.primary {
-      background: #22c55e;
-      color: #04111f;
-    }
-    .admin-btn.secondary {
-      background: rgba(255,255,255,.08);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,.12);
-    }
-    .admin-note {
-      color: #93c5fd;
-      font-size: 13px;
-      line-height: 1.8;
-    }
-    .admin-status {
-      margin-top: 10px;
-      color: #cbd5e1;
-      font-size: 14px;
-      min-height: 24px;
-    }
-    .admin-section-title {
-      margin: 10px 0 0;
-      font-size: 18px;
-      font-weight: 800;
-      color: #fff;
-    }
-    .edit-car-btn {
-      margin-top: 14px;
-      width: 100%;
-      border: 1px solid rgba(255,255,255,.1);
-      border-radius: 16px;
-      padding: 12px 14px;
-      background: rgba(59,130,246,.12);
-      color: #dbeafe;
-      font-family: inherit;
-      font-weight: 800;
-      cursor: pointer;
-    }
-    .edit-car-btn:hover {
-      background: rgba(59,130,246,.2);
-    }
-
     @media (max-width: 900px) {
-      .admin-grid { grid-template-columns: 1fr; }
-      .admin-card { padding: 18px; }
-      .admin-fab { left: 12px; bottom: 12px; }
-
       .top-nav-inner {
         flex-direction: column;
         align-items: flex-start;
@@ -653,12 +473,6 @@
       .thumbs { grid-template-columns: repeat(2, 1fr); }
       .details-grid { grid-template-columns: 1fr; }
       h1 { font-size: 42px; }
-      .car-badge {
-        top: 10px;
-        left: 10px;
-        padding: 8px 12px;
-        font-size: 12px;
-      }
     }
   </style>
 </head>
@@ -682,6 +496,8 @@
         <a class="nav-link" href="#terms">Service</a>
         <a class="nav-link" href="#contact">Kontakt</a>
       </nav>
+
+      <a class="login-link" href="login.html">تسجيل</a>
     </div>
   </header>
 
@@ -693,12 +509,12 @@
     </div>
   </section>
 
-  <section id="cars" class="section inventory-wrap reveal">
+  <section id="cars" class="section inventory-wrap">
     <div class="container">
       <div class="section-head">
         <div>
           <h2 class="section-title">معرض السيارات</h2>
-          <p>يعرض الموقع 8 سيارات في كل صفحة مع سهم التالي والسابق. عند الضغط على صورة السيارة تظهر التفاصيل والصور الإضافية.</p>
+          <p>يعرض الموقع السيارات المتاحة للتأجير مع تفاصيل واضحة وصور مرتبة وسهولة الوصول إلى كل سيارة.</p>
         </div>
       </div>
 
@@ -722,11 +538,10 @@
     </div>
   </section>
 
-  <section id="about" class="section container reveal">
+  <section id="about" class="section container">
     <div class="section-head">
       <div>
         <h2 class="section-title">من نحن</h2>
-        <p>Emotion Car & Service UG تقدم عرض سيارات بطريقة احترافية وواضحة، مع اهتمام بالتفاصيل، سهولة التواصل، وسرعة الوصول إلى معلومات السيارة المطلوبة.</p>
       </div>
     </div>
     <div class="about-grid">
@@ -754,7 +569,7 @@
     </div>
   </section>
 
-  <section id="terms" class="section container reveal">
+  <section id="terms" class="section container">
     <div class="section-head">
       <div>
         <h2 class="section-title">الشروط والأحكام</h2>
@@ -768,12 +583,12 @@
       </div>
       <div class="legal-card">
         <h3>معلومات البيع والتواصل</h3>
-        <p>يتم تأكيد المواصفات النهائية، حالة السيارة، وسعر البيع النهائي عند التواصل المباشر. يمكن للعميل طلب معلومات إضافية أو صور أكثر عبر واتساب أو البريد الإلكتروني.</p>
+        <p>يتم تأكيد المواصفات النهائية، حالة السيارة، وسعر التأجير النهائي عند التواصل المباشر. يمكن للعميل طلب معلومات إضافية أو صور أكثر عبر واتساب أو البريد الإلكتروني.</p>
       </div>
     </div>
   </section>
 
-  <section class="section container reveal">
+  <section class="section container">
     <div class="section-head">
       <div>
         <h2 class="section-title">موقعنا على الخريطة</h2>
@@ -786,7 +601,6 @@
         width="100%"
         height="400"
         style="border:0"
-        allowfullscreen=""
         loading="lazy">
       </iframe>
     </div>
@@ -813,111 +627,15 @@
     </div>
   </div>
 
-  <button id="adminOpenBtn" class="admin-fab">
-    <img src="images/logo.png" alt="logo" onerror="this.src=placeholderLogo" />
-    <span id="adminOpenLabel">تسجيل</span>
-  </button>
-
-  <div id="adminPanel" class="admin-panel">
-    <div class="admin-card">
-      <div class="admin-head">
-        <h3 id="adminPanelTitle">تسجيل الدخول</h3>
-        <button id="adminCloseBtn" class="admin-close">إغلاق</button>
-      </div>
-
-      <div class="admin-stack">
-        <div id="loginSection">
-          <div class="admin-grid">
-            <label>
-              البريد الإلكتروني
-              <input id="adminEmail" type="email" placeholder="admin@email.com" />
-            </label>
-            <label>
-              كلمة المرور
-              <input id="adminPassword" type="password" placeholder="••••••••" />
-            </label>
-          </div>
-
-          <div class="admin-actions">
-            <button id="adminLoginBtn" class="admin-btn primary">تسجيل الدخول</button>
-          </div>
-
-          <div class="admin-note">
-            تسجيل مباشر عبر Supabase لحساب مدير واحد فقط. بعد الدخول ستظهر لك أدوات تعديل السيارة والصورة والتفاصيل.
-          </div>
-        </div>
-
-        <div id="editorSection" style="display:none;">
-          <div class="admin-head" style="margin-bottom:0;">
-            <div class="admin-section-title">تعديل بيانات السيارات</div>
-            <button id="adminLogoutBtn" class="admin-btn secondary" type="button">تسجيل الخروج</button>
-          </div>
-
-          <div class="admin-grid">
-            <label>
-              اختر السيارة
-              <select id="adminCarSelect"></select>
-            </label>
-            <label>
-              الفئة
-              <select id="adminCategory">
-                <option value="SUV">SUV</option>
-                <option value="Sedan">Sedan</option>
-                <option value="Sport">Sport</option>
-              </select>
-            </label>
-            <label>
-              الاسم الكامل
-              <input id="adminName" type="text" placeholder="Mercedes S-Class" />
-            </label>
-            <label>
-              السعر
-              <input id="adminPrice" type="text" placeholder="€128,000" />
-            </label>
-            <label>
-              سنة الصنع
-              <input id="adminYear" type="number" placeholder="2024" />
-            </label>
-            <label>
-              عدد الكيلومترات
-              <input id="adminMileage" type="text" placeholder="8,000 km" />
-            </label>
-            <label>
-              الحالة
-              <input id="adminCondition" type="text" placeholder="ممتازة" />
-            </label>
-            <label>
-              الصورة الرئيسية
-              <input id="adminImageFile" type="file" accept="image/*" />
-            </label>
-          </div>
-
-          <label>
-            الوصف
-            <textarea id="adminDescription" placeholder="اكتب وصف السيارة هنا..."></textarea>
-          </label>
-
-          <div class="admin-actions">
-            <button id="adminSaveBtn" class="admin-btn primary" type="button">حفظ التعديلات</button>
-          </div>
-        </div>
-
-        <div id="adminStatus" class="admin-status"></div>
-      </div>
-    </div>
-  </div>
-
   <footer>
     © 2026 Emotion Car & Service UG. جميع الحقوق محفوظة.
     <div class="legal-badge">✔ شركة مسجلة قانونياً في ألمانيا</div>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = 'https://beyxyvibqzhtyawqrhbv.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_iMt3G9iAvXawW3QN6vGWjw_BOw8qLFK';
-    const ADMIN_EMAIL = 'ضع-بريد-المدير-هنا';
-    const STORAGE_BUCKET = 'site-images';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const placeholderLogo = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
@@ -944,12 +662,6 @@
         <text x="600" y="655" fill="#94a3b8" font-size="28" text-anchor="middle" font-family="Arial">No Image Available</text>
       </svg>
     `);
-
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    let adminUser = null;
-    let currentModalCar = null;
-    let currentPage = 1;
-    const carsPerPage = 8;
 
     const defaultCars = [
       ['Mercedes', 'S-Class', 'Sedan', '€128,000', 2024, '8,000 km', 'ممتازة'],
@@ -1004,39 +716,13 @@
       ]
     }));
 
+    let currentPage = 1;
+    const carsPerPage = 8;
     const WHATSAPP_NUMBER = '4915736645354';
-    const whatsappLink = (car) => {
+
+    function whatsappLink(car) {
       const message = `مرحباً، كنت مهتماً بسيارة ${car.name}. يمكننا مساعدتك وتزويدك بكل التفاصيل.`;
       return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-    };
-
-    function carImage(src) {
-      return src || placeholderCar;
-    }
-
-    function setAdminStatus(message, ok = true) {
-      const el = document.getElementById('adminStatus');
-      el.textContent = message;
-      el.style.color = ok ? '#86efac' : '#fca5a5';
-    }
-
-    function updateAdminUI() {
-      const label = document.getElementById('adminOpenLabel');
-      const title = document.getElementById('adminPanelTitle');
-      const loginSection = document.getElementById('loginSection');
-      const editorSection = document.getElementById('editorSection');
-
-      if (adminUser) {
-        label.textContent = 'الإدارة';
-        title.textContent = 'إدارة السيارات';
-        loginSection.style.display = 'none';
-        editorSection.style.display = 'block';
-      } else {
-        label.textContent = 'تسجيل';
-        title.textContent = 'تسجيل الدخول';
-        loginSection.style.display = 'block';
-        editorSection.style.display = 'none';
-      }
     }
 
     function findCarById(id) {
@@ -1047,7 +733,7 @@
       return `
         <div class="car-card">
           <div class="car-image-wrap">
-            <img class="car-image" src="${carImage(car.image)}" alt="${car.name}" data-car-id="${car.id}" onerror="this.onerror=null;this.src=placeholderCar" />
+            <img class="car-image" src="${car.image || placeholderCar}" alt="${car.name}" data-car-id="${car.id}" onerror="this.onerror=null;this.src=placeholderCar" />
             <div class="car-badge">${car.id}</div>
           </div>
           <div class="car-content">
@@ -1066,7 +752,6 @@
               <div class="detail-box"><span>الحالة</span><strong>${car.condition}</strong></div>
               <div class="detail-box"><span>السعر المطلوب</span><strong>${car.price}</strong></div>
             </div>
-            ${adminUser ? `<button class="edit-car-btn" data-edit-id="${car.id}">تعديل هذه السيارة</button>` : ''}
           </div>
         </div>
       `;
@@ -1086,39 +771,41 @@
       const startIndex = (currentPage - 1) * carsPerPage;
       const paginatedCars = filtered.slice(startIndex, startIndex + carsPerPage);
 
-      document.getElementById('inventoryCars').innerHTML = paginatedCars.map(createCarCard).join('');
+      const box = document.getElementById('inventoryCars');
+      if (!paginatedCars.length) {
+        box.innerHTML = '<div class="empty-box">لا توجد سيارات مطابقة حالياً.</div>';
+      } else {
+        box.innerHTML = paginatedCars.map(createCarCard).join('');
+      }
+
       document.getElementById('pagerInfo').textContent = `الصفحة ${currentPage} من ${totalPages}`;
       document.getElementById('prevPageBtn').disabled = currentPage === 1;
       document.getElementById('nextPageBtn').disabled = currentPage === totalPages;
-      fillAdminCarSelect();
     }
 
     function selectModalImage(image) {
-      document.getElementById('modalImage').src = image;
-      const thumbs = document.querySelectorAll('#modalThumbs .thumb');
-      thumbs.forEach((thumb) => {
+      document.getElementById('modalImage').src = image || placeholderCar;
+      document.querySelectorAll('#modalThumbs .thumb').forEach((thumb) => {
         thumb.classList.toggle('active', thumb.getAttribute('data-image') === image);
       });
     }
 
     function renderThumbs(car) {
-      const thumbs = (car.gallery || []).map((image, index) => `
+      const gallery = Array.isArray(car.gallery) && car.gallery.length ? car.gallery : [car.image].filter(Boolean);
+      document.getElementById('modalThumbs').innerHTML = gallery.map((image, index) => `
         <img src="${image}" class="thumb ${index === 0 ? 'active' : ''}" data-image="${image}" alt="${car.name}" onerror="this.style.display='none'" />
       `).join('');
-      document.getElementById('modalThumbs').innerHTML = thumbs;
       document.querySelectorAll('#modalThumbs .thumb').forEach((thumb) => {
         thumb.addEventListener('click', () => selectModalImage(thumb.getAttribute('data-image')));
       });
     }
 
     function openModal(car) {
-      currentModalCar = car;
       document.getElementById('modalImage').src = car.image || placeholderCar;
       document.getElementById('modalImage').onerror = function () { this.src = placeholderCar; };
-      document.getElementById('modalImage').alt = car.name;
       document.getElementById('modalName').textContent = car.name;
       document.getElementById('modalCategory').textContent = car.category;
-      document.getElementById('modalDescription').textContent = car.description;
+      document.getElementById('modalDescription').textContent = car.description || '';
       document.getElementById('modalWhatsappLink').href = whatsappLink(car);
       document.getElementById('modalDetails').innerHTML = `
         <div class="detail-box"><span>الماركة</span><strong>${car.brand}</strong></div>
@@ -1134,254 +821,45 @@
 
     function closeModal() {
       document.getElementById('carModal').classList.remove('show');
-      currentModalCar = null;
     }
 
-    function openAdminPanel() {
-      updateAdminUI();
-      document.getElementById('adminPanel').classList.add('show');
-    }
-
-    function closeAdminPanel() {
-      document.getElementById('adminPanel').classList.remove('show');
-    }
-
-    function fillAdminCarSelect() {
-      const select = document.getElementById('adminCarSelect');
-      if (!select) return;
-      const current = select.value;
-      select.innerHTML = cars.map(car => `<option value="${car.id}">${car.id} - ${car.name}</option>`).join('');
-      if (current && findCarById(current)) select.value = current;
-      if (!select.value && cars[0]) select.value = cars[0].id;
-      loadSelectedCarToForm();
-    }
-
-    function loadSelectedCarToForm() {
-      const select = document.getElementById('adminCarSelect');
-      if (!select) return;
-      const car = findCarById(select.value);
-      if (!car) return;
-      document.getElementById('adminName').value = car.name || '';
-      document.getElementById('adminCategory').value = car.category || 'SUV';
-      document.getElementById('adminPrice').value = car.price || '';
-      document.getElementById('adminYear').value = car.year || '';
-      document.getElementById('adminMileage').value = car.mileage || '';
-      document.getElementById('adminCondition').value = car.condition || '';
-      document.getElementById('adminDescription').value = car.description || '';
-    }
-
-    async function uploadImageIfNeeded(carId) {
-      const input = document.getElementById('adminImageFile');
-      const file = input.files?.[0];
-      if (!file) return null;
-      const ext = file.name.split('.').pop();
-      const filePath = `cars/car-${carId}-${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file, { upsert: true });
-      if (error) throw error;
-      const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(filePath);
-      input.value = '';
-      return data.publicUrl;
-    }
-
-    async function saveCarChanges() {
-      if (!adminUser) {
-        setAdminStatus('يجب تسجيل الدخول أولاً.', false);
-        return;
-      }
-      const id = Number(document.getElementById('adminCarSelect').value);
-      const car = findCarById(id);
-      if (!car) return;
-
-      try {
-        setAdminStatus('جاري حفظ التعديلات...');
-        const newImage = await uploadImageIfNeeded(id);
-        const name = document.getElementById('adminName').value.trim();
-        const parts = name.split(' ');
-        const updatedCar = {
-          ...car,
-          name,
-          brand: parts[0] || car.brand,
-          model: parts.slice(1).join(' ') || car.model,
-          category: document.getElementById('adminCategory').value,
-          price: document.getElementById('adminPrice').value.trim(),
-          year: Number(document.getElementById('adminYear').value) || car.year,
-          mileage: document.getElementById('adminMileage').value.trim(),
-          condition: document.getElementById('adminCondition').value.trim(),
-          description: document.getElementById('adminDescription').value.trim(),
-          image: newImage || car.image,
-          gallery: newImage ? [newImage, ...(car.gallery || []).slice(1)] : car.gallery
-        };
-
-        const { error } = await supabase.from('cars').upsert({
-          id: updatedCar.id,
-          brand: updatedCar.brand,
-          model: updatedCar.model,
-          category: updatedCar.category,
-          price: updatedCar.price,
-          year: updatedCar.year,
-          mileage: updatedCar.mileage,
-          condition: updatedCar.condition,
-          name: updatedCar.name,
-          description: updatedCar.description,
-          image: updatedCar.image,
-          gallery: updatedCar.gallery
-        }, { onConflict: 'id' });
-
-        if (error) throw error;
-        cars = cars.map(item => item.id === id ? updatedCar : item);
-        renderInventory();
-        setAdminStatus('تم حفظ التعديلات بنجاح.');
-      } catch (error) {
-        setAdminStatus(error.message || 'حدث خطأ أثناء الحفظ.', false);
-      }
-    }
-
-    async function loginAdmin() {
-      const email = document.getElementById('adminEmail').value.trim();
-      const password = document.getElementById('adminPassword').value;
-      if (!email || !password) {
-        setAdminStatus('أدخل البريد الإلكتروني وكلمة المرور.', false);
-        return;
-      }
-      try {
-        setAdminStatus('جاري تسجيل الدخول...');
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        if (ADMIN_EMAIL && !ADMIN_EMAIL.includes('ضع-') && data.user.email !== ADMIN_EMAIL) {
-          await supabase.auth.signOut();
-          throw new Error('هذا الحساب غير مصرح له بالدخول.');
-        }
-        adminUser = data.user;
-        updateAdminUI();
-        renderInventory();
-        setAdminStatus('تم تسجيل الدخول بنجاح.');
-      } catch (error) {
-        setAdminStatus(error.message || 'فشل تسجيل الدخول.', false);
-      }
-    }
-
-    async function logoutAdmin() {
-      await supabase.auth.signOut();
-      adminUser = null;
-      updateAdminUI();
-      renderInventory();
-      setAdminStatus('تم تسجيل الخروج.');
-    }
-
-    async function seedCarsIfTableEmpty() {
+    async function seedCarsIfEmpty() {
       const { data, error } = await supabase.from('cars').select('id').limit(1);
       if (error) return;
       if (Array.isArray(data) && data.length === 0) {
-        const payload = cars.map(car => ({
-          id: car.id,
-          brand: car.brand,
-          model: car.model,
-          category: car.category,
-          price: car.price,
-          year: car.year,
-          mileage: car.mileage,
-          condition: car.condition,
-          name: car.name,
-          description: car.description,
-          image: car.image,
-          gallery: car.gallery
-        }));
-        await supabase.from('cars').upsert(payload, { onConflict: 'id' });
+        await supabase.from('cars').upsert(cars, { onConflict: 'id' });
       }
     }
 
-    async function loadCarsFromSupabase() {
-      const { data, error } = await supabase.from('cars').select('*').order('id', { ascending: true });
-      if (!error && Array.isArray(data) && data.length) {
-        cars = data.map(row => ({
-          id: row.id,
-          brand: row.brand,
-          model: row.model,
-          category: row.category,
-          price: row.price,
-          year: row.year,
-          mileage: row.mileage,
-          condition: row.condition,
-          name: row.name,
-          description: row.description,
-          image: row.image,
-          gallery: Array.isArray(row.gallery) ? row.gallery : [row.image].filter(Boolean)
-        }));
-      }
-      renderInventory();
-    }
-
-    async function checkSession() {
-      const { data } = await supabase.auth.getSession();
-      const user = data.session?.user || null;
-      if (user && (!ADMIN_EMAIL || ADMIN_EMAIL.includes('ضع-') || user.email === ADMIN_EMAIL)) {
-        adminUser = user;
-      }
-      updateAdminUI();
-      renderInventory();
-    }
-
-    document.getElementById('searchInput').addEventListener('input', () => {
-      currentPage = 1;
-      renderInventory();
-    });
-
-    document.getElementById('categoryFilter').addEventListener('change', () => {
-      currentPage = 1;
-      renderInventory();
-    });
-
-    document.getElementById('prevPageBtn').addEventListener('click', () => {
-      if (currentPage > 1) {
-        currentPage -= 1;
-        renderInventory();
-      }
-    });
-
-    document.getElementById('nextPageBtn').addEventListener('click', () => {
-      const search = document.getElementById('searchInput').value.toLowerCase().trim();
-      const category = document.getElementById('categoryFilter').value;
-      const filtered = cars.filter((car) => {
-        const matchesSearch = `${car.name} ${car.brand} ${car.model}`.toLowerCase().includes(search);
-        const matchesCategory = category === 'all' || car.category === category;
-        return matchesSearch && matchesCategory;
-      });
-      const totalPages = Math.max(1, Math.ceil(filtered.length / carsPerPage));
-      if (currentPage < totalPages) {
-        currentPage += 1;
-        renderInventory();
-      }
-    });
-
-    document.getElementById('carModal').addEventListener('click', (e) => {
-      if (e.target.id === 'carModal') closeModal();
-    });
-
-    document.addEventListener('click', (e) => {
-      const image = e.target.closest('.car-image');
-      if (image) {
-        const car = findCarById(image.getAttribute('data-car-id'));
-        if (car) openModal(car);
+    async function loadCars() {
+      const box = document.getElementById('inventoryCars');
+      box.innerHTML = '<div class="loading-box">جاري تحميل السيارات...</div>';
+      try {
+        await seedCarsIfEmpty();
+        const { data, error } = await supabase.from('cars').select('*').order('id', { ascending: true });
+        if (error) throw error;
+        if (Array.isArray(data) && data.length) {
+          cars = data.map((row) => ({
+            id: row.id,
+            brand: row.brand || '',
+            model: row.model || '',
+            category: row.category || 'SUV',
+            price: row.price || '',
+            year: row.year || '',
+            mileage: row.mileage || '',
+            condition: row.condition || '',
+            name: row.name || `${row.brand || ''} ${row.model || ''}`.trim(),
+            description: row.description || '',
+            image: row.image || '',
+            gallery: Array.isArray(row.gallery) ? row.gallery : [row.image].filter(Boolean)
+          }));
+        }
+      } catch (error) {
+        box.innerHTML = `<div class="empty-box">تعذر تحميل السيارات حالياً.<br>${error.message || ''}</div>`;
         return;
       }
-
-      const editButton = e.target.closest('[data-edit-id]');
-      if (editButton) {
-        openAdminPanel();
-        document.getElementById('adminCarSelect').value = editButton.getAttribute('data-edit-id');
-        loadSelectedCarToForm();
-      }
-    });
-
-    document.getElementById('adminOpenBtn').addEventListener('click', openAdminPanel);
-    document.getElementById('adminCloseBtn').addEventListener('click', closeAdminPanel);
-    document.getElementById('adminLoginBtn').addEventListener('click', loginAdmin);
-    document.getElementById('adminLogoutBtn').addEventListener('click', logoutAdmin);
-    document.getElementById('adminSaveBtn').addEventListener('click', saveCarChanges);
-    document.getElementById('adminCarSelect').addEventListener('change', loadSelectedCarToForm);
-    document.getElementById('adminPanel').addEventListener('click', (e) => {
-      if (e.target.id === 'adminPanel') closeAdminPanel();
-    });
+      renderInventory();
+    }
 
     function updateBusinessStatus() {
       const now = new Date();
@@ -1426,41 +904,44 @@
         message = 'مغلق الآن • اليوم الأحد • يفتح الاثنين عند 10:00';
       }
 
-      if (dot) {
-        dot.style.background = color;
-        dot.style.boxShadow = `0 0 10px ${color}`;
-      }
-      if (text) text.textContent = message;
-      if (contact) {
-        contact.textContent = message;
-        contact.style.color = color;
-      }
+      dot.style.background = color;
+      dot.style.boxShadow = `0 0 10px ${color}`;
+      text.textContent = message;
+      contact.textContent = message;
+      contact.style.color = color;
     }
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) entry.target.classList.add('visible');
-      });
-    }, { threshold: 0.12 });
-    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-
-    renderInventory();
-    updateAdminUI();
-    updateBusinessStatus();
-    setInterval(updateBusinessStatus, 60000);
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      const user = session?.user || null;
-      adminUser = user && (!ADMIN_EMAIL || ADMIN_EMAIL.includes('ضع-') || user.email === ADMIN_EMAIL) ? user : null;
-      updateAdminUI();
+    document.getElementById('searchInput').addEventListener('input', () => {
+      currentPage = 1;
       renderInventory();
     });
+    document.getElementById('categoryFilter').addEventListener('change', () => {
+      currentPage = 1;
+      renderInventory();
+    });
+    document.getElementById('prevPageBtn').addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage -= 1;
+        renderInventory();
+      }
+    });
+    document.getElementById('nextPageBtn').addEventListener('click', () => {
+      currentPage += 1;
+      renderInventory();
+    });
+    document.getElementById('carModal').addEventListener('click', (e) => {
+      if (e.target.id === 'carModal') closeModal();
+    });
+    document.addEventListener('click', (e) => {
+      const image = e.target.closest('.car-image');
+      if (!image) return;
+      const car = findCarById(image.getAttribute('data-car-id'));
+      if (car) openModal(car);
+    });
 
-    (async function init() {
-      await checkSession();
-      await seedCarsIfTableEmpty();
-      await loadCarsFromSupabase();
-    })();
+    updateBusinessStatus();
+    setInterval(updateBusinessStatus, 60000);
+    loadCars();
   </script>
 </body>
 </html>
