@@ -38,11 +38,13 @@
 
       <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
         <h2 class="text-2xl font-black mb-4">تعديل السيارة</h2>
+
         <div class="grid md:grid-cols-2 gap-4">
           <div>
             <label class="block mb-2 text-sm text-white/80">الاسم الكامل</label>
             <input id="name" type="text" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="Mercedes S-Class">
           </div>
+
           <div>
             <label class="block mb-2 text-sm text-white/80">الفئة</label>
             <select id="category" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10">
@@ -51,29 +53,43 @@
               <option value="Sport">Sport</option>
             </select>
           </div>
+
           <div>
             <label class="block mb-2 text-sm text-white/80">السعر</label>
             <input id="price" type="text" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="€128,000">
           </div>
+
           <div>
             <label class="block mb-2 text-sm text-white/80">سنة الصنع</label>
             <input id="year" type="number" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="2024">
           </div>
+
           <div>
             <label class="block mb-2 text-sm text-white/80">عدد الكيلومترات</label>
             <input id="mileage" type="text" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="8,000 km">
           </div>
+
           <div>
             <label class="block mb-2 text-sm text-white/80">الحالة</label>
             <input id="condition" type="text" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="ممتازة">
           </div>
+
           <div class="md:col-span-2">
             <label class="block mb-2 text-sm text-white/80">الوصف</label>
             <textarea id="description" rows="6" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="اكتب وصف السيارة هنا..."></textarea>
           </div>
+
           <div class="md:col-span-2">
             <label class="block mb-2 text-sm text-white/80">الصورة الرئيسية</label>
             <input id="imageFile" type="file" accept="image/*" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10">
+          </div>
+
+          <div class="md:col-span-2">
+            <label class="flex items-center gap-3 rounded-2xl p-4 bg-slate-900 border border-white/10 cursor-pointer">
+              <input id="isHidden" type="checkbox" class="h-5 w-5">
+              <span class="text-white/90 font-bold">إخفاء السيارة مؤقتًا من الموقع</span>
+            </label>
+            <p class="text-xs text-white/50 mt-2">عند التفعيل تختفي السيارة من الموقع فقط، ويمكن إرجاعها لاحقًا بإزالة العلامة ثم الحفظ.</p>
           </div>
         </div>
 
@@ -94,6 +110,7 @@
     );
 
     const STORAGE_BUCKET = 'site-images';
+
     const fallbackImage = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
         <defs>
@@ -150,7 +167,8 @@
       name: `${item[0]} ${item[1]}`,
       description: 'سيارة معروضة بحالة ممتازة مع مواصفات واضحة. يمكنك تعديل الصور والأسعار والمعلومات لاحقاً بسهولة.',
       image: fallbackImage,
-      gallery: [fallbackImage]
+      gallery: [fallbackImage],
+      is_hidden: false
     }));
 
     const msg = document.getElementById('msg');
@@ -164,6 +182,7 @@
     const conditionInput = document.getElementById('condition');
     const descriptionInput = document.getElementById('description');
     const imageInput = document.getElementById('imageFile');
+    const isHiddenInput = document.getElementById('isHidden');
     const saveBtn = document.getElementById('saveBtn');
     const reloadBtn = document.getElementById('reloadBtn');
 
@@ -190,7 +209,10 @@
     }
 
     function renderSelect() {
-      carSelect.innerHTML = cars.map(car => `<option value="${car.id}">سيارة ${car.id} - ${car.name}</option>`).join('');
+      carSelect.innerHTML = cars.map(car => {
+        const hiddenLabel = car.is_hidden ? ' (مخفية)' : '';
+        return `<option value="${car.id}">سيارة ${car.id} - ${car.name}${hiddenLabel}</option>`;
+      }).join('');
       if (cars.length) fillForm(cars[0].id);
     }
 
@@ -201,6 +223,7 @@
     function fillForm(id) {
       const car = findCar(id);
       if (!car) return;
+
       nameInput.value = car.name || '';
       categoryInput.value = car.category || 'SUV';
       priceInput.value = car.price || '';
@@ -208,6 +231,8 @@
       mileageInput.value = car.mileage || '';
       conditionInput.value = car.condition || '';
       descriptionInput.value = car.description || '';
+      isHiddenInput.checked = !!car.is_hidden;
+
       preview.src = car.image || fallbackImage;
       preview.onerror = () => preview.src = fallbackImage;
     }
@@ -219,11 +244,14 @@
         showMessage(error.message, false);
         return;
       }
+
       cars = (data || []).map(row => ({
         ...row,
         image: row.image || fallbackImage,
-        gallery: Array.isArray(row.gallery) && row.gallery.length ? row.gallery : [row.image || fallbackImage]
+        gallery: Array.isArray(row.gallery) && row.gallery.length ? row.gallery : [row.image || fallbackImage],
+        is_hidden: !!row.is_hidden
       }));
+
       renderSelect();
       showMessage('تم تحميل السيارات بنجاح');
     }
@@ -231,10 +259,17 @@
     async function uploadImageIfNeeded(carId) {
       const file = imageInput.files?.[0];
       if (!file) return null;
-      const ext = file.name.split('.').pop();
+
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
       const path = `cars/car-${carId}-${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file, { upsert: true, contentType: file.type });
+
+      const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file, {
+        upsert: true,
+        contentType: file.type || 'image/jpeg'
+      });
+
       if (error) throw error;
+
       const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
       return data.publicUrl;
     }
@@ -251,11 +286,11 @@
       try {
         const uploadedImage = await uploadImageIfNeeded(id);
         const fullName = nameInput.value.trim();
-        const parts = fullName.split(' ');
+        const parts = fullName.split(/\s+/).filter(Boolean);
 
         const updated = {
           id,
-          name: fullName,
+          name: fullName || car.name,
           brand: parts[0] || car.brand,
           model: parts.slice(1).join(' ') || car.model,
           category: categoryInput.value,
@@ -265,13 +300,16 @@
           condition: conditionInput.value.trim(),
           description: descriptionInput.value.trim(),
           image: uploadedImage || car.image,
-          gallery: uploadedImage ? [uploadedImage] : (Array.isArray(car.gallery) && car.gallery.length ? car.gallery : [car.image || fallbackImage])
+          gallery: uploadedImage
+            ? [uploadedImage]
+            : (Array.isArray(car.gallery) && car.gallery.length ? car.gallery : [car.image || fallbackImage]),
+          is_hidden: isHiddenInput.checked
         };
 
         const { error } = await supabase.from('cars').upsert(updated, { onConflict: 'id' });
         if (error) throw error;
 
-        showMessage('تم حفظ التعديلات بنجاح');
+        showMessage(isHiddenInput.checked ? 'تم حفظ التعديلات وإخفاء السيارة مؤقتًا' : 'تم حفظ التعديلات بنجاح');
         await loadCars();
         carSelect.value = String(id);
         fillForm(id);
@@ -292,6 +330,7 @@
     carSelect.addEventListener('change', (e) => fillForm(e.target.value));
     reloadBtn.addEventListener('click', loadCars);
     saveBtn.addEventListener('click', saveCar);
+
     imageInput.addEventListener('change', () => {
       const file = imageInput.files?.[0];
       if (!file) return;
