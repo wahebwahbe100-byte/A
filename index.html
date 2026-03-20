@@ -8,6 +8,12 @@
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body {
+      scroll-behavior: smooth;
+    }
+    section {
+      scroll-margin-top: 110px;
+    }
+    body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: linear-gradient(135deg, #020617 0%, #04122a 55%, #052033 100%);
@@ -32,9 +38,31 @@
       padding: 28px;
       box-shadow: 0 24px 80px rgba(0,0,0,.28);
       backdrop-filter: blur(12px);
+      animation: fadeUp .9s ease both;
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .8s ease, transform .8s ease;
+      will-change: opacity, transform;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .top-nav {
+      transition: transform .3s ease, background .3s ease, box-shadow .3s ease;
       position: sticky;
       top: 16px;
       z-index: 50;
@@ -54,27 +82,38 @@
     .brand-pill {
       display: flex;
       align-items: center;
-      gap: 14px;
-      padding: 10px 18px;
+      gap: 16px;
+      padding: 12px 22px;
       border-radius: 999px;
-      background: linear-gradient(135deg, rgba(59,130,246,.18), rgba(34,197,94,.14));
-      border: 1px solid rgba(255,255,255,.09);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 12px 28px rgba(0,0,0,.18);
-      backdrop-filter: blur(10px);
+      background: linear-gradient(135deg, rgba(59,130,246,.2), rgba(34,197,94,.16));
+      border: 1px solid rgba(255,255,255,.1);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 14px 30px rgba(0,0,0,.22);
+      backdrop-filter: blur(12px);
       font-weight: 800;
-      font-size: 15px;
+      font-size: 16px;
       color: #fff;
       white-space: nowrap;
+      min-height: 82px;
     }
     .logo {
-      width: 60px;
-      height: 60px;
+      width: 64px;
+      height: 64px;
       object-fit: contain;
-      border-radius: 14px;
-      background: rgba(0,0,0,.4);
+      border-radius: 16px;
+      background: radial-gradient(circle at center, rgba(255,255,255,.1), rgba(255,255,255,.02));
       padding: 6px;
-      box-shadow: 0 8px 25px rgba(0,0,0,.6), 0 0 20px rgba(59,130,246,.4);
-      border: 1px solid rgba(255,255,255,.15);
+      box-shadow: 0 10px 28px rgba(0,0,0,.45), 0 0 24px rgba(59,130,246,.18);
+      border: 1px solid rgba(255,255,255,.1);
+    }
+    .whatsapp-mini-logo {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      border-radius: 12px;
+      background: radial-gradient(circle at center, rgba(255,255,255,.1), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.08);
+      padding: 4px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.35);
     }
     .nav-links {
       display: flex;
@@ -501,7 +540,10 @@
         <div class="top-nav">
           <div class="brand-pill">
             <img src="images/logo.png" class="logo" alt="logo" onerror="this.src=placeholderLogo" />
-            Emotion Cars & Service UG
+            <div>
+              <div style="font-size:18px;font-weight:800;line-height:1.1;">Emotion Cars</div>
+              <div style="font-size:13px;color:#dbeafe;opacity:.9;margin-top:4px;">Premium Auto Service UG</div>
+            </div>
           </div>
 
           <div class="nav-links">
@@ -520,6 +562,13 @@
         </div>
 
         <h1>Emotion Cars</h1>
+        <div style="display:inline-flex;align-items:center;gap:12px;margin-bottom:16px;padding:10px 14px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);">
+          <img src="images/logo.png" alt="Emotion Cars logo" style="width:72px;height:72px;object-fit:contain;border-radius:14px;background:rgba(255,255,255,.03);padding:6px;" onerror="this.src=placeholderLogo" />
+          <div style="text-align:right;">
+            <div style="font-weight:800;font-size:18px;">Emotion Cars</div>
+            <div style="color:#cbd5e1;font-size:13px;margin-top:4px;">هوية بصرية أوضح ولمسة أفخم للموقع</div>
+          </div>
+        </div>
         <p class="hero-text">
           موقع فاخر لعرض السيارات بصورة حديثة ومرتبة، مع تصميم أنيق يبرز الهوية التجارية ويسهّل على العميل تصفح السيارات والتواصل المباشر بسرعة.
         </p>
@@ -528,7 +577,7 @@
     </div>
   </section>
 
-  <section id="cars" class="section inventory-wrap">
+  <section id="cars" class="section inventory-wrap reveal">
     <div class="container">
       <div class="section-head">
         <div>
@@ -557,7 +606,7 @@
     </div>
   </section>
 
-  <section id="about" class="section container">
+  <section id="about" class="section container reveal">
     <div class="section-head">
       <div>
         <h2 class="section-title">من نحن</h2>
@@ -599,7 +648,7 @@
     </div>
   </section>
 
-  <section id="terms" class="section container">
+  <section id="terms" class="section container reveal">
     <div class="section-head">
       <div>
         <h2 class="section-title">الشروط والأحكام</h2>
@@ -618,7 +667,7 @@
     </div>
   </section>
 
-  <section class="section container">
+  <section class="section container reveal">
     <div class="section-head">
       <div>
         <h2 class="section-title">موقعنا على الخريطة</h2>
@@ -885,6 +934,32 @@
     });
 
     renderInventory();
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+
+    let lastScrollY = window.scrollY;
+    const nav = document.querySelector('.top-nav');
+    window.addEventListener('scroll', () => {
+      const currentY = window.scrollY;
+      if (currentY > 120 && currentY > lastScrollY) {
+        nav.style.transform = 'translateY(-6px)';
+        nav.style.background = 'linear-gradient(90deg, rgba(4,12,28,.96), rgba(8,21,45,.92))';
+        nav.style.boxShadow = '0 22px 60px rgba(0,0,0,.35)';
+      } else {
+        nav.style.transform = 'translateY(0)';
+        nav.style.background = 'linear-gradient(90deg, rgba(4,12,28,.9), rgba(8,21,45,.82))';
+        nav.style.boxShadow = '0 18px 50px rgba(0,0,0,.28)';
+      }
+      lastScrollY = currentY;
+    });
   </script>
 </body>
 </html>
