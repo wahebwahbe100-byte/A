@@ -852,24 +852,139 @@
       const now = new Date();
       const day = now.getDay(); // 0=Sunday
       const hour = now.getHours();
+      const minute = now.getMinutes();
+      const currentMinutes = hour * 60 + minute;
 
-      let isOpen = false;
-      let hoursText = 'الاثنين - الجمعة: 10:00 - 18:00 | السبت: مغلق | الأحد: مغلق';
+      const weekdayNames = {
+        0: 'الأحد',
+        1: 'الاثنين',
+        2: 'الثلاثاء',
+        3: 'الأربعاء',
+        4: 'الخميس',
+        5: 'الجمعة',
+        6: 'السبت'
+      };
 
-      if (day >= 1 && day <= 5) {
-        isOpen = hour >= 10 && hour < 18;
-      }
+      const openMinutes = 10 * 60;
+      const closeMinutes = 18 * 60;
 
       const dot = document.getElementById('statusDot');
       const text = document.getElementById('statusText');
 
-      if (isOpen) {
-        dot.style.background = '#22c55e';
-        text.textContent = 'مفتوح الآن | ' + hoursText;
+      const todayName = weekdayNames[day];
+      const formatTime = (mins) => {
+        const h = Math.floor(mins / 60);
+        const m = mins % 60;
+        return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+      };
+
+      let message = '';
+      let color = '#ef4444';
+
+      if (day >= 1 && day <= 5) {
+        if (currentMinutes >= openMinutes && currentMinutes < closeMinutes) {
+          color = '#22c55e';
+          const remaining = closeMinutes - currentMinutes;
+          const hoursLeft = Math.floor(remaining / 60);
+          const minsLeft = remaining % 60;
+          if (hoursLeft > 0) {
+            message = `مفتوح الآن • اليوم ${todayName} • يغلق عند 18:00 • متبقي ${hoursLeft} س و ${minsLeft} د`;
+          } else {
+            message = `مفتوح الآن • اليوم ${todayName} • يغلق عند 18:00 • متبقي ${minsLeft} دقيقة`;
+          }
+        } else if (currentMinutes < openMinutes) {
+          const remaining = openMinutes - currentMinutes;
+          const hoursLeft = Math.floor(remaining / 60);
+          const minsLeft = remaining % 60;
+          message = `مغلق الآن • اليوم ${todayName} • يفتح عند 10:00 • بعد ${hoursLeft} س و ${minsLeft} د`;
+        } else {
+          let nextDay = day + 1;
+          while (nextDay === 6 || nextDay === 0) nextDay += 1;
+          if (nextDay > 6) nextDay = 1;
+          message = `مغلق الآن • اليوم ${todayName} • يفتح ${weekdayNames[nextDay]} عند 10:00`;
+        }
+      } else if (day === 6) {
+        message = 'مغلق الآن • اليوم السبت • يفتح الاثنين عند 10:00';
       } else {
-        dot.style.background = '#ef4444';
-        text.textContent = 'مغلق الآن | ' + hoursText;
+        message = 'مغلق الآن • اليوم الأحد • يفتح الاثنين عند 10:00';
+      }
+
+      if (dot) dot.style.background = color;
+      if (text) text.textContent = message;
+
+      const liveStatus = document.getElementById('liveBusinessStatus');
+      const contact = document.getElementById('contactBusinessStatus');
+      if (liveStatus) liveStatus.style.color = color;
+      if (contact) {
+        contact.textContent = message;
+        contact.style.color = color;
       }
     }
 
     updateBusinessStatus();
+    updateBusinessStatus();
+    setInterval(updateBusinessStatus, 60000);
+    });
+
+    document.getElementById('categoryFilter').addEventListener('change', function () {
+      currentPage = 1;
+      renderInventory();
+    });
+
+    document.getElementById('prevPageBtn').addEventListener('click', function () {
+      if (currentPage > 1) {
+        currentPage -= 1;
+        renderInventory();
+      }
+    });
+
+    document.getElementById('nextPageBtn').addEventListener('click', function () {
+      const totalPages = Math.ceil(cars.length / carsPerPage);
+      if (currentPage < totalPages) {
+        currentPage += 1;
+        renderInventory();
+      }
+    });
+
+    document.getElementById('carModal').addEventListener('click', function (e) {
+      if (e.target.id === 'carModal') closeModal();
+    });
+
+    document.addEventListener('click', function (e) {
+      const image = e.target.closest('.car-image');
+      if (!image) return;
+      const carId = image.getAttribute('data-car-id');
+      const car = findCarById(carId);
+      if (car) openModal(car);
+    });
+
+    renderInventory();
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+
+    let lastScrollY = window.scrollY;
+    const nav = document.querySelector('.top-nav');
+    window.addEventListener('scroll', () => {
+      const currentY = window.scrollY;
+      if (currentY > 120 && currentY > lastScrollY) {
+        nav.style.transform = 'translateY(-6px)';
+        nav.style.background = 'linear-gradient(90deg, rgba(4,12,28,.96), rgba(8,21,45,.92))';
+        nav.style.boxShadow = '0 22px 60px rgba(0,0,0,.35)';
+      } else {
+        nav.style.transform = 'translateY(0)';
+        nav.style.background = 'linear-gradient(90deg, rgba(4,12,28,.9), rgba(8,21,45,.82))';
+        nav.style.boxShadow = '0 18px 50px rgba(0,0,0,.28)';
+      }
+      lastScrollY = currentY;
+    });
+  </script>
+</body>
+</html>
