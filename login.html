@@ -1,46 +1,348 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<title>تسجيل الدخول</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-body{background:#000;color:#fff;font-family:Arial;text-align:center;padding:50px}
-input{display:block;margin:10px auto;padding:10px;width:250px}
-button{padding:10px 20px;background:green;color:#fff;border:none}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تسجيل الدخول</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Tajawal', Arial, sans-serif;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(59,130,246,.20), transparent 30%),
+        radial-gradient(circle at 80% 0%, rgba(255,255,255,.07), transparent 25%),
+        linear-gradient(135deg, #020617 0%, #0b1f3a 50%, #000000 100%);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .shell {
+      width: min(1100px, 100%);
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+    .panel, .login-card {
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 30px;
+      box-shadow: 0 24px 70px rgba(0,0,0,.45);
+      backdrop-filter: blur(12px);
+    }
+    .panel {
+      padding: 34px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .logo {
+      width: 110px;
+      height: 74px;
+      object-fit: cover;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      padding: 6px;
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.08);
+      color: #fff;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,.12);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(32px, 4vw, 48px);
+      line-height: 1.1;
+      font-weight: 900;
+      background: linear-gradient(90deg, #fff, #93c5fd, #22c55e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .lead {
+      color: #cbd5e1;
+      line-height: 1.9;
+      margin-top: 14px;
+      font-size: 16px;
+    }
+    .feature-list {
+      display: grid;
+      gap: 14px;
+      margin-top: 26px;
+    }
+    .feature {
+      padding: 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.03);
+      color: #e5e7eb;
+    }
+    .feature strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 17px;
+    }
+    .login-card {
+      padding: 34px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .card-head h2 {
+      margin: 0;
+      font-size: 34px;
+      font-weight: 900;
+    }
+    .card-head p {
+      margin: 10px 0 0;
+      color: #cbd5e1;
+      line-height: 1.8;
+    }
+    form {
+      margin-top: 24px;
+      display: grid;
+      gap: 16px;
+    }
+    label {
+      display: grid;
+      gap: 8px;
+      color: #dbeafe;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    input {
+      width: 100%;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: #020617;
+      color: #fff;
+      padding: 15px 16px;
+      font-size: 16px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+    }
+    input:focus {
+      border-color: rgba(59,130,246,.7);
+      box-shadow: 0 0 0 4px rgba(59,130,246,.12);
+      transform: translateY(-1px);
+    }
+    .submit-btn {
+      margin-top: 6px;
+      border: none;
+      border-radius: 18px;
+      background: #22c55e;
+      color: #04111f;
+      padding: 16px;
+      font-size: 18px;
+      font-weight: 900;
+      font-family: inherit;
+      cursor: pointer;
+      transition: transform .2s ease, opacity .2s ease, box-shadow .2s ease;
+      box-shadow: 0 14px 36px rgba(34,197,94,.25);
+    }
+    .submit-btn:hover { transform: translateY(-1px); }
+    .submit-btn:disabled {
+      opacity: .7;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .message {
+      margin-top: 16px;
+      min-height: 58px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: #cbd5e1;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      font-size: 14px;
+    }
+    .footer-note {
+      margin-top: 14px;
+      color: #94a3b8;
+      font-size: 13px;
+      text-align: center;
+    }
+    @media (max-width: 900px) {
+      .shell { grid-template-columns: 1fr; }
+      .panel, .login-card { padding: 24px; }
+      .topbar { flex-direction: column; align-items: flex-start; }
+      .logo { width: 96px; height: 68px; }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="shell">
+    <section class="panel">
+      <div>
+        <div class="topbar">
+          <div class="brand">
+            <img src="images/logo.png" alt="logo" class="logo" onerror="this.style.display='none'">
+            <div>
+              <div style="font-size:22px;font-weight:900;">Emotion Car & Service UG</div>
+              <div style="color:#93c5fd;font-size:14px;margin-top:4px;">بوابة الإدارة الاحترافية</div>
+            </div>
+          </div>
+          <a href="index.html" class="back-link">الرجوع للموقع</a>
+        </div>
 
-<h2>تسجيل الدخول</h2>
+        <h1>مرحباً بك في صفحة الإدارة</h1>
+        <p class="lead">سجّل الدخول للوصول إلى لوحة التحكم وتعديل السيارات والصور والأسعار والتفاصيل الموجودة في الموقع بشكل مباشر.</p>
 
-<input id="email" placeholder="البريد">
-<input id="password" type="password" placeholder="كلمة المرور">
+        <div class="feature-list">
+          <div class="feature">
+            <strong>تعديل بيانات السيارات</strong>
+            يمكنك تحديث الاسم والسعر والحالة والكيلومترات والوصف بسهولة.
+          </div>
+          <div class="feature">
+            <strong>تغيير الصور مباشرة</strong>
+            ارفع صورة جديدة وسيتم حفظها في النظام وربطها بالسيارة المختارة.
+          </div>
+          <div class="feature">
+            <strong>وصول آمن وسريع</strong>
+            بعد نجاح تسجيل الدخول سيتم تحويلك تلقائياً إلى لوحة التحكم.
+          </div>
+        </div>
+      </div>
+    </section>
 
-<button onclick="login()">دخول</button>
+    <section class="login-card">
+      <div class="card-head">
+        <h2>تسجيل الدخول</h2>
+        <p>أدخل البريد الإلكتروني وكلمة المرور الخاصة بك للمتابعة إلى لوحة التحكم.</p>
+      </div>
 
-<p id="msg"></p>
+      <form id="loginForm">
+        <label>
+          البريد الإلكتروني
+          <input id="email" name="email" type="email" autocomplete="username" placeholder="البريد الإلكتروني">
+        </label>
 
-<script>
-const supabase = window.supabase.createClient(
-'https://beyxyvibqzhtyawqrhbv.supabase.co',
-'sb_publishable_iMt3G9iAvXawW3QN6vGWjw_BOw8qLFK'
-);
+        <label>
+          كلمة المرور
+          <input id="password" name="password" type="password" autocomplete="current-password" placeholder="كلمة المرور">
+        </label>
 
-async function login(){
-const email = document.getElementById('email').value;
-const password = document.getElementById('password').value;
+        <button id="loginBtn" type="submit" class="submit-btn">تسجيل الدخول</button>
+      </form>
 
-const {error} = await supabase.auth.signInWithPassword({email,password});
+      <div id="msg" class="message">الصفحة جاهزة. أدخل بيانات الدخول.</div>
+      <div class="footer-note">سيتم تحويلك تلقائياً بعد نجاح تسجيل الدخول.</div>
+    </section>
+  </div>
 
-if(error){
-document.getElementById('msg').innerText = error.message;
-}else{
-window.location = 'dashboard.html';
-}
-}
-</script>
+  <script>
+    const SUPABASE_URL = 'https://mbesnbkludynomgdzfhw.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_EfwicNkVNrNBXKBgoiMXjA_VqTcfnTm';
 
+    const msg = document.getElementById('msg');
+    const form = document.getElementById('loginForm');
+    const btn = document.getElementById('loginBtn');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+
+    function showMessage(text, type = 'neutral') {
+      msg.textContent = text;
+      if (type === 'success') {
+        msg.style.color = '#bbf7d0';
+        msg.style.borderColor = 'rgba(34,197,94,.28)';
+        msg.style.background = 'rgba(34,197,94,.12)';
+      } else if (type === 'error') {
+        msg.style.color = '#fecaca';
+        msg.style.borderColor = 'rgba(239,68,68,.28)';
+        msg.style.background = 'rgba(239,68,68,.12)';
+      } else {
+        msg.style.color = '#cbd5e1';
+        msg.style.borderColor = 'rgba(255,255,255,.10)';
+        msg.style.background = 'rgba(255,255,255,.04)';
+      }
+    }
+
+    let supabase;
+    try {
+      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      showMessage('الصفحة جاهزة. أدخل بيانات الدخول.', 'neutral');
+    } catch (e) {
+      showMessage('تعذر تهيئة الاتصال: ' + (e.message || 'خطأ غير معروف'), 'error');
+    }
+
+    async function loginHandler(event) {
+      event.preventDefault();
+
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!email || !password) {
+        showMessage('يرجى إدخال البريد الإلكتروني وكلمة المرور.', 'error');
+        return;
+      }
+
+      if (!supabase) {
+        showMessage('الاتصال غير جاهز حالياً.', 'error');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'جاري الدخول...';
+      showMessage('يتم الآن التحقق من بيانات الدخول...', 'neutral');
+
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+        if (error) {
+          showMessage(error.message || 'تعذر تسجيل الدخول.', 'error');
+          btn.disabled = false;
+          btn.textContent = 'تسجيل الدخول';
+          return;
+        }
+
+        if (!data || !data.user) {
+          showMessage('لم يتم إنشاء جلسة دخول.', 'error');
+          btn.disabled = false;
+          btn.textContent = 'تسجيل الدخول';
+          return;
+        }
+
+        showMessage('تم تسجيل الدخول بنجاح، سيتم تحويلك الآن.', 'success');
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 900);
+      } catch (err) {
+        showMessage('حدث خطأ غير متوقع: ' + (err.message || 'Unknown error'), 'error');
+        btn.disabled = false;
+        btn.textContent = 'تسجيل الدخول';
+      }
+    }
+
+    form.addEventListener('submit', loginHandler);
+  </script>
 </body>
 </html>
