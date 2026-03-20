@@ -197,6 +197,10 @@
       transform: translateY(-6px) scale(1.01);
       box-shadow: 0 24px 70px rgba(0,0,0,.75);
     }
+    .car-image-wrap {
+      position: relative;
+      overflow: hidden;
+    }
     .car-image {
       width: 100%;
       height: 220px;
@@ -206,6 +210,37 @@
       transition: transform .3s ease;
     }
     .car-card:hover .car-image { transform: scale(1.04); }
+    .car-badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.78);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.16);
+      padding: 9px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: 0 10px 26px rgba(0,0,0,.38);
+      backdrop-filter: blur(10px);
+      letter-spacing: .2px;
+    }
+    .car-badge::before {
+      content: "#";
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #22c55e, #3b82f6);
+      color: #fff;
+      font-size: 12px;
+      box-shadow: 0 0 14px rgba(59,130,246,.35);
+    }
     .car-content { padding: 18px; }
     .car-top {
       display: flex;
@@ -449,6 +484,12 @@
       .thumbs { grid-template-columns: repeat(2, 1fr); }
       .details-grid { grid-template-columns: 1fr; }
       h1 { font-size: 42px; }
+      .car-badge {
+        top: 10px;
+        left: 10px;
+        padding: 8px 12px;
+        font-size: 12px;
+      }
     }
   </style>
 </head>
@@ -716,7 +757,10 @@
     function createCarCard(car) {
       return `
         <div class="car-card">
-          <img class="car-image" src="${carImage(car.image)}" alt="${car.name}" data-car-id="${car.id}" onerror="this.onerror=null;this.src=placeholderCar" />
+          <div class="car-image-wrap">
+            <img class="car-image" src="${carImage(car.image)}" alt="${car.name}" data-car-id="${car.id}" onerror="this.onerror=null;this.src=placeholderCar" />
+            <div class="car-badge">سيارة ${car.id}</div>
+          </div>
           <div class="car-content">
             <div class="car-top">
               <div class="price">${car.price}</div>
