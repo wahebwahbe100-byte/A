@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>تسجيل الدخول</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
   <style>
     * { box-sizing: border-box; }
     body {
@@ -240,7 +240,7 @@
         <p>أدخل البريد الإلكتروني وكلمة المرور الخاصة بك للمتابعة إلى لوحة التحكم.</p>
       </div>
 
-      <form id="loginForm">
+      <div id="loginForm">
         <label>
           البريد الإلكتروني
           <input id="email" name="email" type="email" autocomplete="username" placeholder="البريد الإلكتروني">
@@ -251,8 +251,8 @@
           <input id="password" name="password" type="password" autocomplete="current-password" placeholder="كلمة المرور">
         </label>
 
-        <button id="loginBtn" type="submit" class="submit-btn" onclick="window.__loginHandler && window.__loginHandler(event)">تسجيل الدخول</button>
-      </form>
+        <button id="loginBtn" type="button" class="submit-btn" onclick="loginHandler()">تسجيل الدخول</button>
+      </div>
 
       <div id="msg" class="message">الصفحة جاهزة. أدخل بيانات الدخول.</div>
       <div class="footer-note">سيتم تحويلك تلقائياً بعد نجاح تسجيل الدخول.</div>
@@ -264,10 +264,10 @@
     const SUPABASE_ANON_KEY = 'sb_publishable_EfwicNkVNrNBXKBgoiMXjA_VqTcfnTm';
 
     const msg = document.getElementById('msg');
-    const form = document.getElementById('loginForm');
     const btn = document.getElementById('loginBtn');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
+    let supabase = null;
 
     function showMessage(text, type = 'neutral') {
       msg.textContent = text;
@@ -286,17 +286,17 @@
       }
     }
 
-    let supabase;
-    try {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      showMessage('الصفحة جاهزة. أدخل بيانات الدخول.', 'neutral');
-    } catch (e) {
-      showMessage('تعذر تهيئة الاتصال: ' + (e.message || 'خطأ غير معروف'), 'error');
+    async function initSupabase() {
+      try {
+        const mod = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+        supabase = mod.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        showMessage('الصفحة جاهزة. أدخل بيانات الدخول.', 'neutral');
+      } catch (e) {
+        showMessage('تعذر تهيئة الاتصال: ' + (e.message || 'خطأ غير معروف'), 'error');
+      }
     }
 
-    async function loginHandler(event) {
-      event.preventDefault();
-
+    async function loginHandler() {
       const email = emailInput.value.trim();
       const password = passwordInput.value;
 
@@ -306,7 +306,7 @@
       }
 
       if (!supabase) {
-        showMessage('الاتصال غير جاهز حالياً.', 'error');
+        showMessage('الاتصال غير جاهز حالياً. أعد تحميل الصفحة ثم جرّب مرة أخرى.', 'error');
         return;
       }
 
@@ -342,12 +342,13 @@
       }
     }
 
-    window.__loginHandler = loginHandler;
-    form.addEventListener('submit', loginHandler);
-    btn.addEventListener('click', function(e){
-      if (e.detail !== 0) return;
-      loginHandler(e);
+    window.loginHandler = loginHandler;
+
+    passwordInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') loginHandler();
     });
+
+    initSupabase();
   </script>
 </body>
 </html>
