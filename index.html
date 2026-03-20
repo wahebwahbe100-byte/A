@@ -452,7 +452,7 @@
           <strong>Emotion Car & Service UG</strong>
           <div id="liveBusinessStatus" class="status-row">
             <span id="statusDot" class="status-dot"></span>
-            <span id="statusText">جاري التحميل...</span>
+            <span id="statusText">جاري التحقق من الدوام...</span>
           </div>
         </div>
       </div>
@@ -521,7 +521,7 @@
       <div id="contact" class="contact-card">
         <h3>معلومات التواصل</h3>
         <div class="contact-list">
-          <div class="contact-row"><span>الحالة الآن</span><strong id="contactBusinessStatus">جاري التحقق...</strong></div>
+          <div class="contact-row"><span>الحالة الآن</span><strong id="contactBusinessStatus">جاري التحقق من الدوام...</strong></div>
           <div class="contact-row"><span>اسم النشاط</span><strong>Emotion Car & Service UG</strong></div>
           <div class="contact-row"><span>الهاتف</span><strong>+49 1573 6645354</strong></div>
           <div class="contact-row"><span>البريد</span><strong>emotion.service@icloud.com</strong></div>
@@ -613,12 +613,11 @@
       </svg>
     `);
 
-    const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-    const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
-    const STORAGE_BUCKET = 'YOUR_STORAGE_BUCKET'; // مثال: car-images
+    const SUPABASE_URL = 'https://mbesnbkludynomgdzfhw.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_EfwicNkVNrNBXKBgoiMXjA_VqTcfnTm';
+    const STORAGE_BUCKET = 'images'; // غيّر الاسم إذا كان عندك bucket باسم مختلف
     const WHATSAPP_NUMBER = '4915736645354';
     const carsPerPage = 8;
-    const BUSINESS_TIMEZONE = 'Europe/Berlin';
 
     let currentPage = 1;
     let cars = [];
@@ -650,74 +649,69 @@
       gallery: []
     }));
 
-    function escapeHtml(value) {
-      return String(value ?? '')
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
-    }
-
-    function setImgFallback(img, fallback) {
+    function setImageFallback(img, fallback) {
       img.onerror = null;
       img.src = fallback;
     }
 
-    function buildStorageUrl(path) {
-      if (!path || !supabase || !STORAGE_BUCKET) return '';
-      const cleanPath = String(path).replace(/^\/+/, '');
-      const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(cleanPath);
-      return data?.publicUrl || '';
-    }
-
     function isAbsoluteUrl(value) {
-      return /^https?:\/\//i.test(String(value || ''));
+      return /^https?:\/\//i.test(String(value || '').trim());
     }
 
-    function normalizeImageValue(value) {
-      if (!value) return '';
-      const str = String(value).trim();
-      if (!str) return '';
-      if (isAbsoluteUrl(str)) return str;
-      return buildStorageUrl(str);
+    function getPublicImageUrl(path) {
+      if (!path || !supabase) return '';
+      const cleanPath = String(path).trim().replace(/^\/+/, '');
+      if (!cleanPath) return '';
+      if (isAbsoluteUrl(cleanPath)) return cleanPath;
+
+      try {
+        const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(cleanPath);
+        return data?.publicUrl || '';
+      } catch (error) {
+        console.error('getPublicImageUrl error:', error);
+        return '';
+      }
     }
 
-    function normalizeGallery(value) {
-      if (!value) return [];
-      if (Array.isArray(value)) return value.map(normalizeImageValue).filter(Boolean);
+    function normalizeGallery(galleryValue) {
+      if (!galleryValue) return [];
 
-      if (typeof value === 'string') {
-        const trimmed = value.trim();
+      if (Array.isArray(galleryValue)) {
+        return galleryValue.map(getPublicImageUrl).filter(Boolean);
+      }
+
+      if (typeof galleryValue === 'string') {
+        const text = galleryValue.trim();
 
         try {
-          const parsed = JSON.parse(trimmed);
-          if (Array.isArray(parsed)) return parsed.map(normalizeImageValue).filter(Boolean);
-        } catch (_) {}
+          const parsed = JSON.parse(text);
+          if (Array.isArray(parsed)) {
+            return parsed.map(getPublicImageUrl).filter(Boolean);
+          }
+        } catch (error) {}
 
-        if (trimmed.includes(',')) {
-          return trimmed.split(',').map(v => normalizeImageValue(v.trim())).filter(Boolean);
+        if (text.includes(',')) {
+          return text.split(',').map(item => getPublicImageUrl(item.trim())).filter(Boolean);
         }
 
-        const single = normalizeImageValue(trimmed);
-        return single ? [single] : [];
+        const one = getPublicImageUrl(text);
+        return one ? [one] : [];
       }
 
       return [];
     }
 
-    function normalizeCar(row, index = 0) {
-      const mainImage =
-        normalizeImageValue(row.image) ||
-        normalizeImageValue(row.image_url) ||
-        normalizeImageValue(row.image_path);
+    function normalizeCar(row, index) {
+      const img =
+        getPublicImageUrl(row.image) ||
+        getPublicImageUrl(row.image_url) ||
+        getPublicImageUrl(row.image_path) ||
+        '';
 
       const gallery =
-        normalizeGallery(row.gallery) ||
-        normalizeGallery(row.gallery_urls) ||
+        normalizeGallery(row.gallery).length ? normalizeGallery(row.gallery) :
+        normalizeGallery(row.gallery_urls).length ? normalizeGallery(row.gallery_urls) :
         normalizeGallery(row.gallery_paths);
-
-      const finalGallery = gallery.length ? gallery : (mainImage ? [mainImage] : []);
 
       return {
         id: row.id ?? index + 1,
@@ -730,8 +724,8 @@
         condition: row.condition || '',
         name: row.name || `${row.brand || ''} ${row.model || ''}`.trim(),
         description: row.description || 'لا يوجد وصف حالياً.',
-        image: mainImage || finalGallery[0] || window.placeholderCar,
-        gallery: finalGallery.length ? finalGallery : [window.placeholderCar]
+        image: img || gallery[0] || window.placeholderCar,
+        gallery: gallery.length ? gallery : [img || window.placeholderCar]
       };
     }
 
@@ -748,24 +742,24 @@
       return `
         <div class="car-card">
           <div class="car-image-wrap">
-            <img class="car-image" src="${escapeHtml(car.image || window.placeholderCar)}" alt="${escapeHtml(car.name)}" data-car-id="${escapeHtml(car.id)}" />
-            <div class="car-badge">${escapeHtml(car.id)}</div>
+            <img class="car-image" src="${car.image || window.placeholderCar}" alt="${car.name}" data-car-id="${car.id}">
+            <div class="car-badge">${car.id}</div>
           </div>
           <div class="car-content">
             <div class="car-top">
-              <div class="price">${escapeHtml(car.price || '')}</div>
+              <div class="price">${car.price || ''}</div>
               <div>
-                <h3>${escapeHtml(car.name || '')}</h3>
-                <div class="category">${escapeHtml(car.category || '')}</div>
+                <h3>${car.name || ''}</h3>
+                <div class="category">${car.category || ''}</div>
               </div>
             </div>
             <div class="details-grid">
-              <div class="detail-box"><span>الماركة</span><strong>${escapeHtml(car.brand || '')}</strong></div>
-              <div class="detail-box"><span>الطراز</span><strong>${escapeHtml(car.model || '')}</strong></div>
-              <div class="detail-box"><span>سنة الصنع</span><strong>${escapeHtml(car.year || '')}</strong></div>
-              <div class="detail-box"><span>عدد الكيلومترات</span><strong>${escapeHtml(car.mileage || '')}</strong></div>
-              <div class="detail-box"><span>الحالة</span><strong>${escapeHtml(car.condition || '')}</strong></div>
-              <div class="detail-box"><span>السعر المطلوب</span><strong>${escapeHtml(car.price || '')}</strong></div>
+              <div class="detail-box"><span>الماركة</span><strong>${car.brand || ''}</strong></div>
+              <div class="detail-box"><span>الطراز</span><strong>${car.model || ''}</strong></div>
+              <div class="detail-box"><span>سنة الصنع</span><strong>${car.year || ''}</strong></div>
+              <div class="detail-box"><span>عدد الكيلومترات</span><strong>${car.mileage || ''}</strong></div>
+              <div class="detail-box"><span>الحالة</span><strong>${car.condition || ''}</strong></div>
+              <div class="detail-box"><span>السعر المطلوب</span><strong>${car.price || ''}</strong></div>
             </div>
           </div>
         </div>
@@ -777,8 +771,8 @@
       const category = document.getElementById('categoryFilter')?.value || 'all';
 
       return cars.filter(car => {
-        const haystack = `${car.name || ''} ${car.brand || ''} ${car.model || ''}`.toLowerCase();
-        const matchesSearch = haystack.includes(search);
+        const searchText = `${car.name || ''} ${car.brand || ''} ${car.model || ''}`.toLowerCase();
+        const matchesSearch = searchText.includes(search);
         const matchesCategory = category === 'all' || car.category === category;
         return matchesSearch && matchesCategory;
       });
@@ -790,6 +784,7 @@
 
       const filtered = getFilteredCars();
       const totalPages = Math.max(1, Math.ceil(filtered.length / carsPerPage));
+
       if (currentPage > totalPages) currentPage = totalPages;
 
       const startIndex = (currentPage - 1) * carsPerPage;
@@ -799,8 +794,8 @@
         ? paginatedCars.map(createCarCard).join('')
         : '<div class="empty-box">لا توجد سيارات مطابقة حالياً.</div>';
 
-      document.querySelectorAll('.car-image').forEach(img => {
-        img.addEventListener('error', () => setImgFallback(img, window.placeholderCar), { once: true });
+      document.querySelectorAll('.car-image').forEach((img) => {
+        img.addEventListener('error', () => setImageFallback(img, window.placeholderCar), { once: true });
       });
 
       const pagerInfo = document.getElementById('pagerInfo');
@@ -815,10 +810,11 @@
     function selectModalImage(image) {
       const modalImage = document.getElementById('modalImage');
       if (!modalImage) return;
-      modalImage.src = image || window.placeholderCar;
-      modalImage.onerror = () => setImgFallback(modalImage, window.placeholderCar);
 
-      document.querySelectorAll('#modalThumbs .thumb').forEach(thumb => {
+      modalImage.src = image || window.placeholderCar;
+      modalImage.onerror = () => setImageFallback(modalImage, window.placeholderCar);
+
+      document.querySelectorAll('#modalThumbs .thumb').forEach((thumb) => {
         thumb.classList.toggle('active', thumb.getAttribute('data-image') === image);
       });
     }
@@ -830,12 +826,12 @@
       const gallery = Array.isArray(car.gallery) && car.gallery.length ? car.gallery : [car.image || window.placeholderCar];
 
       thumbs.innerHTML = gallery.map((image, index) => `
-        <img src="${escapeHtml(image)}" class="thumb ${index === 0 ? 'active' : ''}" data-image="${escapeHtml(image)}" alt="${escapeHtml(car.name)}">
+        <img src="${image}" class="thumb ${index === 0 ? 'active' : ''}" data-image="${image}" alt="${car.name}">
       `).join('');
 
-      document.querySelectorAll('#modalThumbs .thumb').forEach(thumb => {
+      document.querySelectorAll('#modalThumbs .thumb').forEach((thumb) => {
         thumb.addEventListener('click', () => selectModalImage(thumb.getAttribute('data-image')));
-        thumb.addEventListener('error', () => setImgFallback(thumb, window.placeholderCar), { once: true });
+        thumb.addEventListener('error', () => setImageFallback(thumb, window.placeholderCar), { once: true });
       });
     }
 
@@ -851,19 +847,19 @@
       if (!modalImage || !modalName || !modalCategory || !modalDescription || !modalWhatsappLink || !modalDetails || !modal) return;
 
       modalImage.src = car.image || window.placeholderCar;
-      modalImage.onerror = () => setImgFallback(modalImage, window.placeholderCar);
+      modalImage.onerror = () => setImageFallback(modalImage, window.placeholderCar);
       modalName.textContent = car.name || '';
       modalCategory.textContent = car.category || '';
       modalDescription.textContent = car.description || '';
       modalWhatsappLink.href = whatsappLink(car);
 
       modalDetails.innerHTML = `
-        <div class="detail-box"><span>الماركة</span><strong>${escapeHtml(car.brand || '')}</strong></div>
-        <div class="detail-box"><span>الطراز</span><strong>${escapeHtml(car.model || '')}</strong></div>
-        <div class="detail-box"><span>سنة الصنع</span><strong>${escapeHtml(car.year || '')}</strong></div>
-        <div class="detail-box"><span>عدد الكيلومترات</span><strong>${escapeHtml(car.mileage || '')}</strong></div>
-        <div class="detail-box"><span>الحالة</span><strong>${escapeHtml(car.condition || '')}</strong></div>
-        <div class="detail-box"><span>السعر المطلوب</span><strong>${escapeHtml(car.price || '')}</strong></div>
+        <div class="detail-box"><span>الماركة</span><strong>${car.brand || ''}</strong></div>
+        <div class="detail-box"><span>الطراز</span><strong>${car.model || ''}</strong></div>
+        <div class="detail-box"><span>سنة الصنع</span><strong>${car.year || ''}</strong></div>
+        <div class="detail-box"><span>عدد الكيلومترات</span><strong>${car.mileage || ''}</strong></div>
+        <div class="detail-box"><span>الحالة</span><strong>${car.condition || ''}</strong></div>
+        <div class="detail-box"><span>السعر المطلوب</span><strong>${car.price || ''}</strong></div>
       `;
 
       renderThumbs(car);
@@ -877,42 +873,33 @@
       document.body.classList.remove('modal-open');
     }
 
-    function getBerlinNowParts() {
-      const formatter = new Intl.DateTimeFormat('en-GB', {
-        timeZone: BUSINESS_TIMEZONE,
-        weekday: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      });
-
-      const parts = formatter.formatToParts(new Date());
-      const map = {};
-      for (const part of parts) {
-        map[part.type] = part.value;
-      }
-
-      const weekdays = {
-        Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6
-      };
-
-      return {
-        day: weekdays[map.weekday] ?? 0,
-        hour: Number(map.hour ?? 0),
-        minute: Number(map.minute ?? 0)
-      };
-    }
-
     function updateBusinessStatus() {
-      try {
-        const dot = document.getElementById('statusDot');
-        const text = document.getElementById('statusText');
-        const contact = document.getElementById('contactBusinessStatus');
-        if (!dot || !text || !contact) return;
+      const dot = document.getElementById('statusDot');
+      const text = document.getElementById('statusText');
+      const contact = document.getElementById('contactBusinessStatus');
 
-        const { day, hour, minute } = getBerlinNowParts();
+      if (!dot || !text || !contact) return;
+
+      try {
+        const now = new Date();
+        const berlinString = now.toLocaleString('en-US', { timeZone: 'Europe/Berlin' });
+        const berlinNow = new Date(berlinString);
+
+        const day = berlinNow.getDay();
+        const hour = berlinNow.getHours();
+        const minute = berlinNow.getMinutes();
         const currentMinutes = hour * 60 + minute;
-        const weekdayNames = {0:'الأحد',1:'الاثنين',2:'الثلاثاء',3:'الأربعاء',4:'الخميس',5:'الجمعة',6:'السبت'};
+
+        const weekdayNames = {
+          0: 'الأحد',
+          1: 'الاثنين',
+          2: 'الثلاثاء',
+          3: 'الأربعاء',
+          4: 'الخميس',
+          5: 'الجمعة',
+          6: 'السبت'
+        };
+
         const openMinutes = 10 * 60;
         const closeMinutes = 18 * 60;
         const todayName = weekdayNames[day];
@@ -926,6 +913,7 @@
             const remaining = closeMinutes - currentMinutes;
             const hoursLeft = Math.floor(remaining / 60);
             const minsLeft = remaining % 60;
+
             message = hoursLeft > 0
               ? `مفتوح الآن • اليوم ${todayName} • يغلق عند 18:00 • متبقي ${hoursLeft} س و ${minsLeft} د`
               : `مفتوح الآن • اليوم ${todayName} • يغلق عند 18:00 • متبقي ${minsLeft} دقيقة`;
@@ -933,11 +921,13 @@
             const remaining = openMinutes - currentMinutes;
             const hoursLeft = Math.floor(remaining / 60);
             const minsLeft = remaining % 60;
+
             message = `مغلق الآن • اليوم ${todayName} • يفتح عند 10:00 • بعد ${hoursLeft} س و ${minsLeft} د`;
           } else {
             let nextDay = day + 1;
             while (nextDay === 6 || nextDay === 0) nextDay += 1;
             if (nextDay > 6) nextDay = 1;
+
             message = `مغلق الآن • اليوم ${todayName} • يفتح ${weekdayNames[nextDay]} عند 10:00`;
           }
         } else if (day === 6) {
@@ -953,12 +943,11 @@
         contact.style.color = color;
       } catch (error) {
         console.error('updateBusinessStatus error:', error);
-        const text = document.getElementById('statusText');
-        const contact = document.getElementById('contactBusinessStatus');
-        const dot = document.getElementById('statusDot');
-        if (dot) dot.style.background = '#f59e0b';
-        if (text) text.textContent = 'تعذر تحديد حالة الدوام حالياً';
-        if (contact) contact.textContent = 'تعذر تحديد حالة الدوام حالياً';
+        dot.style.background = '#f59e0b';
+        dot.style.boxShadow = '0 0 10px #f59e0b';
+        text.textContent = 'تعذر تحديد حالة الدوام';
+        contact.textContent = 'تعذر تحديد حالة الدوام';
+        contact.style.color = '#f59e0b';
       }
     }
 
@@ -987,14 +976,13 @@
 
     function initSupabase() {
       try {
-        if (!window.supabase?.createClient) return null;
-        if (!SUPABASE_URL || SUPABASE_URL === 'YOUR_SUPABASE_URL') return null;
-        if (!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') return null;
-        return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        if (window.supabase?.createClient) {
+          return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
       } catch (error) {
         console.error('supabase init failed:', error);
-        return null;
       }
+      return null;
     }
 
     function bindEvents() {
@@ -1018,6 +1006,7 @@
       document.getElementById('nextPageBtn')?.addEventListener('click', () => {
         const filtered = getFilteredCars();
         const totalPages = Math.max(1, Math.ceil(filtered.length / carsPerPage));
+
         if (currentPage < totalPages) {
           currentPage += 1;
           renderInventory();
@@ -1037,22 +1026,24 @@
       document.addEventListener('click', (e) => {
         const image = e.target.closest('.car-image');
         if (!image) return;
+
         const car = findCarById(image.getAttribute('data-car-id'));
         if (car) openModal(car);
       });
 
       const siteLogo = document.getElementById('siteLogo');
       if (siteLogo) {
-        siteLogo.addEventListener('error', () => setImgFallback(siteLogo, window.placeholderLogo), { once: true });
+        siteLogo.addEventListener('error', () => setImageFallback(siteLogo, window.placeholderLogo), { once: true });
       }
     }
 
     function initPage() {
+      supabase = initSupabase();
+      bindEvents();
+
       updateBusinessStatus();
       setInterval(updateBusinessStatus, 60000);
 
-      supabase = initSupabase();
-      bindEvents();
       loadCars();
     }
 
