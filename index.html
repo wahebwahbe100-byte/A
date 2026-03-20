@@ -4,7 +4,7 @@
  <meta charset="UTF-8" />
  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
  <title>Emotion Car</title>
- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
  <style>
   * { box-sizing: border-box; }
@@ -104,6 +104,7 @@
    font-size: clamp(24px, 2.2vw, 34px);
    line-height: 1.05;
    letter-spacing: -.4px;
+   max-width: 100%;
   }
 
   .brand-kicker {
@@ -907,6 +908,63 @@
       font-size: 15px;
     }
 
+
+    .emotion-script {
+      display: inline-block;
+      font-family: 'Pacifico', cursive;
+      font-weight: 400;
+      line-height: .95;
+      letter-spacing: .2px;
+      background: linear-gradient(180deg, #67e8f9 0%, #38bdf8 28%, #1d4ed8 70%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow:
+        0 1px 0 rgba(255,255,255,.18),
+        2px 2px 0 rgba(2,6,23,.82),
+        4px 4px 12px rgba(0,0,0,.45);
+      filter: drop-shadow(0 2px 4px rgba(59,130,246,.25));
+      white-space: nowrap;
+    }
+    .emotion-script.brand-name {
+      font-size: clamp(30px, 3vw, 44px);
+      transform: skewX(-8deg);
+      transform-origin: left center;
+    }
+    .emotion-script.brand-name .car-word {
+      font-family: 'Inter', Arial, sans-serif;
+      font-style: italic;
+      font-weight: 900;
+      font-size: .58em;
+      letter-spacing: .08em;
+      margin-inline-start: .32em;
+      color: #e5e7eb;
+      -webkit-text-fill-color: #e5e7eb;
+      text-shadow: 2px 2px 0 rgba(2,6,23,.9), 0 0 12px rgba(255,255,255,.12);
+      display: inline-block;
+      transform: translateY(-.06em) skewX(-10deg);
+      vertical-align: baseline;
+    }
+    .emotion-script.hero-mark {
+      font-size: clamp(44px, 7vw, 86px);
+      transform: skewX(-8deg);
+      display: inline-flex;
+      align-items: flex-end;
+      gap: .18em;
+      flex-wrap: wrap;
+    }
+    .emotion-script.hero-mark .car-word {
+      font-family: 'Inter', Arial, sans-serif;
+      font-style: italic;
+      font-weight: 900;
+      font-size: .5em;
+      letter-spacing: .08em;
+      color: #e5e7eb;
+      -webkit-text-fill-color: #e5e7eb;
+      text-shadow: 2px 2px 0 rgba(2,6,23,.9), 0 0 12px rgba(255,255,255,.12);
+      transform: translateY(-.12em) skewX(-10deg);
+    }
+
 </style>
 </head>
 <body>
@@ -916,7 +974,7 @@
     <img src="images/logo.png" class="logo" alt="logo" onerror="this.src=window.placeholderLogo" />
     <div class="brand-text">
      <span class="brand-kicker">Premium Autohandel in Deutschland</span>
-     <strong>Emotion Car</strong>
+     <strong class="emotion-script brand-name">Emotion <span class="car-word">CAR</span></strong>
      <div id="liveBusinessStatus" class="status-row">
       <span id="statusDot" class="status-dot"></span>
       <span id="statusText">Wird geladen...</span>
@@ -1003,7 +1061,7 @@
     <h3>Kontaktinformationen</h3>
     <div class="contact-list">
      <div class="contact-row"><span>Aktueller Status</span><strong id="contactBusinessStatus">...</strong></div>
-     <div class="contact-row"><span>Firmenname</span><strong>Emotion Car</strong></div>
+     <div class="contact-row"><span>Firmenname</span><strong class="emotion-script brand-name">Emotion <span class="car-word">CAR</span></strong></div>
      <div class="contact-row"><span>Telefon</span><strong>+49 1573 6645354</strong></div>
      <div class="contact-row"><span>E-Mail</span><strong>emotion.service@icloud.com</strong></div>
      <div class="contact-row"><span>Adresse</span><strong>Eulerstraße 25, 13357 Berlin</strong></div>
