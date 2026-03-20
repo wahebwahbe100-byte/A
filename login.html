@@ -251,7 +251,7 @@
           <input id="password" name="password" type="password" autocomplete="current-password" placeholder="كلمة المرور">
         </label>
 
-        <button id="loginBtn" type="submit" class="submit-btn">تسجيل الدخول</button>
+        <button id="loginBtn" type="submit" class="submit-btn" onclick="window.__loginHandler && window.__loginHandler(event)">تسجيل الدخول</button>
       </form>
 
       <div id="msg" class="message">الصفحة جاهزة. أدخل بيانات الدخول.</div>
@@ -342,7 +342,8 @@
       }
     }
 
-    form.addEventListener('submit', loginHandler);
+    window.__loginHandler = loginHandler;
+    form.addEvent
   </script>
 </body>
 </html>
