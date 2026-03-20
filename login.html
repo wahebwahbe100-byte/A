@@ -156,7 +156,39 @@ clearMessage();
 
 if(!email || !password){
 showMessage('يرجى إدخال البريد الإلكتروني وكلمة المرور.');
+alert('يرجى إدخال البريد الإلكتروني وكلمة المرور.');
 return;
+}
+
+btn.disabled=true;
+btn.innerText='جاري الدخول...';
+
+try{
+const result = await supabase.auth.signInWithPassword({ email, password });
+const data = result.data;
+const error = result.error;
+
+if(error){
+const text = 'خطأ: ' + (error.message || 'تعذر تسجيل الدخول');
+showMessage(text);
+alert(text);
+btn.disabled=false;
+btn.innerText='تسجيل الدخول';
+return;
+}
+
+showMessage('تم تسجيل الدخول بنجاح.','success');
+alert('تم تسجيل الدخول بنجاح.');
+setTimeout(()=>{
+window.location.href='index.html';
+},1000);
+}catch(e){
+const text = 'تعذر تسجيل الدخول حالياً: ' + (e.message || 'خطأ غير معروف');
+showMessage(text);
+alert(text);
+btn.disabled=false;
+btn.innerText='تسجيل الدخول';
+}
 }
 
 btn.disabled=true;
