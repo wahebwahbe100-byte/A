@@ -587,7 +587,10 @@
             <img src="images/logo.png" class="logo" alt="logo" onerror="this.src=placeholderLogo" />
             <div>
               <div style="font-size:18px;font-weight:800;line-height:1.1;">Emotion Car & Service UG</div>
-              <div id="liveBusinessStatus" style="font-size:13px;color:#dbeafe;opacity:.9;margin-top:4px;">جاري التحقق من ساعات العمل...</div>
+              <div id="liveBusinessStatus" style="font-size:13px;color:#dbeafe;opacity:.9;margin-top:4px;display:flex;align-items:center;gap:6px;">
+                <span id="statusDot" style="width:8px;height:8px;border-radius:50%;display:inline-block;background:#999;"></span>
+                <span id="statusText">جاري التحقق من ساعات العمل...</span>
+              </div>
             </div>
           </div>
 
@@ -600,15 +603,18 @@
             </div>
           </div>
         </div>
+              <div id="liveBusinessStatus" style="font-size:13px;color:#dbeafe;opacity:.9;margin-top:4px;">جاري التحقق من ساعات العمل...</div>
+            </div>
+          </div>
+
+          <div class="nav-links">
+            
+          </div>
+        </div>
       </div>
 
           <div class="nav-links">
-            <div class="nav-menu">
-              <a class="nav-link" href="#cars">Home</a>
-              <a class="nav-link" href="#about">About</a>
-              <a class="nav-link" href="#terms">Services</a>
-              <a class="nav-link" href="#contact">Contact</a>
-            </div>
+            
           </div>
         </div>
     
@@ -623,12 +629,7 @@
           </div>
 
           <div class="nav-links">
-            <div class="nav-menu">
-              <a class="nav-link" href="#cars">Home</a>
-              <a class="nav-link" href="#about">About</a>
-              <a class="nav-link" href="#terms">Services</a>
-              <a class="nav-link" href="#contact">Contact</a>
-            </div>
+            
           </div>
         </div>
       </div>
@@ -1030,6 +1031,38 @@
     document.getElementById('searchInput').addEventListener('input', function () {
       currentPage = 1;
       renderInventory();
+
+    function updateBusinessStatus() {
+      const now = new Date();
+      const day = now.getDay(); // 0=Sunday
+      const hour = now.getHours();
+
+      let isOpen = false;
+
+      // Monday-Friday 10-18
+      if (day >= 1 && day <= 5) {
+        isOpen = hour >= 10 && hour < 18;
+      }
+
+      // Saturday closed
+      if (day === 6) isOpen = false;
+
+      // Sunday closed
+      if (day === 0) isOpen = false;
+
+      const dot = document.getElementById('statusDot');
+      const text = document.getElementById('statusText');
+
+      if (isOpen) {
+        dot.style.background = '#22c55e';
+        text.textContent = 'مفتوح الآن';
+      } else {
+        dot.style.background = '#ef4444';
+        text.textContent = 'مغلق الآن';
+      }
+    }
+
+    updateBusinessStatus();
     updateBusinessStatus();
     setInterval(updateBusinessStatus, 60000);
     });
