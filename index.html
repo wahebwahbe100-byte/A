@@ -216,7 +216,7 @@
       left: 14px;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 0;
       background: rgba(15, 23, 42, 0.65);
       color: #fff;
       border: 1px solid rgba(255,255,255,.12);
@@ -227,13 +227,7 @@
       backdrop-filter: blur(6px);
     }
 
-    .car-badge img {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 1px solid rgba(255,255,255,.2);
-    }
+    
     
     .car-content { padding: 18px; }
     .car-top {
@@ -754,7 +748,7 @@
           <div class="car-image-wrap">
             <img class="car-image" src="${carImage(car.image)}" alt="${car.name}" data-car-id="${car.id}" onerror="this.onerror=null;this.src=placeholderCar" />
             <div class="car-badge">
-              <img src="images/logo.png" onerror="this.src=placeholderLogo" />
+              
               ${car.id}
             </div>
           </div>
