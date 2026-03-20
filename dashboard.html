@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة التحكم</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-950 text-white p-4 md:p-8">
+  <div class="max-w-7xl mx-auto space-y-8">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div>
+        <h1 class="text-3xl font-black">لوحة التحكم</h1>
+        <p class="text-white/70 mt-2">بعد تسجيل الدخول يمكنك تعديل صور 30 سيارة والسعر والتفاصيل نفسها الموجودة في الموقع.</p>
+      </div>
+      <div class="flex gap-3 flex-wrap">
+        <a href="index.html" class="px-5 py-3 rounded-2xl bg-white/10 border border-white/10">عرض الموقع</a>
+        <button id="logoutBtn" class="px-5 py-3 rounded-2xl bg-red-600 hover:bg-red-700">تسجيل خروج</button>
+      </div>
+    </div>
+
+    <div id="msg" class="text-sm"></div>
+
+    <div class="grid lg:grid-cols-[340px,1fr] gap-8">
+      <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+        <h2 class="text-2xl font-black mb-4">اختيار السيارة</h2>
+        <div class="space-y-4">
+          <select id="carSelect" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10"></select>
+          <div class="text-white/70 text-sm leading-7">
+            اختر السيارة التي تريد تعديلها، ثم غيّر الصورة والسعر والوصف وباقي البيانات، وبعدها اضغط حفظ.
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-slate-900/70 p-4">
+            <div class="text-sm text-white/60 mb-2">الصورة الحالية</div>
+            <img id="preview" class="w-full h-56 object-cover rounded-2xl bg-slate-950" alt="preview">
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+        <h2 class="text-2xl font-black mb-4">تعديل السيارة</h2>
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <label class="block mb-2 text-sm text-white/80">الاسم الكامل</label>
+            <input id="name" type="text" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="Mercedes S-Class">
+          </div>
+          <div>
+            <label class="block mb-2 text-sm text-white/80">الفئة</label>
+            <select id="category" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10">
+              <option value="SUV">SUV</option>
+              <option value="Sedan">Sedan</option>
+              <option value="Sport">Sport</option>
+            </select>
+          </div>
+          <div>
+            <label class="block mb-2 text-sm text-white/80">السعر</label>
+            <input id="price" type="text" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="€128,000">
+          </div>
+          <div>
+            <label class="block mb-2 text-sm text-white/80">سنة الصنع</label>
+            <input id="year" type="number" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="2024">
+          </div>
+          <div>
+            <label class="block mb-2 text-sm text-white/80">عدد الكيلومترات</label>
+            <input id="mileage" type="text" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="8,000 km">
+          </div>
+          <div>
+            <label class="block mb-2 text-sm text-white/80">الحالة</label>
+            <input id="condition" type="text" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="ممتازة">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block mb-2 text-sm text-white/80">الوصف</label>
+            <textarea id="description" rows="6" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="اكتب وصف السيارة هنا..."></textarea>
+          </div>
+          <div class="md:col-span-2">
+            <label class="block mb-2 text-sm text-white/80">الصورة الرئيسية</label>
+            <input id="imageFile" type="file" accept="image/*" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10">
+          </div>
+        </div>
+
+        <div class="flex gap-4 flex-wrap mt-6">
+          <button id="saveBtn" class="px-6 py-4 rounded-2xl bg-lime-500 hover:bg-lime-600 font-black text-slate-950">حفظ التعديلات</button>
+          <button id="reloadBtn" class="px-6 py-4 rounded-2xl bg-white/10 border border-white/10 font-black">إعادة تحميل البيانات</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const supabase = createClient(
+      'https://mbesnbkludynomgdzfhw.supabase.co',
+      'sb_publishable_EfwicNkVNrNBXKBgoiMXjA_VqTcfnTm'
+    );
+
+    const STORAGE_BUCKET = 'site-images';
+    const fallbackImage = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+        <defs>
+          <linearGradient id="g" x1="0" x2="1">
+            <stop offset="0%" stop-color="#0f172a"/>
+            <stop offset="100%" stop-color="#1e293b"/>
+          </linearGradient>
+        </defs>
+        <rect width="1200" height="700" fill="url(#g)"/>
+        <text x="600" y="350" fill="#cbd5e1" font-size="42" text-anchor="middle" font-family="Arial">No Image Available</text>
+      </svg>
+    `);
+
+    const defaultCars = [
+      ['Mercedes', 'S-Class', 'Sedan', '€128,000', 2024, '8,000 km', 'ممتازة'],
+      ['BMW', 'X7', 'SUV', '€102,500', 2023, '14,500 km', 'ممتازة'],
+      ['Audi', 'RS7', 'Sport', '€119,900', 2024, '5,200 km', 'ممتازة'],
+      ['Range Rover', 'Sport', 'SUV', '€115,300', 2023, '18,100 km', 'ممتازة'],
+      ['Porsche', 'Taycan', 'Sport', '€134,800', 2024, '3,700 km', 'ممتازة'],
+      ['Lexus', 'LX', 'SUV', '€92,000', 2022, '21,000 km', 'جيدة جداً'],
+      ['Cadillac', 'Escalade', 'SUV', '€97,000', 2021, '26,000 km', 'جيدة جداً'],
+      ['Bentley', 'Bentayga', 'SUV', '€154,000', 2022, '19,500 km', 'ممتازة'],
+      ['Rolls-Royce', 'Ghost', 'Sedan', '€210,000', 2021, '17,800 km', 'ممتازة'],
+      ['Tesla', 'Model S', 'Sedan', '€88,000', 2023, '12,300 km', 'ممتازة'],
+      ['Ferrari', 'Roma', 'Sport', '€199,000', 2022, '7,400 km', 'ممتازة'],
+      ['Lamborghini', 'Urus', 'SUV', '€239,000', 2023, '6,900 km', 'ممتازة'],
+      ['Maserati', 'Levante', 'SUV', '€83,500', 2021, '29,000 km', 'جيدة جداً'],
+      ['Jaguar', 'F-Pace', 'SUV', '€59,900', 2020, '41,000 km', 'جيدة جداً'],
+      ['Genesis', 'G90', 'Sedan', '€66,400', 2022, '24,100 km', 'ممتازة'],
+      ['Volvo', 'XC90', 'SUV', '€57,800', 2021, '33,000 km', 'جيدة جداً'],
+      ['Toyota', 'Land Cruiser', 'SUV', '€74,000', 2022, '27,000 km', 'ممتازة'],
+      ['GMC', 'Yukon Denali', 'SUV', '€79,500', 2023, '15,000 km', 'ممتازة'],
+      ['Jeep', 'Grand Wagoneer', 'SUV', '€82,700', 2022, '22,200 km', 'جيدة جداً'],
+      ['Aston Martin', 'DBX', 'SUV', '€167,000', 2023, '9,800 km', 'ممتازة'],
+      ['Mercedes', 'GLE 450', 'SUV', '€71,000', 2021, '28,400 km', 'جيدة جداً'],
+      ['BMW', '740i', 'Sedan', '€69,900', 2022, '18,900 km', 'ممتازة'],
+      ['Audi', 'Q8', 'SUV', '€73,600', 2023, '11,400 km', 'ممتازة'],
+      ['Porsche', 'Cayenne', 'SUV', '€95,200', 2022, '20,700 km', 'ممتازة'],
+      ['Volkswagen', 'Touareg', 'SUV', '€49,500', 2021, '34,100 km', 'جيدة جداً'],
+      ['Land Rover', 'Defender', 'SUV', '€77,300', 2023, '14,200 km', 'ممتازة'],
+      ['Kia', 'EV9', 'SUV', '€63,400', 2024, '4,800 km', 'ممتازة'],
+      ['Hyundai', 'Palisade', 'SUV', '€46,800', 2022, '25,600 km', 'جيدة جداً'],
+      ['Nissan', 'Patrol', 'SUV', '€68,900', 2021, '37,700 km', 'جيدة جداً'],
+      ['Chevrolet', 'Tahoe', 'SUV', '€61,500', 2022, '23,900 km', 'جيدة جداً']
+    ].map((item, index) => ({
+      id: index + 1,
+      brand: item[0],
+      model: item[1],
+      category: item[2],
+      price: item[3],
+      year: item[4],
+      mileage: item[5],
+      condition: item[6],
+      name: `${item[0]} ${item[1]}`,
+      description: 'سيارة معروضة بحالة ممتازة مع مواصفات واضحة. يمكنك تعديل الصور والأسعار والمعلومات لاحقاً بسهولة.',
+      image: fallbackImage,
+      gallery: [fallbackImage]
+    }));
+
+    const msg = document.getElementById('msg');
+    const carSelect = document.getElementById('carSelect');
+    const preview = document.getElementById('preview');
+    const nameInput = document.getElementById('name');
+    const categoryInput = document.getElementById('category');
+    const priceInput = document.getElementById('price');
+    const yearInput = document.getElementById('year');
+    const mileageInput = document.getElementById('mileage');
+    const conditionInput = document.getElementById('condition');
+    const descriptionInput = document.getElementById('description');
+    const imageInput = document.getElementById('imageFile');
+    const saveBtn = document.getElementById('saveBtn');
+    const reloadBtn = document.getElementById('reloadBtn');
+
+    let cars = [];
+
+    function showMessage(text, ok = true) {
+      msg.textContent = text;
+      msg.className = ok ? 'text-sm text-emerald-300' : 'text-sm text-red-300';
+    }
+
+    async function requireLogin() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        window.location.href = './login.html';
+      }
+    }
+
+    async function seedCarsIfEmpty() {
+      const { data, error } = await supabase.from('cars').select('id').limit(1);
+      if (error) return;
+      if (Array.isArray(data) && data.length === 0) {
+        await supabase.from('cars').upsert(defaultCars, { onConflict: 'id' });
+      }
+    }
+
+    function renderSelect() {
+      carSelect.innerHTML = cars.map(car => `<option value="${car.id}">سيارة ${car.id} - ${car.name}</option>`).join('');
+      if (cars.length) fillForm(cars[0].id);
+    }
+
+    function findCar(id) {
+      return cars.find(car => String(car.id) === String(id));
+    }
+
+    function fillForm(id) {
+      const car = findCar(id);
+      if (!car) return;
+      nameInput.value = car.name || '';
+      categoryInput.value = car.category || 'SUV';
+      priceInput.value = car.price || '';
+      yearInput.value = car.year || '';
+      mileageInput.value = car.mileage || '';
+      conditionInput.value = car.condition || '';
+      descriptionInput.value = car.description || '';
+      preview.src = car.image || fallbackImage;
+      preview.onerror = () => preview.src = fallbackImage;
+    }
+
+    async function loadCars() {
+      showMessage('جاري تحميل السيارات...');
+      const { data, error } = await supabase.from('cars').select('*').order('id', { ascending: true });
+      if (error) {
+        showMessage(error.message, false);
+        return;
+      }
+      cars = (data || []).map(row => ({
+        ...row,
+        image: row.image || fallbackImage,
+        gallery: Array.isArray(row.gallery) && row.gallery.length ? row.gallery : [row.image || fallbackImage]
+      }));
+      renderSelect();
+      showMessage('تم تحميل السيارات بنجاح');
+    }
+
+    async function uploadImageIfNeeded(carId) {
+      const file = imageInput.files?.[0];
+      if (!file) return null;
+      const ext = file.name.split('.').pop();
+      const path = `cars/car-${carId}-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file, { upsert: true, contentType: file.type });
+      if (error) throw error;
+      const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+      return data.publicUrl;
+    }
+
+    async function saveCar() {
+      const id = Number(carSelect.value);
+      const car = findCar(id);
+      if (!car) return;
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'جاري الحفظ...';
+      showMessage('جاري حفظ التعديلات...');
+
+      try {
+        const uploadedImage = await uploadImageIfNeeded(id);
+        const fullName = nameInput.value.trim();
+        const parts = fullName.split(' ');
+
+        const updated = {
+          id,
+          name: fullName,
+          brand: parts[0] || car.brand,
+          model: parts.slice(1).join(' ') || car.model,
+          category: categoryInput.value,
+          price: priceInput.value.trim(),
+          year: Number(yearInput.value) || car.year,
+          mileage: mileageInput.value.trim(),
+          condition: conditionInput.value.trim(),
+          description: descriptionInput.value.trim(),
+          image: uploadedImage || car.image,
+          gallery: uploadedImage ? [uploadedImage] : (Array.isArray(car.gallery) && car.gallery.length ? car.gallery : [car.image || fallbackImage])
+        };
+
+        const { error } = await supabase.from('cars').upsert(updated, { onConflict: 'id' });
+        if (error) throw error;
+
+        showMessage('تم حفظ التعديلات بنجاح');
+        await loadCars();
+        carSelect.value = String(id);
+        fillForm(id);
+        imageInput.value = '';
+      } catch (error) {
+        showMessage(error.message || 'حدث خطأ أثناء الحفظ', false);
+      }
+
+      saveBtn.disabled = false;
+      saveBtn.textContent = 'حفظ التعديلات';
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      window.location.href = './login.html';
+    });
+
+    carSelect.addEventListener('change', (e) => fillForm(e.target.value));
+    reloadBtn.addEventListener('click', loadCars);
+    saveBtn.addEventListener('click', saveCar);
+    imageInput.addEventListener('change', () => {
+      const file = imageInput.files?.[0];
+      if (!file) return;
+      preview.src = URL.createObjectURL(file);
+    });
+
+    await requireLogin();
+    await seedCarsIfEmpty();
+    await loadCars();
+  </script>
+</body>
+</html>
