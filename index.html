@@ -228,19 +228,7 @@
       backdrop-filter: blur(10px);
       letter-spacing: .2px;
     }
-    .car-badge::before {
-      content: "#";
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #22c55e, #3b82f6);
-      color: #fff;
-      font-size: 12px;
-      box-shadow: 0 0 14px rgba(59,130,246,.35);
-    }
+    
     .car-content { padding: 18px; }
     .car-top {
       display: flex;
@@ -565,8 +553,8 @@
         <h3>لماذا هذا الموقع مناسب لنشاطك؟</h3>
         <div class="feature-list">
           <div class="feature-item">
-            <strong>عرض احترافي للسيارات</strong>
-            صور واضحة، تفاصيل مرتبة، وسهولة فتح مواصفات كل سيارة.
+            <strong>تأجير سيارات باحترافية عالية</strong>
+            نوفر عرضاً واضحاً للسيارات المتاحة للتأجير مع تفاصيل دقيقة، مما يساعد العميل على اختيار السيارة المناسبة بسهولة.
           </div>
           <div class="feature-item">
             <strong>تواصل مباشر عبر واتساب</strong>
@@ -759,7 +747,7 @@
         <div class="car-card">
           <div class="car-image-wrap">
             <img class="car-image" src="${carImage(car.image)}" alt="${car.name}" data-car-id="${car.id}" onerror="this.onerror=null;this.src=placeholderCar" />
-            <div class="car-badge">سيارة ${car.id}</div>
+            <div class="car-badge" style="font-size:12px;font-weight:600">سيارة رقم ${car.id}</div>
           </div>
           <div class="car-content">
             <div class="car-top">
