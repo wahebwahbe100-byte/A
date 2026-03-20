@@ -7,24 +7,89 @@
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-body{margin:0;font-family:'Tajawal';background:#020617;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh}
-.box{background:#0f172a;padding:30px;border-radius:20px;width:350px;text-align:center}
-input{width:100%;padding:12px;margin:10px 0;border-radius:10px;border:1px solid #333;background:#020617;color:#fff}
-button{width:100%;padding:12px;background:#22c55e;border:none;border-radius:10px;font-weight:bold;cursor:pointer}
+body{
+margin:0;
+font-family:'Tajawal';
+background:linear-gradient(135deg,#020617,#0b1f3a,#000);
+color:#fff;
+}
+.container{
+max-width:800px;
+margin:80px auto;
+padding:20px;
+}
+.card{
+background:rgba(255,255,255,0.05);
+border:1px solid rgba(255,255,255,0.1);
+border-radius:25px;
+padding:30px;
+box-shadow:0 20px 60px rgba(0,0,0,0.6);
+}
+.top{
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-bottom:20px;
+}
+.top img{
+width:80px;
+border-radius:15px;
+}
+.back{
+background:#111;
+padding:10px 15px;
+border-radius:10px;
+text-decoration:none;
+color:#fff;
+}
+h1{
+margin:0 0 20px;
+font-size:28px;
+}
+input{
+width:100%;
+padding:14px;
+margin:10px 0;
+border-radius:14px;
+border:1px solid rgba(255,255,255,0.1);
+background:#020617;
+color:#fff;
+}
+button{
+width:100%;
+padding:14px;
+margin-top:10px;
+border:none;
+border-radius:14px;
+background:#22c55e;
+font-weight:bold;
+cursor:pointer;
+}
+#msg{margin-top:10px}
 </style>
 </head>
 <body>
-<div style="position:absolute;top:20px;right:20px;display:flex;align-items:center;gap:10px">
-<img src="images/logo.png" style="width:50px;height:50px;border-radius:10px">
-<a href="index.html" style="color:white;text-decoration:none;background:#111;padding:8px 12px;border-radius:10px">رجوع</a>
+
+<div class="container">
+
+<div class="card">
+
+<div class="top">
+<a href="index.html" class="back">رجوع</a>
+<img src="images/logo.png">
 </div>
 
-<div class="box">
-<h2>تسجيل الدخول</h2>
-<input id="email" type="email" placeholder="البريد الإلكتروني">
+<h1>تسجيل الدخول</h1>
+
+<input id="email" type="email" placeholder="">
 <input id="password" type="password" placeholder="كلمة المرور">
-<button onclick="login()">دخول</button>
+
+<button onclick="login()">تسجيل الدخول</button>
+
 <p id="msg"></p>
+
+</div>
+
 </div>
 
 <script>
@@ -36,15 +101,16 @@ const supabase = window.supabase.createClient(
 async function login(){
 const email=document.getElementById('email').value;
 const password=document.getElementById('password').value;
+
 const {data,error}=await supabase.auth.signInWithPassword({email,password});
 
 if(error){
 document.getElementById('msg').innerText='خطأ في تسجيل الدخول';
 }else{
-document.getElementById('msg').innerText='تم الدخول';
 window.location.href='index.html';
 }
 }
 </script>
+
 </body>
 </html>
