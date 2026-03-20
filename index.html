@@ -3,78 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Emotion Car & Service UG & Service UG</title>
+  <title>Emotion Car & Service UG</title>
   <style>
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body {
-      scroll-behavior: smooth;
-    }
-    section {
-      scroll-margin-top: 110px;
-    }
-    body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: linear-gradient(135deg, #020617 0%, #0b1f3a 50%, #000000 100%);
-      color: #ffffff;
       color: #fff;
     }
-    a { text-decoration: none; }
+    a { text-decoration: none; color: inherit; }
     .container { width: min(1200px, calc(100% - 32px)); margin: 0 auto; }
     .section { padding: 56px 0; }
-
-    .hero {
-      padding: 32px 0 28px;
-      border-bottom: 1px solid rgba(255,255,255,.06);
-      background: linear-gradient(135deg, #020617 0%, #0b1f3a 50%, #000000 100%);
-    }
-    .hero-card {
-      background: transparent;
-      border: none;
-      border-radius: 0;
-      padding: 0;
-      box-shadow: none;
-      overflow: visible;
-    }
-    .reveal {
-      opacity: 0;
-      transform: translateY(28px);
-      transition: opacity .8s ease, transform .8s ease;
-      will-change: opacity, transform;
-    }
-    .reveal.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    @keyframes fadeUp {
-      from {
-        opacity: 0;
-        transform: translateY(24px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+    section { scroll-margin-top: 90px; }
 
     .top-nav {
       position: sticky;
       top: 0;
-      z-index: 50;
+      z-index: 100;
+      background: rgba(7,16,32,.96);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(0,0,0,.28);
+    }
+    .top-nav-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 24px;
-      padding: 14px 28px;
-      background: rgba(7,16,32,.96);
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      box-shadow: 0 8px 24px rgba(0,0,0,.28);
-      backdrop-filter: blur(10px);
-    }  padding: 0;
-      background: transparent;
-      border: none;
-      box-shadow: none;
+      padding: 14px 0;
+    }
+    .brand-pill {
+      display: flex;
+      align-items: center;
+      gap: 14px;
       min-width: 0;
     }
     .logo {
@@ -82,149 +45,99 @@
       height: 96px;
       object-fit: contain;
       border-radius: 20px;
-      background: rgba(0,0,0,.65);
-      padding: 10px;
-      border: 1px solid rgba(255,255,255,.22);
-      box-shadow: 0 18px 50px rgba(0,0,0,.75), 0 0 30px rgba(59,130,246,.5);
+      background: rgba(255,255,255,.10);
+      padding: 8px;
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 18px 50px rgba(0,0,0,.65), 0 0 24px rgba(59,130,246,.35);
       opacity: 0;
-      transform: translateY(10px) scale(.9);
+      transform: translateY(8px) scale(.92);
       animation: logoIn .8s ease forwards, logoGlow 3s ease-in-out 1s infinite alternate, logoFloat 4s ease-in-out 1s infinite;
+      flex-shrink: 0;
     }
-
-    @keyframes logoIn {
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
+    @keyframes logoIn { to { opacity: 1; transform: translateY(0) scale(1); } }
     @keyframes logoGlow {
-      from { box-shadow: 0 12px 40px rgba(0,0,0,.6), 0 0 10px rgba(59,130,246,.25); }
-      to { box-shadow: 0 14px 50px rgba(0,0,0,.65), 0 0 28px rgba(59,130,246,.55); }
+      from { box-shadow: 0 18px 50px rgba(0,0,0,.65), 0 0 12px rgba(59,130,246,.25); }
+      to { box-shadow: 0 20px 54px rgba(0,0,0,.72), 0 0 26px rgba(59,130,246,.48); }
     }
     @keyframes logoFloat {
-      0% { transform: translateY(0) scale(1); }
+      0%,100% { transform: translateY(0) scale(1); }
       50% { transform: translateY(-4px) scale(1.02); }
-      100% { transform: translateY(0) scale(1); }
     }
-    .whatsapp-mini-logo {
-      width: 44px;
-      height: 44px;
-      object-fit: contain;
-      border-radius: 12px;
-      background: radial-gradient(circle at center, rgba(255,255,255,.1), rgba(255,255,255,.02));
-      border: 1px solid rgba(255,255,255,.08);
-      padding: 4px;
-      box-shadow: 0 6px 18px rgba(0,0,0,.35);
+    .brand-text strong {
+      display: block;
+      font-size: 28px;
+      line-height: 1.05;
     }
-    .nav-links {
+    .status-row {
+      margin-top: 8px;
       display: flex;
       align-items: center;
-      justify-content: flex-end;
-      gap: 18px;
-      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 13px;
+      color: #dbeafe;
     }
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      background: #999;
+      box-shadow: 0 0 10px rgba(255,255,255,.3);
+      flex-shrink: 0;
+    }
+
     .nav-menu {
       display: flex;
       align-items: center;
       gap: 34px;
-      paddiding: 8px 0;
+      flex-wrap: wrap;
+    }
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 0;
       color: #e5e7eb;
       font-size: 15px;
       font-weight: 500;
       letter-spacing: .2px;
       transition: color .2s ease;
-      positinone;
-    }
-    .nav-link:hover::after {
-      width: 100%;
+      position: relative;
     }
     .nav-link::after {
       content: "";
       position: absolute;
-      bottom: -6px;
-      right: 0;
+      left: 0;
+      bottom: -14px;
       width: 0;
       height: 2px;
-      background: linear-gradient(90deg,#22c55e,#60a5fa);
-      transition: width .25s ease;
+      background: #ffffff;
+      transition: width .2s ease;
     }
-    .nav-link:hover::after {
-      width: 100%;
-      left: 0;
-    }
-    .nav-link::before {
-      content: none;
-    }
-    .nav-link:hover {
-      background: transparent;
-      border-color: transparent;
-      color: #ffffff;
-      opacity: .82;
-      transform: translateY(-1px);
-    }
-    .whatsapp-stack {
-      display: none;
-      align-items: center;
-    }
-    .whatsapp-mini-logo {
-      width: 40px;
-      height: 40px;
-      object-fit: contain;
-      border-radius: 10px;
-      background: rgba(0,0,0,.5);
-      border: 1px solid rgba(255,255,255,.15);
-      padding: 4px;
-      box-shadow: 0 6px 18px rgba(0,0,0,.5);
-    }
-    .nav-link.primary {
-      background: linear-gradien;
-      border: none;
-      box-shadow: 0 10px 24px rgba(34,197,94,.35);
-    }
-    .nav-link.primary::before {
-      background: rgba(255,255,255,.9);
-      box-shadow: 0 0 12px rgba(255,255,255,.35);
-    }
-    .nav-link.primary:hover {
-      background: linear-gradient(135deg, #16a34a, #15803d);
-      transform: translateY(-2px);
-    }
+    .nav-link:hover { color: #fff; }
+    .nav-link:hover::after { width: 100%; }
 
-    h1, h2, h3, p { margin: 0; }
+    .hero {
+      padding: 34px 0 30px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(59,130,246,.20), transparent 30%),
+        radial-gradient(circle at 80% 0%, rgba(255,255,255,.08), transparent 25%),
+        linear-gradient(135deg, #020617 0%, #0b1f3a 50%, #000000 100%);
+    }
+    .hero-box {
+      padding: 48px 0 24px;
+      text-align: center;
+    }
     h1 {
-      font-size: clamp(38px, 5vw, 70px);
-      line-height: 1.15;
-      margin-bottom: 14px;
+      margin: 0;
+      font-size: clamp(42px, 6vw, 86px);
+      line-height: 1.08;
       font-weight: 900;
       letter-spacing: -1px;
-      background: linear-gradient(90deg,#fff,#93c5fd,#22c55e);
+      background: linear-gradient(90deg, #fff, #93c5fd, #22c55e);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-    }
-    .hero-text {
-      color: #cbd5e1;
-      line-height: 2;
-      max-width: 900px;
-      font-size: 18px;
-      opacity: .9;
-    }
-    .hero-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 24px;
-      flex-wrap: wrap;
-    }
-    .hero-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 13px 18px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.06);
-      color: #fff;
-      font-weight: 700;
-    }
-    .hero-btn.primary {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      border-color: rgba(34,197,94,.22);
     }
 
     .section-head {
@@ -236,6 +149,7 @@
       flex-wrap: wrap;
     }
     .section-title {
+      margin: 0;
       font-size: 36px;
       font-weight: 900;
       background: linear-gradient(90deg,#ffffff,#60a5fa,#93c5fd);
@@ -243,11 +157,17 @@
       -webkit-text-fill-color: transparent;
     }
     .section-head p {
+      margin: 10px 0 0;
       color: #cbd5e1;
       max-width: 720px;
       line-height: 1.8;
     }
 
+    .inventory-wrap {
+      background: rgba(255,255,255,.03);
+      border-top: 1px solid rgba(255,255,255,.08);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
     .filters {
       display: flex;
       gap: 12px;
@@ -263,12 +183,6 @@
       font-size: 15px;
       min-width: 190px;
     }
-
-    .inventory-wrap {
-      background: rgba(255,255,255,.03);
-      border-top: 1px solid rgba(255,255,255,.08);
-      border-bottom: 1px solid rgba(255,255,255,.08);
-    }
     .grid { display: grid; gap: 20px; }
     .cars-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
     .car-card {
@@ -277,19 +191,11 @@
       border-radius: 26px;
       overflow: hidden;
       box-shadow: 0 10px 40px rgba(0,0,0,.6);
-      transition: .3s ease;
-    }
-    .car-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 20px 60px rgba(0,0,0,.8);
-    }
-    .car-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 18px 50px rgba(0,0,0,.12);
+      transition: transform .3s ease, box-shadow .3s ease;
     }
     .car-card:hover {
       transform: translateY(-6px) scale(1.01);
-      box-shadow: 0 30px 80px rgba(0,0,0,.6);
+      box-shadow: 0 24px 70px rgba(0,0,0,.75);
     }
     .car-image {
       width: 100%;
@@ -355,14 +261,8 @@
       font-size: 15px;
       font-weight: 700;
     }
-    .pager button:disabled {
-      opacity: .45;
-      cursor: not-allowed;
-    }
-    .pager-info {
-      color: #cbd5e1;
-      font-size: 14px;
-    }
+    .pager button:disabled { opacity: .45; cursor: not-allowed; }
+    .pager-info { color: #cbd5e1; font-size: 14px; }
 
     .about-grid {
       display: grid;
@@ -424,6 +324,17 @@
       color: #cbd5e1;
       line-height: 1.9;
       margin-top: 10px;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .8s ease, transform .8s ease;
+      will-change: opacity, transform;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
 
     .modal {
@@ -522,78 +433,69 @@
       font-size: 13px;
       color: #fff;
     }
-    .legal-badge {
-      margin-top: 12px;
-      display: inline-block;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: #f1f5f9;
-      border: 1px solid rgba(0,0,0,.08);
-      font-size: 13px;
-      color: #0f172a;
-    }
 
     @media (max-width: 900px) {
-      .top-nav {
-        padding: 18px 20px;
-        gap: 14px;
+      .top-nav-inner {
         flex-direction: column;
         align-items: flex-start;
       }
-      .nav-links {
-        width: 100%;
-        justify-content: flex-start;
-      }
       .nav-menu {
-        width: 100%;
         gap: 18px;
         flex-wrap: wrap;
       }
-      .brand-pill {
-        width: auto;
-        justify-content: flex-start;
-      }
+      .brand-text strong { font-size: 22px; }
+      .logo { width: 76px; height: 76px; }
       .about-grid, .legal-grid, .modal-grid { grid-template-columns: 1fr; }
       .thumbs { grid-template-columns: repeat(2, 1fr); }
       .details-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 42px; }
     }
   </style>
 </head>
 <body>
-  <section class="hero">
-  <div class="container">
-    <div class="top-nav">
+  <header class="top-nav">
+    <div class="container top-nav-inner">
       <div class="brand-pill">
         <img src="images/logo.png" class="logo" alt="logo" onerror="this.src=placeholderLogo" />
-        <div>
-          <div style="font-size:20px;font-weight:800;">Emotion Car & Service UG</div>
-          <div id="liveBusinessStatus" style="font-size:13px;display:flex;align-items:center;gap:6px;">
-            <span id="statusDot" style="width:12px;height:12px;border-radius:50%;background:#999;display:inline-block;"></span>
+        <div class="brand-text">
+          <strong>Emotion Car & Service UG</strong>
+          <div id="liveBusinessStatus" class="status-row">
+            <span id="statusDot" class="status-dot"></span>
             <span id="statusText">جاري التحميل...</span>
           </div>
         </div>
       </div>
 
-      <div class="nav-menu">
+      <nav class="nav-menu">
         <a class="nav-link" href="#cars">Fahrzeuge</a>
         <a class="nav-link" href="#about">Über uns</a>
         <a class="nav-link" href="#terms">Service</a>
         <a class="nav-link" href="#contact">Kontakt</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <div class="hero-box">
+        <h1>Emotion Car & Service UG</h1>
       </div>
     </div>
-
-    <div style="padding:60px 0 30px; text-align:center;">
-      <h1>Emotion Car & Service UG</h1>
-    </div>
-  </div>
-</section>
+  </section>
 
   <section id="cars" class="section inventory-wrap reveal">
     <div class="container">
       <div class="section-head">
         <div>
           <h2 class="section-title">معرض السيارات</h2>
-          <p>يعرض الموقع 10 سيارات في كل صفحة مع سهم التالي والسابق. عند الضغe="all">كل الفئات</option>
+          <p>يعرض الموقع 8 سيارات في كل صفحة مع سهم التالي والسابق. عند الضغط على صورة السيارة تظهر التفاصيل والصور الإضافية.</p>
+        </div>
+      </div>
+
+      <div class="filters">
+        <input id="searchInput" type="text" placeholder="ابحث عن سيارة..." />
+        <select id="categoryFilter">
+          <option value="all">كل الفئات</option>
           <option value="SUV">SUV</option>
           <option value="Sedan">Sedan</option>
           <option value="Sport">Sport</option>
@@ -614,7 +516,7 @@
     <div class="section-head">
       <div>
         <h2 class="section-title">من نحن</h2>
-        <p>Emotion Car & Service UG & Service UG تقدم عرض سيارات بطريقة احترافية وواضحة، مع اهتمام بالتفاصيل، سهولة التواصل، وسرعة الوصول إلى معلومات السيارة المطلوبة.</p>
+        <p>Emotion Car & Service UG تقدم عرض سيارات بطريقة احترافية وواضحة، مع اهتمام بالتفاصيل، سهولة التواصل، وسرعة الوصول إلى معلومات السيارة المطلوبة.</p>
       </div>
     </div>
     <div class="about-grid">
@@ -639,11 +541,11 @@
         <h3>معلومات التواصل</h3>
         <div class="contact-list">
           <div class="contact-row"><span>الحالة الآن</span><strong id="contactBusinessStatus">جاري التحقق...</strong></div>
-          <div class="contact-row"><span>اسم النشاط</span><strong>Emotion Car & Service UG & Service UG</strong></div>
+          <div class="contact-row"><span>اسم النشاط</span><strong>Emotion Car & Service UG</strong></div>
           <div class="contact-row"><span>الهاتف</span><strong>+49 1573 6645354</strong></div>
           <div class="contact-row"><span>البريد</span><strong>emotion.service@icloud.com</strong></div>
           <div class="contact-row"><span>العنوان</span><strong>Eulerstraße 25, 13357 Berlin</strong></div>
-          <div class="contact-row"><span>ساعات العمل</span><strong>الاثنين - الجمعة: 10:00 - 18:00<br>السبت: حسب الموعد<br>الأحد: مغلق</strong></div>
+          <div class="contact-row"><span>ساعات العمل</span><strong>الاثنين - الجمعة: 10:00 - 18:00<br>السبت: مغلق<br>الأحد: مغلق</strong></div>
         </div>
         <div class="cta-bar">
           <a class="cta-btn primary" href="https://wa.me/4915736645354" target="_blank">تواصل عبر واتساب</a>
@@ -712,8 +614,10 @@
     </div>
   </div>
 
-  <footer>© 2026 Emotion Car & Service UG & Service UG. جميع الحقوق محفوظة.
-    <div class="legal-badge">✔ شركة مسجلة قانونياً في ألمانيا</div></footer>
+  <footer>
+    © 2026 Emotion Car & Service UG. جميع الحقوق محفوظة.
+    <div class="legal-badge">✔ شركة مسجلة قانونياً في ألمانيا</div>
+  </footer>
 
   <script>
     const placeholderLogo = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
@@ -737,80 +641,230 @@
         <path d="M275 420c42-78 116-118 240-118h150c67 0 118 18 166 56l59 46h60c31 0 55 22 55 50v22H201v-18c0-20 10-38 28-48l46-26z" fill="#334155"/>
         <circle cx="372" cy="486" r="58" fill="#0f172a" stroke="#60a5fa" stroke-width="10"/>
         <circle cx="847" cy="486" r="58" fill="#0f172a" stroke="#22c55e" stroke-width="10"/>
-        <text x="600" y="610" fill="#cbd5e1" font-size="46" text-anchor="middle" font-family="Arial">Emotion Car & Service UG</text>
+        <text x="600" y="610" fill="#cbd5e1" font-size="46" text-anchor="middle" font-family="Arial">Emotion Cars</text>
         <text x="600" y="655" fill="#94a3b8" font-size="28" text-anchor="middle" font-family="Arial">No Image Available</text>
       </svg>
     `);
 
     const WHATSAPP_NUMBER = '4915736645354';
-    const businessHours = {
-      1: { open: 10, close: 18 },
-      2: { open: 10, close: 18 },
-      3: { open: 10, close: 18 },
-      4: { open: 10, close: 18 },
-      5: { open: 10, close: 18 },
-      6: { closed: true },
-      0: { closed: true }
+    const whatsappLink = (car) => {
+      const message = `مرحباً، كنت مهتماً بسيارة ${car.name}. يمكننا مساعدتك وتزويدك بكل التفاصيل.`;
+      return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
     };
 
-    function getBerlinBusinessStatus() {
-      const now = new Date();
-      const berlinFormatter = new Intl.DateTimeFormat('en-GB', {
-        timeZone: 'Europe/Berlin',
-        weekday: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-        hourCycle: 'h23'
-      });
-      const parts = berlinFormatter.formatToParts(now);
-      const weekdayMap = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
-      const weekday = weekdayMap[parts.find(p => p.type === 'weekday')?.value] ?? 0;
-      const hour = Number(parts.find(p => p.type === 'hour')?.value ?? 0);
-      const minute = Number(parts.find(p => p.type === 'minute')?.value ?? 0);
-      const current = hour + minute / 60;
-      const today = businessHours[weekday];
+    const carSeed = [
+      ['Mercedes', 'S-Class', 'Sedan', '€128,000', 2024, '8,000 km', 'ممتازة'],
+      ['BMW', 'X7', 'SUV', '€102,500', 2023, '14,500 km', 'ممتازة'],
+      ['Audi', 'RS7', 'Sport', '€119,900', 2024, '5,200 km', 'ممتازة'],
+      ['Range Rover', 'Sport', 'SUV', '€115,300', 2023, '18,100 km', 'ممتازة'],
+      ['Porsche', 'Taycan', 'Sport', '€134,800', 2024, '3,700 km', 'ممتازة'],
+      ['Lexus', 'LX', 'SUV', '€92,000', 2022, '21,000 km', 'جيدة جداً'],
+      ['Cadillac', 'Escalade', 'SUV', '€97,000', 2021, '26,000 km', 'جيدة جداً'],
+      ['Bentley', 'Bentayga', 'SUV', '€154,000', 2022, '19,500 km', 'ممتازة'],
+      ['Rolls-Royce', 'Ghost', 'Sedan', '€210,000', 2021, '17,800 km', 'ممتازة'],
+      ['Tesla', 'Model S', 'Sedan', '€88,000', 2023, '12,300 km', 'ممتازة'],
+      ['Ferrari', 'Roma', 'Sport', '€199,000', 2022, '7,400 km', 'ممتازة'],
+      ['Lamborghini', 'Urus', 'SUV', '€239,000', 2023, '6,900 km', 'ممتازة'],
+      ['Maserati', 'Levante', 'SUV', '€83,500', 2021, '29,000 km', 'جيدة جداً'],
+      ['Jaguar', 'F-Pace', 'SUV', '€59,900', 2020, '41,000 km', 'جيدة جداً'],
+      ['Genesis', 'G90', 'Sedan', '€66,400', 2022, '24,100 km', 'ممتازة'],
+      ['Volvo', 'XC90', 'SUV', '€57,800', 2021, '33,000 km', 'جيدة جداً'],
+      ['Toyota', 'Land Cruiser', 'SUV', '€74,000', 2022, '27,000 km', 'ممتازة'],
+      ['GMC', 'Yukon Denali', 'SUV', '€79,500', 2023, '15,000 km', 'ممتازة'],
+      ['Jeep', 'Grand Wagoneer', 'SUV', '€82,700', 2022, '22,200 km', 'جيدة جداً'],
+      ['Aston Martin', 'DBX', 'SUV', '€167,000', 2023, '9,800 km', 'ممتازة'],
+      ['Mercedes', 'GLE 450', 'SUV', '€71,000', 2021, '28,400 km', 'جيدة جداً'],
+      ['BMW', '740i', 'Sedan', '€69,900', 2022, '18,900 km', 'ممتازة'],
+      ['Audi', 'Q8', 'SUV', '€73,600', 2023, '11,400 km', 'ممتازة'],
+      ['Porsche', 'Cayenne', 'SUV', '€95,200', 2022, '20,700 km', 'ممتازة'],
+      ['Volkswagen', 'Touareg', 'SUV', '€49,500', 2021, '34,100 km', 'جيدة جداً'],
+      ['Land Rover', 'Defender', 'SUV', '€77,300', 2023, '14,200 km', 'ممتازة'],
+      ['Kia', 'EV9', 'SUV', '€63,400', 2024, '4,800 km', 'ممتازة'],
+      ['Hyundai', 'Palisade', 'SUV', '€46,800', 2022, '25,600 km', 'جيدة جداً'],
+      ['Nissan', 'Patrol', 'SUV', '€68,900', 2021, '37,700 km', 'جيدة جداً'],
+      ['Chevrolet', 'Tahoe', 'SUV', '€61,500', 2022, '23,900 km', 'جيدة جداً']
+    ];
 
-      if (!today || today.closed) {
-        return 'مغلق الآن - الأحد';
-      }
-      if (today.note) {
-        return 'السبت - حسب الموعد';
-      }
-      if (current >= today.open && current < today.close) {
-        return `مفتوح الآن - حتى ${String(today.close).padStart(2,'0')}:00`;
-      }
-      return `مغلق الآن - يفتح ${String(today.open).padStart(2,'0')}:00`;
+    const cars = carSeed.map((item, index) => ({
+      id: index + 1,
+      brand: item[0],
+      model: item[1],
+      category: item[2],
+      price: item[3],
+      year: item[4],
+      mileage: item[5],
+      condition: item[6],
+      name: `${item[0]} ${item[1]}`,
+      description: 'سيارة معروضة بحالة ممتازة مع مواصفات واضحة. يمكنك تعديل الصور والأسعار والمعلومات لاحقاً بسهولة.',
+      image: `images/auto${index + 1}.jpg`,
+      gallery: [
+        `images/auto${index + 1}.jpg`,
+        `images/auto${index + 1}-2.jpg`,
+        `images/auto${index + 1}-3.jpg`,
+        `images/auto${index + 1}-4.jpg`
+      ]
+    }));
+
+    let currentModalCar = null;
+    let currentPage = 1;
+    const carsPerPage = 8;
+
+    function carImage(src) {
+      return src || placeholderCar;
     }
+
+    function createCarCard(car) {
+      return `
+        <div class="car-card">
+          <img class="car-image" src="${carImage(car.image)}" alt="${car.name}" data-car-id="${car.id}" onerror="this.onerror=null;this.src=placeholderCar" />
+          <div class="car-content">
+            <div class="car-top">
+              <div class="price">${car.price}</div>
+              <div>
+                <h3>${car.name}</h3>
+                <div class="category">${car.category}</div>
+              </div>
+            </div>
+            <div class="details-grid">
+              <div class="detail-box"><span>الماركة</span><strong>${car.brand}</strong></div>
+              <div class="detail-box"><span>الطراز</span><strong>${car.model}</strong></div>
+              <div class="detail-box"><span>سنة الصنع</span><strong>${car.year}</strong></div>
+              <div class="detail-box"><span>عدد الكيلومترات</span><strong>${car.mileage}</strong></div>
+              <div class="detail-box"><span>الحالة</span><strong>${car.condition}</strong></div>
+              <div class="detail-box"><span>السعر المطلوب</span><strong>${car.price}</strong></div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderInventory() {
+      const search = document.getElementById('searchInput').value.toLowerCase().trim();
+      const category = document.getElementById('categoryFilter').value;
+      const filtered = cars.filter((car) => {
+        const matchesSearch = `${car.name} ${car.brand} ${car.model}`.toLowerCase().includes(search);
+        const matchesCategory = category === 'all' || car.category === category;
+        return matchesSearch && matchesCategory;
+      });
+
+      const totalPages = Math.max(1, Math.ceil(filtered.length / carsPerPage));
+      if (currentPage > totalPages) currentPage = totalPages;
+      const startIndex = (currentPage - 1) * carsPerPage;
+      const paginatedCars = filtered.slice(startIndex, startIndex + carsPerPage);
+
+      document.getElementById('inventoryCars').innerHTML = paginatedCars.map(createCarCard).join('');
+      document.getElementById('pagerInfo').textContent = `الصفحة ${currentPage} من ${totalPages}`;
+      document.getElementById('prevPageBtn').disabled = currentPage === 1;
+      document.getElementById('nextPageBtn').disabled = currentPage === totalPages;
+    }
+
+    function findCarById(id) {
+      return cars.find((car) => String(car.id) === String(id));
+    }
+
+    function selectModalImage(image) {
+      document.getElementById('modalImage').src = image;
+      const thumbs = document.querySelectorAll('#modalThumbs .thumb');
+      thumbs.forEach((thumb) => {
+        thumb.classList.toggle('active', thumb.getAttribute('data-image') === image);
+      });
+    }
+
+    function renderThumbs(car) {
+      const thumbs = car.gallery.map((image, index) => `
+        <img src="${image}" class="thumb ${index === 0 ? 'active' : ''}" data-image="${image}" alt="${car.name}" onerror="this.style.display='none'" />
+      `).join('');
+      document.getElementById('modalThumbs').innerHTML = thumbs;
+      document.querySelectorAll('#modalThumbs .thumb').forEach((thumb) => {
+        thumb.addEventListener('click', () => selectModalImage(thumb.getAttribute('data-image')));
+      });
+    }
+
+    function openModal(car) {
+      currentModalCar = car;
+      document.getElementById('modalImage').src = car.image || placeholderCar;
+      document.getElementById('modalImage').onerror = function () { this.src = placeholderCar; };
+      document.getElementById('modalImage').alt = car.name;
+      document.getElementById('modalName').textContent = car.name;
+      document.getElementById('modalCategory').textContent = car.category;
+      document.getElementById('modalDescription').textContent = car.description;
+      document.getElementById('modalWhatsappLink').href = whatsappLink(car);
+      document.getElementById('modalDetails').innerHTML = `
+        <div class="detail-box"><span>الماركة</span><strong>${car.brand}</strong></div>
+        <div class="detail-box"><span>الطراز</span><strong>${car.model}</strong></div>
+        <div class="detail-box"><span>سنة الصنع</span><strong>${car.year}</strong></div>
+        <div class="detail-box"><span>عدد الكيلومترات</span><strong>${car.mileage}</strong></div>
+        <div class="detail-box"><span>الحالة</span><strong>${car.condition}</strong></div>
+        <div class="detail-box"><span>السعر المطلوب</span><strong>${car.price}</strong></div>
+      `;
+      renderThumbs(car);
+      document.getElementById('carModal').classList.add('show');
+    }
+
+    function closeModal() {
+      document.getElementById('carModal').classList.remove('show');
+      currentModalCar = null;
+    }
+
+    document.getElementById('searchInput').addEventListener('input', function () {
+      currentPage = 1;
+      renderInventory();
+    });
+
+    document.getElementById('categoryFilter').addEventListener('change', function () {
+      currentPage = 1;
+      renderInventory();
+    });
+
+    document.getElementById('prevPageBtn').addEventListener('click', function () {
+      if (currentPage > 1) {
+        currentPage -= 1;
+        renderInventory();
+      }
+    });
+
+    document.getElementById('nextPageBtn').addEventListener('click', function () {
+      const search = document.getElementById('searchInput').value.toLowerCase().trim();
+      const category = document.getElementById('categoryFilter').value;
+      const filtered = cars.filter((car) => {
+        const matchesSearch = `${car.name} ${car.brand} ${car.model}`.toLowerCase().includes(search);
+        const matchesCategory = category === 'all' || car.category === category;
+        return matchesSearch && matchesCategory;
+      });
+      const totalPages = Math.ceil(filtered.length / carsPerPage);
+      if (currentPage < totalPages) {
+        currentPage += 1;
+        renderInventory();
+      }
+    });
+
+    document.getElementById('carModal').addEventListener('click', function (e) {
+      if (e.target.id === 'carModal') closeModal();
+    });
+
+    document.addEventListener('click', function (e) {
+      const image = e.target.closest('.car-image');
+      if (!image) return;
+      const carId = image.getAttribute('data-car-id');
+      const car = findCarById(carId);
+      if (car) openModal(car);
+    });
 
     function updateBusinessStatus() {
       const now = new Date();
-      const day = now.getDay(); // 0=Sunday
+      const day = now.getDay();
       const hour = now.getHours();
       const minute = now.getMinutes();
       const currentMinutes = hour * 60 + minute;
-
       const weekdayNames = {
-        0: 'الأحد',
-        1: 'الاثنين',
-        2: 'الثلاثاء',
-        3: 'الأربعاء',
-        4: 'الخميس',
-        5: 'الجمعة',
-        6: 'السبت'
+        0: 'الأحد', 1: 'الاثنين', 2: 'الثلاثاء', 3: 'الأربعاء', 4: 'الخميس', 5: 'الجمعة', 6: 'السبت'
       };
-
       const openMinutes = 10 * 60;
       const closeMinutes = 18 * 60;
-
       const dot = document.getElementById('statusDot');
       const text = document.getElementById('statusText');
-
+      const contact = document.getElementById('contactBusinessStatus');
       const todayName = weekdayNames[day];
-      const formatTime = (mins) => {
-        const h = Math.floor(mins / 60);
-        const m = mins % 60;
-        return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-      };
 
       let message = '';
       let color = '#ef4444';
@@ -821,11 +875,9 @@
           const remaining = closeMinutes - currentMinutes;
           const hoursLeft = Math.floor(remaining / 60);
           const minsLeft = remaining % 60;
-          if (hoursLeft > 0) {
-            message = `مفتوح الآن • اليوم ${todayName} • يغلق عند 18:00 • متبقي ${hoursLeft} س و ${minsLeft} د`;
-          } else {
-            message = `مفتوح الآن • اليوم ${todayName} • يغلق عند 18:00 • متبقي ${minsLeft} دقيقة`;
-          }
+          message = hoursLeft > 0
+            ? `مفتوح الآن • اليوم ${todayName} • يغلق عند 18:00 • متبقي ${hoursLeft} س و ${minsLeft} د`
+            : `مفتوح الآن • اليوم ${todayName} • يغلق عند 18:00 • متبقي ${minsLeft} دقيقة`;
         } else if (currentMinutes < openMinutes) {
           const remaining = openMinutes - currentMinutes;
           const hoursLeft = Math.floor(remaining / 60);
@@ -848,80 +900,23 @@
         dot.style.boxShadow = `0 0 10px ${color}`;
       }
       if (text) text.textContent = message;
-
-      const liveStatus = document.getElementById('liveBusinessStatus');
-      const contact = document.getElementById('contactBusinessStatus');
-      if (liveStatus) liveStatus.style.color = color;
       if (contact) {
         contact.textContent = message;
         contact.style.color = color;
       }
     }
 
-    updateBusinessStatus();
+    renderInventory();
     updateBusinessStatus();
     setInterval(updateBusinessStatus, 60000);
-    });
-
-    document.getElementById('categoryFilter').addEventListener('change', function () {
-      currentPage = 1;
-      renderInventory();
-    });
-
-    document.getElementById('prevPageBtn').addEventListener('click', function () {
-      if (currentPage > 1) {
-        currentPage -= 1;
-        renderInventory();
-      }
-    });
-
-    document.getElementById('nextPageBtn').addEventListener('click', function () {
-      const totalPages = Math.ceil(cars.length / carsPerPage);
-      if (currentPage < totalPages) {
-        currentPage += 1;
-        renderInventory();
-      }
-    });
-
-    document.getElementById('carModal').addEventListener('click', function (e) {
-      if (e.target.id === 'carModal') closeModal();
-    });
-
-    document.addEventListener('click', function (e) {
-      const image = e.target.closest('.car-image');
-      if (!image) return;
-      const carId = image.getAttribute('data-car-id');
-      const car = findCarById(carId);
-      if (car) openModal(car);
-    });
-
-    renderInventory();
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
+        if (entry.isIntersecting) entry.target.classList.add('visible');
       });
     }, { threshold: 0.12 });
 
     document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
-
-    let lastScrollY = window.scrollY;
-    const nav = document.querySelector('.top-nav');
-    window.addEventListener('scroll', () => {
-      const currentY = window.scrollY;
-      if (currentY > 120 && currentY > lastScrollY) {
-        nav.style.transform = 'translateY(-6px)';
-        nav.style.background = 'linear-gradient(90deg, rgba(4,12,28,.96), rgba(8,21,45,.92))';
-        nav.style.boxShadow = '0 22px 60px rgba(0,0,0,.35)';
-      } else {
-        nav.style.transform = 'translateY(0)';
-        nav.style.background = 'linear-gradient(90deg, rgba(4,12,28,.9), rgba(8,21,45,.82))';
-        nav.style.boxShadow = '0 18px 50px rgba(0,0,0,.28)';
-      }
-      lastScrollY = currentY;
-    });
   </script>
 </body>
 </html>
