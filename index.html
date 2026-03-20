@@ -4,176 +4,179 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Emotion Car & Service UG</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      font-family: "Tajawal", sans-serif;
-      background: linear-gradient(135deg, #020617 0%, #0b1f3a 55%, #000 100%);
+      font-family: 'Tajawal', Arial, sans-serif;
+      background: linear-gradient(135deg, #020617 0%, #0b1f3a 50%, #000000 100%);
       color: #fff;
     }
-
     a { text-decoration: none; color: inherit; }
+    .container { width: min(1200px, calc(100% - 32px)); margin: 0 auto; }
+    .section { padding: 56px 0; }
+    section { scroll-margin-top: 90px; }
 
-    .container {
-      width: min(1200px, calc(100% - 32px));
-      margin: 0 auto;
-    }
-
-    .topbar {
+    .top-nav {
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(5, 12, 24, 0.94);
+      background: rgba(7,16,32,.96);
+      border-bottom: 1px solid rgba(255,255,255,.08);
       backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 8px 24px rgba(0,0,0,.28);
     }
-
-    .topbar-inner {
-      min-height: 88px;
+    .top-nav-inner {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 18px;
-      flex-wrap: wrap;
+      gap: 24px;
       padding: 14px 0;
     }
-
-    .brand {
+    .brand-pill {
       display: flex;
       align-items: center;
       gap: 14px;
+      min-width: 0;
     }
-
     .logo {
-      width: 88px;
-      height: 88px;
+      width: 140px;
+      height: 90px;
       object-fit: cover;
-      border-radius: 20px;
-      background: rgba(255,255,255,0.08);
-      padding: 8px;
-      border: 1px solid rgba(255,255,255,0.15);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      border-radius: 18px;
+      background: rgba(255,255,255,.10);
+      padding: 6px;
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 18px 50px rgba(0,0,0,.65), 0 0 24px rgba(59,130,246,.35);
+      animation: logoGlow 3s ease-in-out infinite alternate, logoFloat 4s ease-in-out infinite;
+      flex-shrink: 0;
     }
-
-    .brand h1 {
-      margin: 0;
-      font-size: clamp(24px, 3vw, 42px);
-      font-weight: 900;
+    @keyframes logoGlow {
+      from { box-shadow: 0 18px 50px rgba(0,0,0,.65), 0 0 12px rgba(59,130,246,.25); }
+      to { box-shadow: 0 20px 54px rgba(0,0,0,.72), 0 0 26px rgba(59,130,246,.48); }
     }
-
-    .status-badge {
+    @keyframes logoFloat {
+      0%,100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-4px) scale(1.02); }
+    }
+    .brand-text strong {
+      display: block;
+      font-size: 28px;
+      line-height: 1.05;
+    }
+    .status-row {
       margin-top: 8px;
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      font-size: 14px;
-      font-weight: 800;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(255,255,255,0.06);
+      gap: 8px;
+      font-size: 13px;
+      color: #dbeafe;
     }
-
     .status-dot {
       width: 12px;
       height: 12px;
       border-radius: 50%;
+      display: inline-block;
+      background: #999;
+      box-shadow: 0 0 10px rgba(255,255,255,.3);
       flex-shrink: 0;
     }
-
-    .status-open {
-      color: #dcfce7;
-      background: rgba(34,197,94,0.14);
-      border-color: rgba(34,197,94,0.25);
-    }
-
-    .status-open .status-dot {
-      background: #22c55e;
-      box-shadow: 0 0 14px rgba(34,197,94,0.8);
-    }
-
-    .status-closed {
-      color: #fee2e2;
-      background: rgba(239,68,68,0.14);
-      border-color: rgba(239,68,68,0.25);
-    }
-
-    .status-closed .status-dot {
-      background: #ef4444;
-      box-shadow: 0 0 14px rgba(239,68,68,0.8);
-    }
-
-    .nav {
+    .nav-menu {
       display: flex;
       align-items: center;
-      gap: 22px;
+      gap: 34px;
       flex-wrap: wrap;
     }
-
-    .nav a {
-      color: #e2e8f0;
-      font-weight: 700;
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 0;
+      color: #e5e7eb;
       font-size: 15px;
+      font-weight: 700;
+      position: relative;
+    }
+    .nav-link::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -14px;
+      width: 0;
+      height: 2px;
+      background: #ffffff;
+      transition: width .2s ease;
+    }
+    .nav-link:hover::after { width: 100%; }
+    .login-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.08);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.12);
+      font-weight: 800;
     }
 
     .hero {
-      padding: 56px 0 38px;
+      padding: 34px 0 30px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
       background:
-        radial-gradient(circle at 20% 20%, rgba(59,130,246,.18), transparent 30%),
-        radial-gradient(circle at 80% 0%, rgba(255,255,255,.08), transparent 25%);
+        radial-gradient(circle at 20% 20%, rgba(59,130,246,.20), transparent 30%),
+        radial-gradient(circle at 80% 0%, rgba(255,255,255,.08), transparent 25%),
+        linear-gradient(135deg, #020617 0%, #0b1f3a 50%, #000000 100%);
     }
-
-    .hero-box {
-      text-align: center;
-      padding: 48px 0 20px;
-    }
-
-    .hero-box h2 {
-      margin: 0 0 12px;
-      font-size: clamp(42px, 8vw, 88px);
-      line-height: 1.04;
+    .hero-box { padding: 48px 0 24px; text-align: center; }
+    h1 {
+      margin: 0;
+      font-size: clamp(42px, 6vw, 86px);
+      line-height: 1.08;
       font-weight: 900;
+      letter-spacing: -1px;
       background: linear-gradient(90deg, #fff, #93c5fd, #22c55e);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    .hero-box p {
-      margin: 0 auto;
-      max-width: 780px;
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+    .section-title {
+      margin: 0;
+      font-size: 36px;
+      font-weight: 900;
+      background: linear-gradient(90deg,#ffffff,#60a5fa,#93c5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .section-head p {
+      margin: 10px 0 0;
       color: #cbd5e1;
-      font-size: 18px;
+      max-width: 720px;
       line-height: 1.8;
     }
 
-    .section {
-      padding: 56px 0;
+    .inventory-wrap {
+      background: rgba(255,255,255,.03);
+      border-top: 1px solid rgba(255,255,255,.08);
+      border-bottom: 1px solid rgba(255,255,255,.08);
     }
-
-    .section-title {
-      margin: 0 0 10px;
-      font-size: 34px;
-      font-weight: 900;
-    }
-
-    .section-text {
-      margin: 0 0 26px;
-      color: #cbd5e1;
-      line-height: 1.9;
-    }
-
     .filters {
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
       margin-bottom: 24px;
     }
-
     input, select {
       background: #0f172a;
       color: #fff;
@@ -181,237 +184,304 @@
       border-radius: 14px;
       padding: 12px 14px;
       font-size: 15px;
-      min-width: 210px;
+      min-width: 190px;
       font-family: inherit;
     }
-
-    .cars-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 22px;
-    }
-
+    .grid { display: grid; gap: 20px; }
+    .cars-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
     .car-card {
-      background: linear-gradient(180deg, #071224, #0f172a);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 24px;
+      background: linear-gradient(180deg,#020617,#0f172a);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 26px;
       overflow: hidden;
-      box-shadow: 0 14px 35px rgba(0,0,0,0.45);
-      transition: transform .25s ease, box-shadow .25s ease;
+      box-shadow: 0 10px 40px rgba(0,0,0,.6);
+      transition: transform .3s ease, box-shadow .3s ease;
     }
-
     .car-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: 0 24px 70px rgba(0,0,0,.75);
     }
-
+    .car-image-wrap { position: relative; overflow: hidden; }
     .car-image {
       width: 100%;
       height: 220px;
       object-fit: cover;
       display: block;
-      background: #111827;
+      cursor: pointer;
+      transition: transform .3s ease;
     }
-
-    .car-content {
-      padding: 18px;
+    .car-card:hover .car-image { transform: scale(1.04); }
+    .car-badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      height: 34px;
+      background: rgba(15,23,42,.7);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.14);
+      padding: 0 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      backdrop-filter: blur(8px);
     }
-
+    .car-content { padding: 18px; }
     .car-top {
       display: flex;
-      justify-content: space-between;
       align-items: start;
-      gap: 10px;
-      margin-bottom: 14px;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
     }
-
-    .car-name {
-      margin: 0;
-      font-size: 22px;
-      font-weight: 800;
-    }
-
-    .car-category {
-      color: #94a3b8;
-      margin-top: 4px;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
     .price {
-      background: rgba(34,197,94,0.14);
+      background: rgba(34,197,94,.14);
       color: #bbf7d0;
-      border: 1px solid rgba(34,197,94,0.18);
+      border: 1px solid rgba(34,197,94,.18);
       border-radius: 999px;
-      padding: 8px 12px;
+      padding: 8px 14px;
       font-size: 14px;
-      font-weight: 800;
       white-space: nowrap;
     }
-
-    .details {
+    .category { color: #94a3b8; font-size: 14px; margin-top: 6px; }
+    .details-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-top: 14px;
+      gap: 12px;
+      margin-top: 12px;
     }
-
-    .detail {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 14px;
+    .detail-box {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
       padding: 12px;
     }
-
-    .detail span {
+    .detail-box span {
       display: block;
       color: #94a3b8;
       font-size: 13px;
-      margin-bottom: 5px;
+      margin-bottom: 6px;
     }
-
-    .detail strong {
-      font-size: 14px;
+    .pager {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+    .pager button {
+      background: rgba(255,255,255,.06);
+      color: white;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+    }
+    .pager button:disabled { opacity: .45; cursor: not-allowed; }
+    .pager-info { color: #cbd5e1; font-size: 14px; }
+    .empty-box {
+      padding: 28px;
+      text-align: center;
+      color: #cbd5e1;
+      border: 1px dashed rgba(255,255,255,.12);
+      border-radius: 18px;
+      background: rgba(255,255,255,.02);
+      grid-column: 1 / -1;
     }
 
     .about-grid {
       display: grid;
       grid-template-columns: 1.1fr .9fr;
-      gap: 22px;
+      gap: 24px;
+      align-items: stretch;
     }
-
-    .card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
+    .about-card, .contact-card, .legal-card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
       border-radius: 24px;
       padding: 24px;
     }
-
-    .contact-list {
-      display: grid;
-      gap: 12px;
-      margin-top: 16px;
-    }
-
+    .contact-list { display: grid; gap: 14px; margin-top: 18px; }
     .contact-row {
       display: flex;
       justify-content: space-between;
       gap: 12px;
-      padding: 14px 16px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.06);
-      border-radius: 16px;
+      color: #e2e8f0;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 18px;
+      padding: 16px;
     }
-
-    .contact-row span {
-      color: #94a3b8;
-    }
-
-    .cta {
-      margin-top: 16px;
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .btn {
+    .contact-row span { color: #94a3b8; }
+    .cta-bar { margin-top: 18px; display: flex; gap: 12px; flex-wrap: wrap; }
+    .cta-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       padding: 12px 18px;
       border-radius: 16px;
-      font-weight: 800;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(255,255,255,0.06);
-    }
-
-    .btn.primary {
-      background: #22c55e;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.06);
       color: #fff;
-      border-color: rgba(34,197,94,0.25);
     }
+    .cta-btn.primary {
+      background: #22c55e;
+      border-color: rgba(34,197,94,.25);
+    }
+    .legal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+    }
+    .legal-card p { color: #cbd5e1; line-height: 1.9; margin-top: 10px; }
 
-    .empty-box {
-      padding: 26px;
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 999;
+    }
+    .modal.show { display: flex; }
+    .modal-card {
+      width: min(1000px, 100%);
+      max-height: 92vh;
+      overflow: auto;
+      background: #0f172a;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 28px;
+      position: relative;
+    }
+    .close-btn {
+      position: sticky;
+      top: 14px;
+      margin: 14px 14px 0 auto;
+      display: block;
+      width: fit-content;
+      background: rgba(255,255,255,.08);
+      color: white;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+      z-index: 2;
+      font-family: inherit;
+    }
+    .modal-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 26px;
+      padding: 22px;
+    }
+    .modal-image {
+      width: 100%;
+      min-height: 340px;
+      max-height: 560px;
+      object-fit: cover;
+      border-radius: 24px;
+      display: block;
+    }
+    .thumbs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .thumb {
+      width: 100%;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 14px;
+      border: 2px solid rgba(255,255,255,.08);
+      cursor: pointer;
+      background: #111827;
+    }
+    .thumb.active { border-color: #22c55e; }
+    .whatsapp-banner {
+      margin-top: 14px;
+      background: #22c55e;
+      color: white;
       text-align: center;
-      color: #cbd5e1;
-      border: 1px dashed rgba(255,255,255,0.14);
+      padding: 16px;
       border-radius: 18px;
-      background: rgba(255,255,255,0.02);
+      font-weight: bold;
     }
-
-    .map-wrap {
-      border-radius: 20px;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.1);
-    }
+    .modal-title { font-size: 32px; margin-bottom: 8px; }
+    .modal-desc { color: #cbd5e1; line-height: 1.9; margin: 18px 0; }
 
     footer {
       padding: 40px 0 50px;
-      text-align: center;
       color: #cbd5e1;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      margin-top: 20px;
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,.08);
+      margin-top: 40px;
       font-size: 14px;
     }
 
     @media (max-width: 900px) {
-      .topbar-inner {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .about-grid,
-      .details {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-box h2 {
-        font-size: 48px;
-      }
+      .top-nav-inner { flex-direction: column; align-items: flex-start; }
+      .nav-menu { gap: 18px; }
+      .brand-text strong { font-size: 22px; }
+      .logo { width: 120px; height: 80px; }
+      .about-grid, .legal-grid, .modal-grid { grid-template-columns: 1fr; }
+      .thumbs { grid-template-columns: repeat(2, 1fr); }
+      .details-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 42px; }
     }
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="container topbar-inner">
-      <div class="brand">
-        <img
-          class="logo"
-          src="images/logo.png"
-          alt="Emotion Car"
-          onerror="this.src=window.placeholderLogo"
-        />
-        <div>
-          <h1>Emotion Car & Service UG</h1>
-          <div id="businessStatus" class="status-badge">
-            <span class="status-dot"></span>
-            <span id="statusText">جاري التحقق...</span>
+  <header class="top-nav">
+    <div class="container top-nav-inner">
+      <div class="brand-pill">
+        <img src="images/logo.png" class="logo" alt="logo" onerror="this.src=window.placeholderLogo" />
+        <div class="brand-text">
+          <strong>Emotion Car & Service UG</strong>
+          <div id="liveBusinessStatus" class="status-row">
+            <span id="statusDot" class="status-dot"></span>
+            <span id="statusText">جاري التحميل...</span>
           </div>
+          <div id="smartClock" style="margin-top:6px;color:#93c5fd;font-size:13px;font-weight:700;">الوقت الآن: --:--</div>
         </div>
       </div>
 
-      <nav class="nav">
-        <a href="#cars">السيارات</a>
-        <a href="#about">من نحن</a>
-        <a href="#contact">التواصل</a>
+      <nav class="nav-menu">
+        <a class="nav-link" href="#cars">Fahrzeuge</a>
+        <a class="nav-link" href="#about">Über uns</a>
+        <a class="nav-link" href="#terms">Service</a>
+        <a class="nav-link" href="#contact">Kontakt</a>
       </nav>
+
+      <a class="login-link" href="login.html">تسجيل</a>
     </div>
   </header>
 
   <section class="hero">
-    <div class="container hero-box">
-      <h2>Emotion Car</h2>
-      <p>
-        موقع بسيط ومرتب لعرض السيارات بشكل واضح مع صور، تفاصيل، وحالة النشاط مفتوح أو مغلق بشكل مباشر.
-      </p>
+    <div class="container">
+      <div class="hero-box">
+        <h1>Emotion Car & Service UG</h1>
+      </div>
     </div>
   </section>
 
-  <section id="cars" class="section">
+  <section id="cars" class="section inventory-wrap">
     <div class="container">
-      <h3 class="section-title">السيارات المتوفرة</h3>
-      <p class="section-text">هذه السيارات تظهر مباشرة داخل الموقع بدون الحاجة إلى قاعدة بيانات.</p>
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">معرض السيارات</h2>
+          <p>يعرض الموقع السيارات المتاحة للتأجير مع تفاصيل واضحة وصور مرتبة وسهولة الوصول إلى كل سيارة.</p>
+        </div>
+      </div>
 
       <div class="filters">
         <input id="searchInput" type="text" placeholder="ابحث عن سيارة..." />
@@ -423,278 +493,455 @@
         </select>
       </div>
 
-      <div id="carsGrid" class="cars-grid"></div>
+      <div id="inventoryCars" class="grid cars-grid"></div>
+
+      <div class="pager">
+        <button id="nextPageBtn">التالي ←</button>
+        <div id="pagerInfo" class="pager-info"></div>
+        <button id="prevPageBtn">→ السابق</button>
+      </div>
     </div>
   </section>
 
-  <section id="about" class="section">
-    <div class="container about-grid">
-      <div class="card">
-        <h3 class="section-title">من نحن</h3>
-        <p class="section-text">
-          نحن وكالة متخصصة في عرض وتأجير السيارات، ونوفر لك واجهة واضحة وسهلة تساعد الزبون على مشاهدة السيارات المتوفرة ومعرفة حالة النشاط مباشرة.
+  <section id="about" class="section container">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">من نحن</h2>
+      </div>
+    </div>
+    <div class="about-grid">
+      <div class="about-card">
+        <h3>نحن وكالة متخصصة في تأجير السيارات</h3>
+        <p style="margin-top:14px; line-height:1.9; color:#cbd5e1;">
+          نحن وكالة احترافية في مجال تأجير السيارات، نقدم لك مجموعة متنوعة من السيارات الحديثة والمجهزة بأعلى المعايير، مع حرصنا على توفير تجربة سهلة وسريعة وموثوقة، تساعدك على اختيار السيارة المناسبة بكل راحة وثقة.
         </p>
       </div>
-
-      <div id="contact" class="card">
-        <h3 class="section-title">معلومات التواصل</h3>
-
+      <div id="contact" class="contact-card">
+        <h3>معلومات التواصل</h3>
         <div class="contact-list">
-          <div class="contact-row">
-            <span>الحالة الآن</span>
-            <strong id="contactBusinessStatus">جاري التحقق...</strong>
-          </div>
-          <div class="contact-row">
-            <span>اسم النشاط</span>
-            <strong>Emotion Car & Service UG</strong>
-          </div>
-          <div class="contact-row">
-            <span>الهاتف</span>
-            <strong>+49 1573 6645354</strong>
-          </div>
-          <div class="contact-row">
-            <span>البريد</span>
-            <strong>emotion.service@icloud.com</strong>
-          </div>
-          <div class="contact-row">
-            <span>العنوان</span>
-            <strong>Eulerstraße 25, 13357 Berlin</strong>
-          </div>
+          <div class="contact-row"><span>الحالة الآن</span><strong id="contactBusinessStatus">جاري التحقق...</strong></div>
+          <div class="contact-row"><span>اسم النشاط</span><strong>Emotion Car & Service UG</strong></div>
+          <div class="contact-row"><span>الهاتف</span><strong>+49 1573 6645354</strong></div>
+          <div class="contact-row"><span>البريد</span><strong>emotion.service@icloud.com</strong></div>
+          <div class="contact-row"><span>العنوان</span><strong>Eulerstraße 25, 13357 Berlin</strong></div>
+          <div class="contact-row"><span>ساعات العمل</span><strong>الاثنين - الجمعة: 10:00 - 18:00<br>السبت: مغلق<br>الأحد: مغلق</strong></div>
         </div>
-
-        <div class="cta">
-          <a class="btn primary" href="https://wa.me/4915736645354" target="_blank">واتساب</a>
-          <a class="btn" href="mailto:emotion.service@icloud.com">بريد إلكتروني</a>
+        <div class="cta-bar">
+          <a class="cta-btn primary" href="https://wa.me/4915736645354" target="_blank">تواصل عبر واتساب</a>
+          <a class="cta-btn" href="mailto:emotion.service@icloud.com">إرسال بريد</a>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="section">
-    <div class="container">
-      <h3 class="section-title">موقعنا</h3>
-      <p class="section-text">يمكنك الوصول إلينا مباشرة عبر الخريطة.</p>
-
-      <div class="map-wrap">
-        <iframe
-          src="https://www.google.com/maps?q=Eulerstraße+25,+13357+Berlin&output=embed"
-          width="100%"
-          height="380"
-          style="border:0"
-          loading="lazy">
-        </iframe>
+  <section id="terms" class="section container">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">الشروط والأحكام</h2>
+      </div>
+    </div>
+    <div class="legal-grid">
+      <div class="legal-card">
+        <h3>شروط استخدام الموقع</h3>
+        <p>جميع المعلومات والصور والأسعار المعروضة هدفها التعريف بالسيارات المتاحة. قد تتغير بعض التفاصيل أو الأسعار حسب حالة المركبة والتوفر الفعلي وقت التواصل.</p>
+      </div>
+      <div class="legal-card">
+        <h3>معلومات البيع والتواصل</h3>
+        <p>يتم تأكيد المواصفات النهائية، حالة السيارة، وسعر التأجير النهائي عند التواصل المباشر. يمكن للعميل طلب معلومات إضافية أو صور أكثر عبر واتساب أو البريد الإلكتروني.</p>
       </div>
     </div>
   </section>
+
+  <section class="section container">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">موقعنا على الخريطة</h2>
+        <p>يمكنك زيارة موقعنا مباشرة عبر الخريطة.</p>
+      </div>
+    </div>
+    <div style="border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.1)">
+      <iframe src="https://www.google.com/maps?q=Eulerstraße+25,+13357+Berlin&output=embed" width="100%" height="400" style="border:0" loading="lazy"></iframe>
+    </div>
+  </section>
+
+  <div id="carModal" class="modal">
+    <div class="modal-card">
+      <button class="close-btn" onclick="closeModal()">إغلاق</button>
+      <div class="modal-grid">
+        <div>
+          <a id="modalWhatsappLink" target="_blank">
+            <img id="modalImage" class="modal-image" src="" alt="car" />
+            <div class="whatsapp-banner">إن كنت مهتماً يمكننا مساعدتك عبر واتساب</div>
+          </a>
+          <div id="modalThumbs" class="thumbs"></div>
+        </div>
+        <div>
+          <h2 id="modalName" class="modal-title"></h2>
+          <p id="modalCategory" class="category"></p>
+          <p id="modalDescription" class="modal-desc"></p>
+          <div id="modalDetails" class="details-grid"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <footer>
-    © 2026 Emotion Car & Service UG - جميع الحقوق محفوظة
+    © 2026 Emotion Car & Service UG. جميع الحقوق محفوظة.
   </footer>
 
   <script>
-    window.placeholderLogo = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" width="160" height="100" viewBox="0 0 160 100">
-        <rect width="160" height="100" rx="18" fill="#0f172a"/>
-        <path d="M28 58c14-16 34-24 60-24 11 0 23 2 34 7" fill="none" stroke="#3b82f6" stroke-width="7" stroke-linecap="round"/>
-        <path d="M34 64h72c12 0 22-6 28-16" fill="none" stroke="#22c55e" stroke-width="7" stroke-linecap="round"/>
-        <text x="80" y="84" text-anchor="middle" fill="white" font-size="20" font-family="Arial">EC</text>
-      </svg>
-    `);
+  window.placeholderLogo = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="160" height="100" viewBox="0 0 160 100">
+      <rect width="160" height="100" rx="16" fill="#0f172a"/>
+      <path d="M28 58c14-16 34-24 60-24 11 0 23 2 34 7" fill="none" stroke="#3b82f6" stroke-width="7" stroke-linecap="round"/>
+      <path d="M34 64h72c12 0 22-6 28-16" fill="none" stroke="#22c55e" stroke-width="7" stroke-linecap="round"/>
+      <text x="80" y="86" text-anchor="middle" fill="white" font-size="20" font-family="Arial">EC</text>
+    </svg>
+  `);
 
-    window.placeholderCar = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
-        <defs>
-          <linearGradient id="g" x1="0" x2="1">
-            <stop offset="0%" stop-color="#0f172a"/>
-            <stop offset="100%" stop-color="#1e293b"/>
-          </linearGradient>
-        </defs>
-        <rect width="1200" height="700" fill="url(#g)"/>
-        <path d="M275 420c42-78 116-118 240-118h150c67 0 118 18 166 56l59 46h60c31 0 55 22 55 50v22H201v-18c0-20 10-38 28-48l46-26z" fill="#334155"/>
-        <circle cx="372" cy="486" r="58" fill="#0f172a" stroke="#60a5fa" stroke-width="10"/>
-        <circle cx="847" cy="486" r="58" fill="#0f172a" stroke="#22c55e" stroke-width="10"/>
-        <text x="600" y="610" fill="#cbd5e1" font-size="46" text-anchor="middle" font-family="Arial">Emotion Cars</text>
-        <text x="600" y="655" fill="#94a3b8" font-size="28" text-anchor="middle" font-family="Arial">No Image Available</text>
-      </svg>
-    `);
+  window.placeholderCar = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+      <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0%" stop-color="#0f172a"/><stop offset="100%" stop-color="#1e293b"/></linearGradient></defs>
+      <rect width="1200" height="700" fill="url(#g)"/>
+      <path d="M275 420c42-78 116-118 240-118h150c67 0 118 18 166 56l59 46h60c31 0 55 22 55 50v22H201v-18c0-20 10-38 28-48l46-26z" fill="#334155"/>
+      <circle cx="372" cy="486" r="58" fill="#0f172a" stroke="#60a5fa" stroke-width="10"/>
+      <circle cx="847" cy="486" r="58" fill="#0f172a" stroke="#22c55e" stroke-width="10"/>
+      <text x="600" y="610" fill="#cbd5e1" font-size="46" text-anchor="middle" font-family="Arial">Emotion Cars</text>
+      <text x="600" y="655" fill="#94a3b8" font-size="28" text-anchor="middle" font-family="Arial">No Image Available</text>
+    </svg>
+  `);
 
-    const cars = [
-      {
-        id: 1,
-        name: "Mercedes S-Class",
-        brand: "Mercedes",
-        model: "S-Class",
-        category: "Sedan",
-        price: "€128,000",
-        year: "2024",
-        mileage: "8,000 km",
-        condition: "ممتازة",
-        image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80"
-      },
-      {
-        id: 2,
-        name: "BMW X7",
-        brand: "BMW",
-        model: "X7",
-        category: "SUV",
-        price: "€102,500",
-        year: "2023",
-        mileage: "14,500 km",
-        condition: "ممتازة",
-        image: "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=80"
-      },
-      {
-        id: 3,
-        name: "Audi RS7",
-        brand: "Audi",
-        model: "RS7",
-        category: "Sport",
-        price: "€119,900",
-        year: "2024",
-        mileage: "5,200 km",
-        condition: "ممتازة",
-        image: "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=80"
-      },
-      {
-        id: 4,
-        name: "Range Rover Sport",
-        brand: "Range Rover",
-        model: "Sport",
-        category: "SUV",
-        price: "€115,300",
-        year: "2023",
-        mileage: "18,100 km",
-        condition: "ممتازة",
-        image: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=1200&q=80"
-      },
-      {
-        id: 5,
-        name: "Porsche Taycan",
-        brand: "Porsche",
-        model: "Taycan",
-        category: "Sport",
-        price: "€134,800",
-        year: "2024",
-        mileage: "3,700 km",
-        condition: "ممتازة",
-        image: "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?auto=format&fit=crop&w=1200&q=80"
-      },
-      {
-        id: 6,
-        name: "Lexus LX",
-        brand: "Lexus",
-        model: "LX",
-        category: "SUV",
-        price: "€92,000",
-        year: "2022",
-        mileage: "21,000 km",
-        condition: "جيدة جداً",
-        image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1200&q=80"
-      }
-    ];
+  const imageBase = 'https://raw.githubusercontent.com/wahebwahbe100-byte/A/main/images';
+  const WHATSAPP_NUMBER = '4915736645354';
+  const carsPerPage = 8;
+  let currentPage = 1;
+  let cars = [];
+  let supabase = null;
 
-    function updateBusinessStatus() {
-      const status = document.getElementById("businessStatus");
-      const statusText = document.getElementById("statusText");
-      const contactStatus = document.getElementById("contactBusinessStatus");
+  const carSeed = [
+    ['Mercedes', 'S-Class', 'Sedan', '€128,000', 2024, '8,000 km', 'ممتازة'],
+    ['BMW', 'X7', 'SUV', '€102,500', 2023, '14,500 km', 'ممتازة'],
+    ['Audi', 'RS7', 'Sport', '€119,900', 2024, '5,200 km', 'ممتازة'],
+    ['Range Rover', 'Sport', 'SUV', '€115,300', 2023, '18,100 km', 'ممتازة'],
+    ['Porsche', 'Taycan', 'Sport', '€134,800', 2024, '3,700 km', 'ممتازة'],
+    ['Lexus', 'LX', 'SUV', '€92,000', 2022, '21,000 km', 'جيدة جداً'],
+    ['Cadillac', 'Escalade', 'SUV', '€97,000', 2021, '26,000 km', 'جيدة جداً'],
+    ['Bentley', 'Bentayga', 'SUV', '€154,000', 2022, '19,500 km', 'ممتازة'],
+    ['Rolls-Royce', 'Ghost', 'Sedan', '€210,000', 2021, '17,800 km', 'ممتازة'],
+    ['Tesla', 'Model S', 'Sedan', '€88,000', 2023, '12,300 km', 'ممتازة'],
+    ['Ferrari', 'Roma', 'Sport', '€199,000', 2022, '7,400 km', 'ممتازة'],
+    ['Lamborghini', 'Urus', 'SUV', '€239,000', 2023, '6,900 km', 'ممتازة'],
+    ['Maserati', 'Levante', 'SUV', '€83,500', 2021, '29,000 km', 'جيدة جداً'],
+    ['Jaguar', 'F-Pace', 'SUV', '€59,900', 2020, '41,000 km', 'جيدة جداً'],
+    ['Genesis', 'G90', 'Sedan', '€66,400', 2022, '24,100 km', 'ممتازة'],
+    ['Volvo', 'XC90', 'SUV', '€57,800', 2021, '33,000 km', 'جيدة جداً'],
+    ['Toyota', 'Land Cruiser', 'SUV', '€74,000', 2022, '27,000 km', 'ممتازة'],
+    ['GMC', 'Yukon Denali', 'SUV', '€79,500', 2023, '15,000 km', 'ممتازة'],
+    ['Jeep', 'Grand Wagoneer', 'SUV', '€82,700', 2022, '22,200 km', 'جيدة جداً'],
+    ['Aston Martin', 'DBX', 'SUV', '€167,000', 2023, '9,800 km', 'ممتازة'],
+    ['Mercedes', 'GLE 450', 'SUV', '€71,000', 2021, '28,400 km', 'جيدة جداً'],
+    ['BMW', '740i', 'Sedan', '€69,900', 2022, '18,900 km', 'ممتازة'],
+    ['Audi', 'Q8', 'SUV', '€73,600', 2023, '11,400 km', 'ممتازة'],
+    ['Porsche', 'Cayenne', 'SUV', '€95,200', 2022, '20,700 km', 'ممتازة'],
+    ['Volkswagen', 'Touareg', 'SUV', '€49,500', 2021, '34,100 km', 'جيدة جداً'],
+    ['Land Rover', 'Defender', 'SUV', '€77,300', 2023, '14,200 km', 'ممتازة'],
+    ['Kia', 'EV9', 'SUV', '€63,400', 2024, '4,800 km', 'ممتازة'],
+    ['Hyundai', 'Palisade', 'SUV', '€46,800', 2022, '25,600 km', 'جيدة جداً'],
+    ['Nissan', 'Patrol', 'SUV', '€68,900', 2021, '37,700 km', 'جيدة جداً'],
+    ['Chevrolet', 'Tahoe', 'SUV', '€61,500', 2022, '23,900 km', 'جيدة جداً']
+  ];
 
-      const now = new Date();
-      const berlinTime = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Berlin" }));
-      const day = berlinTime.getDay();
-      const hour = berlinTime.getHours();
-      const minute = berlinTime.getMinutes();
-      const totalMinutes = hour * 60 + minute;
+  const defaultCars = carSeed.map((item, index) => ({
+    id: index + 1,
+    brand: item[0],
+    model: item[1],
+    category: item[2],
+    price: item[3],
+    year: item[4],
+    mileage: item[5],
+    condition: item[6],
+    name: `${item[0]} ${item[1]}`,
+    description: 'سيارة معروضة بحالة ممتازة مع مواصفات واضحة. يمكنك تعديل الصور والأسعار والمعلومات لاحقاً بسهولة.',
+    image: `${imageBase}/auto${index + 1}.jpg`,
+    gallery: [`${imageBase}/auto${index + 1}.jpg`]
+  }));
 
-      const openMinutes = 10 * 60;
-      const closeMinutes = 18 * 60;
+  function whatsappLink(car) {
+    const message = `مرحباً، كنت مهتماً بسيارة ${car.name}. يمكننا مساعدتك وتزويدك بكل التفاصيل.`;
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  }
 
-      let isOpen = false;
+  function findCarById(id) {
+    return cars.find((car) => String(car.id) === String(id));
+  }
 
-      if (day >= 1 && day <= 5 && totalMinutes >= openMinutes && totalMinutes < closeMinutes) {
-        isOpen = true;
-      }
-
-      status.className = "status-badge " + (isOpen ? "status-open" : "status-closed");
-      statusText.textContent = isOpen ? "مفتوح الآن" : "مغلق الآن";
-      contactStatus.textContent = isOpen ? "مفتوح الآن" : "مغلق الآن";
-      contactStatus.style.color = isOpen ? "#22c55e" : "#ef4444";
-    }
-
-    function createCarCard(car) {
-      return `
-        <div class="car-card">
-          <img
-            class="car-image"
-            src="${car.image}"
-            alt="${car.name}"
-            onerror="this.src=window.placeholderCar"
-          />
-          <div class="car-content">
-            <div class="car-top">
-              <div>
-                <h4 class="car-name">${car.name}</h4>
-                <div class="car-category">${car.category}</div>
-              </div>
-              <div class="price">${car.price}</div>
-            </div>
-
-            <div class="details">
-              <div class="detail">
-                <span>الماركة</span>
-                <strong>${car.brand}</strong>
-              </div>
-              <div class="detail">
-                <span>الطراز</span>
-                <strong>${car.model}</strong>
-              </div>
-              <div class="detail">
-                <span>سنة الصنع</span>
-                <strong>${car.year}</strong>
-              </div>
-              <div class="detail">
-                <span>عدد الكيلومترات</span>
-                <strong>${car.mileage}</strong>
-              </div>
-              <div class="detail">
-                <span>الحالة</span>
-                <strong>${car.condition}</strong>
-              </div>
-              <div class="detail">
-                <span>السعر</span>
-                <strong>${car.price}</strong>
-              </div>
+  function createCarCard(car) {
+    return `
+      <div class="car-card">
+        <div class="car-image-wrap">
+          <img class="car-image" src="${car.image || window.placeholderCar}" alt="${car.name}" data-car-id="${car.id}" onerror="this.onerror=null;this.src=window.placeholderCar" />
+          <div class="car-badge">${car.id}</div>
+        </div>
+        <div class="car-content">
+          <div class="car-top">
+            <div class="price">${car.price || ''}</div>
+            <div>
+              <h3>${car.name || ''}</h3>
+              <div class="category">${car.category || ''}</div>
             </div>
           </div>
+          <div class="details-grid">
+            <div class="detail-box"><span>الماركة</span><strong>${car.brand || ''}</strong></div>
+            <div class="detail-box"><span>الطراز</span><strong>${car.model || ''}</strong></div>
+            <div class="detail-box"><span>سنة الصنع</span><strong>${car.year || ''}</strong></div>
+            <div class="detail-box"><span>عدد الكيلومترات</span><strong>${car.mileage || ''}</strong></div>
+            <div class="detail-box"><span>الحالة</span><strong>${car.condition || ''}</strong></div>
+            <div class="detail-box"><span>السعر المطلوب</span><strong>${car.price || ''}</strong></div>
+          </div>
         </div>
-      `;
-    }
+      </div>`;
+  }
 
-    function renderCars() {
-      const grid = document.getElementById("carsGrid");
-      const searchValue = (document.getElementById("searchInput").value || "").toLowerCase().trim();
-      const categoryValue = document.getElementById("categoryFilter").value;
+  function renderInventory() {
+    const inventory = document.getElementById('inventoryCars');
+    if (!inventory) return;
 
-      const filtered = cars.filter(car => {
-        const matchSearch =
-          `${car.name} ${car.brand} ${car.model}`.toLowerCase().includes(searchValue);
-        const matchCategory = categoryValue === "all" || car.category === categoryValue;
-        return matchSearch && matchCategory;
-      });
+    const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+    const category = document.getElementById('categoryFilter')?.value || 'all';
 
-      if (!filtered.length) {
-        grid.innerHTML = `<div class="empty-box">لا توجد سيارات مطابقة حالياً.</div>`;
-        return;
+    const filtered = cars.filter((car) => {
+      const matchesSearch = `${car.name || ''} ${car.brand || ''} ${car.model || ''}`.toLowerCase().includes(search);
+      const matchesCategory = category === 'all' || car.category === category;
+      return matchesSearch && matchesCategory;
+    });
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / carsPerPage));
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const startIndex = (currentPage - 1) * carsPerPage;
+    const paginatedCars = filtered.slice(startIndex, startIndex + carsPerPage);
+
+    inventory.innerHTML = paginatedCars.length
+      ? paginatedCars.map(createCarCard).join('')
+      : '<div class="empty-box">لا توجد سيارات مطابقة حالياً.</div>';
+
+    const pagerInfo = document.getElementById('pagerInfo');
+    const prevBtn = document.getElementById('prevPageBtn');
+    const nextBtn = document.getElementById('nextPageBtn');
+
+    if (pagerInfo) pagerInfo.textContent = `الصفحة ${currentPage} من ${totalPages}`;
+    if (prevBtn) prevBtn.disabled = currentPage === 1;
+    if (nextBtn) nextBtn.disabled = currentPage === totalPages;
+  }
+
+  function selectModalImage(image) {
+    const modalImage = document.getElementById('modalImage');
+    if (!modalImage) return;
+    modalImage.src = image || window.placeholderCar;
+    document.querySelectorAll('#modalThumbs .thumb').forEach((thumb) => {
+      thumb.classList.toggle('active', thumb.getAttribute('data-image') === image);
+    });
+  }
+
+  function renderThumbs(car) {
+    const thumbs = document.getElementById('modalThumbs');
+    if (!thumbs) return;
+
+    const gallery = Array.isArray(car.gallery) && car.gallery.length ? car.gallery : [car.image || window.placeholderCar];
+    thumbs.innerHTML = gallery.map((image, index) => `
+      <img src="${image}" class="thumb ${index === 0 ? 'active' : ''}" data-image="${image}" alt="${car.name}" onerror="this.style.display='none'" />
+    `).join('');
+
+    document.querySelectorAll('#modalThumbs .thumb').forEach((thumb) => {
+      thumb.addEventListener('click', () => selectModalImage(thumb.getAttribute('data-image')));
+    });
+  }
+
+  function openModal(car) {
+    const modalImage = document.getElementById('modalImage');
+    const modalName = document.getElementById('modalName');
+    const modalCategory = document.getElementById('modalCategory');
+    const modalDescription = document.getElementById('modalDescription');
+    const modalWhatsappLink = document.getElementById('modalWhatsappLink');
+    const modalDetails = document.getElementById('modalDetails');
+    const modal = document.getElementById('carModal');
+
+    if (!modalImage || !modalName || !modalCategory || !modalDescription || !modalWhatsappLink || !modalDetails || !modal) return;
+
+    modalImage.src = car.image || window.placeholderCar;
+    modalImage.onerror = function () { this.src = window.placeholderCar; };
+    modalName.textContent = car.name || '';
+    modalCategory.textContent = car.category || '';
+    modalDescription.textContent = car.description || '';
+    modalWhatsappLink.href = whatsappLink(car);
+    modalDetails.innerHTML = `
+      <div class="detail-box"><span>الماركة</span><strong>${car.brand || ''}</strong></div>
+      <div class="detail-box"><span>الطراز</span><strong>${car.model || ''}</strong></div>
+      <div class="detail-box"><span>سنة الصنع</span><strong>${car.year || ''}</strong></div>
+      <div class="detail-box"><span>عدد الكيلومترات</span><strong>${car.mileage || ''}</strong></div>
+      <div class="detail-box"><span>الحالة</span><strong>${car.condition || ''}</strong></div>
+      <div class="detail-box"><span>السعر المطلوب</span><strong>${car.price || ''}</strong></div>`;
+
+    renderThumbs(car);
+    modal.classList.add('show');
+  }
+
+  function closeModal() {
+    const modal = document.getElementById('carModal');
+    if (modal) modal.classList.remove('show');
+  }
+
+  window.closeModal = closeModal;
+
+  async function loadCars() {
+    cars = [...defaultCars];
+    renderInventory();
+
+    if (!supabase) return;
+
+    try {
+      const { data, error } = await supabase.from('cars').select('*').order('id', { ascending: true });
+      if (error) throw error;
+
+      if (Array.isArray(data) && data.length) {
+        cars = data.map((row) => ({
+          ...row,
+          image: row.image || `${imageBase}/auto${row.id}.jpg`,
+          gallery: Array.isArray(row.gallery) && row.gallery.length ? row.gallery : [row.image || `${imageBase}/auto${row.id}.jpg`]
+        }));
+        renderInventory();
       }
+    } catch (error) {
+      console.error('loadCars failed:', error);
+    }
+  }
 
-      grid.innerHTML = filtered.map(createCarCard).join("");
+  function updateBusinessStatus() {
+    const dot = document.getElementById('statusDot');
+    const text = document.getElementById('statusText');
+    const contact = document.getElementById('contactBusinessStatus');
+    const clock = document.getElementById('smartClock');
+    if (!dot || !text || !contact) return;
+
+    const now = new Date();
+    const day = now.getDay();
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+    const second = now.getSeconds();
+    const currentMinutes = hour * 60 + minute;
+    const weekdayNames = {0:'الأحد',1:'الاثنين',2:'الثلاثاء',3:'الأربعاء',4:'الخميس',5:'الجمعة',6:'السبت'};
+    const openMinutes = 10 * 60;
+    const closeMinutes = 18 * 60;
+    const todayName = weekdayNames[day];
+
+    const two = (n) => String(n).padStart(2, '0');
+    if (clock) {
+      clock.textContent = `الوقت الآن: ${two(hour)}:${two(minute)}:${two(second)} • ${todayName}`;
     }
 
-    document.getElementById("searchInput").addEventListener("input", renderCars);
-    document.getElementById("categoryFilter").addEventListener("change", renderCars);
+    let message = '';
+    let color = '#ef4444';
 
+    if (day >= 1 && day <= 5) {
+      if (currentMinutes >= openMinutes && currentMinutes < closeMinutes) {
+        color = '#22c55e';
+        const remaining = closeMinutes - currentMinutes;
+        const hoursLeft = Math.floor(remaining / 60);
+        const minsLeft = remaining % 60;
+        message = hoursLeft > 0
+          ? `مفتوح الآن • يغلق عند 18:00 • متبقي ${hoursLeft} س و ${minsLeft} د`
+          : `مفتوح الآن • يغلق عند 18:00 • متبقي ${minsLeft} دقيقة`;
+      } else if (currentMinutes < openMinutes) {
+        const remaining = openMinutes - currentMinutes;
+        const hoursLeft = Math.floor(remaining / 60);
+        const minsLeft = remaining % 60;
+        message = `مغلق الآن • يفتح عند 10:00 • بعد ${hoursLeft} س و ${minsLeft} د`;
+      } else {
+        let nextDay = day + 1;
+        while (nextDay === 6 || nextDay === 0) nextDay += 1;
+        if (nextDay > 6) nextDay = 1;
+        message = `مغلق الآن • يفتح ${weekdayNames[nextDay]} عند 10:00`;
+      }
+    } else if (day === 6) {
+      message = 'مغلق الآن • اليوم السبت • يفتح الاثنين عند 10:00';
+    } else {
+      message = 'مغلق الآن • اليوم الأحد • يفتح الاثنين عند 10:00';
+    }
+
+    dot.style.background = color;
+    dot.style.boxShadow = `0 0 10px ${color}`;
+    text.textContent = message;
+    contact.textContent = `${message} • ${todayName}`;
+    contact.style.color = color;
+  }
+
+  function initPage() {
+    try {
+      if (window.supabase?.createClient) {
+        supabase = window.supabase.createClient(
+          'https://mbesnbkludynomgdzfhw.supabase.co',
+          'sb_publishable_EfwicNkVNrNBXKBgoiMXjA_VqTcfnTm'
+        );
+      }
+    } catch (error) {
+      console.error('supabase init failed:', error);
+      supabase = null;
+    }
+
+    cars = [...defaultCars];
+    renderInventory();
     updateBusinessStatus();
-    setInterval(updateBusinessStatus, 60000);
-    renderCars();
-  </script>
+    setInterval(updateBusinessStatus, 1000);
+    loadCars();
+
+    document.getElementById('searchInput')?.addEventListener('input', () => {
+      currentPage = 1;
+      renderInventory();
+    });
+
+    document.getElementById('categoryFilter')?.addEventListener('change', () => {
+      currentPage = 1;
+      renderInventory();
+    });
+
+    document.getElementById('prevPageBtn')?.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage -= 1;
+        renderInventory();
+      }
+    });
+
+    document.getElementById('nextPageBtn')?.addEventListener('click', () => {
+      const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+      const category = document.getElementById('categoryFilter')?.value || 'all';
+      const filtered = cars.filter((car) =>
+        `${car.name || ''} ${car.brand || ''} ${car.model || ''}`.toLowerCase().includes(search) &&
+        (category === 'all' || car.category === category)
+      );
+      const totalPages = Math.max(1, Math.ceil(filtered.length / carsPerPage));
+      if (currentPage < totalPages) {
+        currentPage += 1;
+        renderInventory();
+      }
+    });
+
+    document.getElementById('carModal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'carModal') closeModal();
+    });
+
+    document.addEventListener('click', (e) => {
+      const image = e.target.closest('.car-image');
+      if (!image) return;
+      const car = findCarById(image.getAttribute('data-car-id'));
+      if (car) openModal(car);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPage);
+  } else {
+    initPage();
+  }
+</script>
 </body>
 </html>
