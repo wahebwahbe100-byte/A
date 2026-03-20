@@ -589,265 +589,351 @@
   </footer>
 
   <script>
-    window.placeholderLogo = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" width="160" height="100" viewBox="0 0 160 100">
-        <rect width="160" height="100" rx="16" fill="#0f172a"/>
-        <path d="M28 58c14-16 34-24 60-24 11 0 23 2 34 7" fill="none" stroke="#3b82f6" stroke-width="7" stroke-linecap="round"/>
-        <path d="M34 64h72c12 0 22-6 28-16" fill="none" stroke="#22c55e" stroke-width="7" stroke-linecap="round"/>
-        <text x="80" y="86" text-anchor="middle" fill="white" font-size="20" font-family="Arial">EC</text>
-      </svg>
-    `);
+  window.placeholderLogo = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="160" height="100" viewBox="0 0 160 100">
+      <rect width="160" height="100" rx="16" fill="#0f172a"/>
+      <path d="M28 58c14-16 34-24 60-24 11 0 23 2 34 7" fill="none" stroke="#3b82f6" stroke-width="7" stroke-linecap="round"/>
+      <path d="M34 64h72c12 0 22-6 28-16" fill="none" stroke="#22c55e" stroke-width="7" stroke-linecap="round"/>
+      <text x="80" y="86" text-anchor="middle" fill="white" font-size="20" font-family="Arial">EC</text>
+    </svg>
+  `);
 
-    window.placeholderCar = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
-        <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0%" stop-color="#0f172a"/><stop offset="100%" stop-color="#1e293b"/></linearGradient></defs>
-        <rect width="1200" height="700" fill="url(#g)"/>
-        <path d="M275 420c42-78 116-118 240-118h150c67 0 118 18 166 56l59 46h60c31 0 55 22 55 50v22H201v-18c0-20 10-38 28-48l46-26z" fill="#334155"/>
-        <circle cx="372" cy="486" r="58" fill="#0f172a" stroke="#60a5fa" stroke-width="10"/>
-        <circle cx="847" cy="486" r="58" fill="#0f172a" stroke="#22c55e" stroke-width="10"/>
-        <text x="600" y="610" fill="#cbd5e1" font-size="46" text-anchor="middle" font-family="Arial">Emotion Cars</text>
-        <text x="600" y="655" fill="#94a3b8" font-size="28" text-anchor="middle" font-family="Arial">No Image Available</text>
-      </svg>
-    `);
+  window.placeholderCar = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+      <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0%" stop-color="#0f172a"/><stop offset="100%" stop-color="#1e293b"/></linearGradient></defs>
+      <rect width="1200" height="700" fill="url(#g)"/>
+      <path d="M275 420c42-78 116-118 240-118h150c67 0 118 18 166 56l59 46h60c31 0 55 22 55 50v22H201v-18c0-20 10-38 28-48l46-26z" fill="#334155"/>
+      <circle cx="372" cy="486" r="58" fill="#0f172a" stroke="#60a5fa" stroke-width="10"/>
+      <circle cx="847" cy="486" r="58" fill="#0f172a" stroke="#22c55e" stroke-width="10"/>
+      <text x="600" y="610" fill="#cbd5e1" font-size="46" text-anchor="middle" font-family="Arial">Emotion Cars</text>
+      <text x="600" y="655" fill="#94a3b8" font-size="28" text-anchor="middle" font-family="Arial">No Image Available</text>
+    </svg>
+  `);
 
-    const supabase = window.supabase.createClient(
-      'https://mbesnbkludynomgdzfhw.supabase.co',
-      'sb_publishable_EfwicNkVNrNBXKBgoiMXjA_VqTcfnTm'
-    );
+  const imageBase = 'https://raw.githubusercontent.com/wahebwahbe100-byte/A/main/images';
+  const WHATSAPP_NUMBER = '4915736645354';
+  const carsPerPage = 8;
+  let currentPage = 1;
+  let cars = [];
+  let supabase = null;
 
-    const defaultCars = [
-      ['Mercedes', 'S-Class', 'Sedan', '€128,000', 2024, '8,000 km', 'ممتازة'],
-      ['BMW', 'X7', 'SUV', '€102,500', 2023, '14,500 km', 'ممتازة'],
-      ['Audi', 'RS7', 'Sport', '€119,900', 2024, '5,200 km', 'ممتازة'],
-      ['Range Rover', 'Sport', 'SUV', '€115,300', 2023, '18,100 km', 'ممتازة'],
-      ['Porsche', 'Taycan', 'Sport', '€134,800', 2024, '3,700 km', 'ممتازة'],
-      ['Lexus', 'LX', 'SUV', '€92,000', 2022, '21,000 km', 'جيدة جداً'],
-      ['Cadillac', 'Escalade', 'SUV', '€97,000', 2021, '26,000 km', 'جيدة جداً'],
-      ['Bentley', 'Bentayga', 'SUV', '€154,000', 2022, '19,500 km', 'ممتازة'],
-      ['Rolls-Royce', 'Ghost', 'Sedan', '€210,000', 2021, '17,800 km', 'ممتازة'],
-      ['Tesla', 'Model S', 'Sedan', '€88,000', 2023, '12,300 km', 'ممتازة'],
-      ['Ferrari', 'Roma', 'Sport', '€199,000', 2022, '7,400 km', 'ممتازة'],
-      ['Lamborghini', 'Urus', 'SUV', '€239,000', 2023, '6,900 km', 'ممتازة'],
-      ['Maserati', 'Levante', 'SUV', '€83,500', 2021, '29,000 km', 'جيدة جداً'],
-      ['Jaguar', 'F-Pace', 'SUV', '€59,900', 2020, '41,000 km', 'جيدة جداً'],
-      ['Genesis', 'G90', 'Sedan', '€66,400', 2022, '24,100 km', 'ممتازة'],
-      ['Volvo', 'XC90', 'SUV', '€57,800', 2021, '33,000 km', 'جيدة جداً'],
-      ['Toyota', 'Land Cruiser', 'SUV', '€74,000', 2022, '27,000 km', 'ممتازة'],
-      ['GMC', 'Yukon Denali', 'SUV', '€79,500', 2023, '15,000 km', 'ممتازة'],
-      ['Jeep', 'Grand Wagoneer', 'SUV', '€82,700', 2022, '22,200 km', 'جيدة جداً'],
-      ['Aston Martin', 'DBX', 'SUV', '€167,000', 2023, '9,800 km', 'ممتازة'],
-      ['Mercedes', 'GLE 450', 'SUV', '€71,000', 2021, '28,400 km', 'جيدة جداً'],
-      ['BMW', '740i', 'Sedan', '€69,900', 2022, '18,900 km', 'ممتازة'],
-      ['Audi', 'Q8', 'SUV', '€73,600', 2023, '11,400 km', 'ممتازة'],
-      ['Porsche', 'Cayenne', 'SUV', '€95,200', 2022, '20,700 km', 'ممتازة'],
-      ['Volkswagen', 'Touareg', 'SUV', '€49,500', 2021, '34,100 km', 'جيدة جداً'],
-      ['Land Rover', 'Defender', 'SUV', '€77,300', 2023, '14,200 km', 'ممتازة'],
-      ['Kia', 'EV9', 'SUV', '€63,400', 2024, '4,800 km', 'ممتازة'],
-      ['Hyundai', 'Palisade', 'SUV', '€46,800', 2022, '25,600 km', 'جيدة جداً'],
-      ['Nissan', 'Patrol', 'SUV', '€68,900', 2021, '37,700 km', 'جيدة جداً'],
-      ['Chevrolet', 'Tahoe', 'SUV', '€61,500', 2022, '23,900 km', 'جيدة جداً']
-    ].map((item, index) => ({
-      id: index + 1,
-      brand: item[0],
-      model: item[1],
-      category: item[2],
-      price: item[3],
-      year: item[4],
-      mileage: item[5],
-      condition: item[6],
-      name: `${item[0]} ${item[1]}`,
-      description: 'سيارة معروضة بحالة ممتازة مع مواصفات واضحة. يمكنك تعديل الصور والأسعار والمعلومات لاحقاً بسهولة.',
-      image: window.placeholderCar,
-      gallery: [window.placeholderCar]
-    }));
+  const carSeed = [
+    ['Mercedes', 'S-Class', 'Sedan', '€128,000', 2024, '8,000 km', 'ممتازة'],
+    ['BMW', 'X7', 'SUV', '€102,500', 2023, '14,500 km', 'ممتازة'],
+    ['Audi', 'RS7', 'Sport', '€119,900', 2024, '5,200 km', 'ممتازة'],
+    ['Range Rover', 'Sport', 'SUV', '€115,300', 2023, '18,100 km', 'ممتازة'],
+    ['Porsche', 'Taycan', 'Sport', '€134,800', 2024, '3,700 km', 'ممتازة'],
+    ['Lexus', 'LX', 'SUV', '€92,000', 2022, '21,000 km', 'جيدة جداً'],
+    ['Cadillac', 'Escalade', 'SUV', '€97,000', 2021, '26,000 km', 'جيدة جداً'],
+    ['Bentley', 'Bentayga', 'SUV', '€154,000', 2022, '19,500 km', 'ممتازة'],
+    ['Rolls-Royce', 'Ghost', 'Sedan', '€210,000', 2021, '17,800 km', 'ممتازة'],
+    ['Tesla', 'Model S', 'Sedan', '€88,000', 2023, '12,300 km', 'ممتازة'],
+    ['Ferrari', 'Roma', 'Sport', '€199,000', 2022, '7,400 km', 'ممتازة'],
+    ['Lamborghini', 'Urus', 'SUV', '€239,000', 2023, '6,900 km', 'ممتازة'],
+    ['Maserati', 'Levante', 'SUV', '€83,500', 2021, '29,000 km', 'جيدة جداً'],
+    ['Jaguar', 'F-Pace', 'SUV', '€59,900', 2020, '41,000 km', 'جيدة جداً'],
+    ['Genesis', 'G90', 'Sedan', '€66,400', 2022, '24,100 km', 'ممتازة'],
+    ['Volvo', 'XC90', 'SUV', '€57,800', 2021, '33,000 km', 'جيدة جداً'],
+    ['Toyota', 'Land Cruiser', 'SUV', '€74,000', 2022, '27,000 km', 'ممتازة'],
+    ['GMC', 'Yukon Denali', 'SUV', '€79,500', 2023, '15,000 km', 'ممتازة'],
+    ['Jeep', 'Grand Wagoneer', 'SUV', '€82,700', 2022, '22,200 km', 'جيدة جداً'],
+    ['Aston Martin', 'DBX', 'SUV', '€167,000', 2023, '9,800 km', 'ممتازة'],
+    ['Mercedes', 'GLE 450', 'SUV', '€71,000', 2021, '28,400 km', 'جيدة جداً'],
+    ['BMW', '740i', 'Sedan', '€69,900', 2022, '18,900 km', 'ممتازة'],
+    ['Audi', 'Q8', 'SUV', '€73,600', 2023, '11,400 km', 'ممتازة'],
+    ['Porsche', 'Cayenne', 'SUV', '€95,200', 2022, '20,700 km', 'ممتازة'],
+    ['Volkswagen', 'Touareg', 'SUV', '€49,500', 2021, '34,100 km', 'جيدة جداً'],
+    ['Land Rover', 'Defender', 'SUV', '€77,300', 2023, '14,200 km', 'ممتازة'],
+    ['Kia', 'EV9', 'SUV', '€63,400', 2024, '4,800 km', 'ممتازة'],
+    ['Hyundai', 'Palisade', 'SUV', '€46,800', 2022, '25,600 km', 'جيدة جداً'],
+    ['Nissan', 'Patrol', 'SUV', '€68,900', 2021, '37,700 km', 'جيدة جداً'],
+    ['Chevrolet', 'Tahoe', 'SUV', '€61,500', 2022, '23,900 km', 'جيدة جداً']
+  ];
 
-    let cars = [...defaultCars];
-    let currentPage = 1;
-    const carsPerPage = 8;
-    const WHATSAPP_NUMBER = '4915736645354';
+  const defaultCars = carSeed.map((item, index) => ({
+    id: index + 1,
+    brand: item[0],
+    model: item[1],
+    category: item[2],
+    price: item[3],
+    year: item[4],
+    mileage: item[5],
+    condition: item[6],
+    name: `${item[0]} ${item[1]}`,
+    description: 'سيارة معروضة بحالة ممتازة مع مواصفات واضحة. يمكنك تعديل الصور والأسعار والمعلومات لاحقاً بسهولة.',
+    image: `${imageBase}/auto${index + 1}.jpg`,
+    gallery: [`${imageBase}/auto${index + 1}.jpg`]
+  }));
 
-    function whatsappLink(car) {
-      const message = `مرحباً، كنت مهتماً بسيارة ${car.name}. يمكننا مساعدتك وتزويدك بكل التفاصيل.`;
-      return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-    }
+  function whatsappLink(car) {
+    const message = `مرحباً، كنت مهتماً بسيارة ${car.name}. يمكننا مساعدتك وتزويدك بكل التفاصيل.`;
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  }
 
-    function findCarById(id) {
-      return cars.find((car) => String(car.id) === String(id));
-    }
+  function findCarById(id) {
+    return cars.find((car) => String(car.id) === String(id));
+  }
 
-    function createCarCard(car) {
-      return `
-        <div class="car-card">
-          <div class="car-image-wrap">
-            <img class="car-image" src="${car.image || window.placeholderCar}" alt="${car.name}" data-car-id="${car.id}" onerror="this.onerror=null;this.src=window.placeholderCar" />
-            <div class="car-badge">${car.id}</div>
-          </div>
-          <div class="car-content">
-            <div class="car-top">
-              <div class="price">${car.price || ''}</div>
-              <div>
-                <h3>${car.name || ''}</h3>
-                <div class="category">${car.category || ''}</div>
-              </div>
-            </div>
-            <div class="details-grid">
-              <div class="detail-box"><span>الماركة</span><strong>${car.brand || ''}</strong></div>
-              <div class="detail-box"><span>الطراز</span><strong>${car.model || ''}</strong></div>
-              <div class="detail-box"><span>سنة الصنع</span><strong>${car.year || ''}</strong></div>
-              <div class="detail-box"><span>عدد الكيلومترات</span><strong>${car.mileage || ''}</strong></div>
-              <div class="detail-box"><span>الحالة</span><strong>${car.condition || ''}</strong></div>
-              <div class="detail-box"><span>السعر المطلوب</span><strong>${car.price || ''}</strong></div>
+  function createCarCard(car) {
+    return `
+      <div class="car-card">
+        <div class="car-image-wrap">
+          <img class="car-image" src="${car.image || window.placeholderCar}" alt="${car.name}" data-car-id="${car.id}" onerror="this.onerror=null;this.src=window.placeholderCar" />
+          <div class="car-badge">${car.id}</div>
+        </div>
+        <div class="car-content">
+          <div class="car-top">
+            <div class="price">${car.price || ''}</div>
+            <div>
+              <h3>${car.name || ''}</h3>
+              <div class="category">${car.category || ''}</div>
             </div>
           </div>
-        </div>`;
-    }
+          <div class="details-grid">
+            <div class="detail-box"><span>الماركة</span><strong>${car.brand || ''}</strong></div>
+            <div class="detail-box"><span>الطراز</span><strong>${car.model || ''}</strong></div>
+            <div class="detail-box"><span>سنة الصنع</span><strong>${car.year || ''}</strong></div>
+            <div class="detail-box"><span>عدد الكيلومترات</span><strong>${car.mileage || ''}</strong></div>
+            <div class="detail-box"><span>الحالة</span><strong>${car.condition || ''}</strong></div>
+            <div class="detail-box"><span>السعر المطلوب</span><strong>${car.price || ''}</strong></div>
+          </div>
+        </div>
+      </div>`;
+  }
 
-    function renderInventory() {
-      const search = document.getElementById('searchInput').value.toLowerCase().trim();
-      const category = document.getElementById('categoryFilter').value;
-      const filtered = cars.filter((car) => {
-        const matchesSearch = `${car.name || ''} ${car.brand || ''} ${car.model || ''}`.toLowerCase().includes(search);
-        const matchesCategory = category === 'all' || car.category === category;
-        return matchesSearch && matchesCategory;
-      });
+  function renderInventory() {
+    const inventory = document.getElementById('inventoryCars');
+    if (!inventory) return;
 
-      const totalPages = Math.max(1, Math.ceil(filtered.length / carsPerPage));
-      if (currentPage > totalPages) currentPage = totalPages;
-      const startIndex = (currentPage - 1) * carsPerPage;
-      const paginatedCars = filtered.slice(startIndex, startIndex + carsPerPage);
+    const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+    const category = document.getElementById('categoryFilter')?.value || 'all';
 
-      const box = document.getElementById('inventoryCars');
-      box.innerHTML = paginatedCars.length ? paginatedCars.map(createCarCard).join('') : '<div class="empty-box">لا توجد سيارات مطابقة حالياً.</div>';
-      document.getElementById('pagerInfo').textContent = `الصفحة ${currentPage} من ${totalPages}`;
-      document.getElementById('prevPageBtn').disabled = currentPage === 1;
-      document.getElementById('nextPageBtn').disabled = currentPage === totalPages;
-    }
-
-    function selectModalImage(image) {
-      document.getElementById('modalImage').src = image || window.placeholderCar;
-      document.querySelectorAll('#modalThumbs .thumb').forEach((thumb) => {
-        thumb.classList.toggle('active', thumb.getAttribute('data-image') === image);
-      });
-    }
-
-    function renderThumbs(car) {
-      const gallery = Array.isArray(car.gallery) && car.gallery.length ? car.gallery : [car.image || window.placeholderCar];
-      document.getElementById('modalThumbs').innerHTML = gallery.map((image, index) => `
-        <img src="${image}" class="thumb ${index === 0 ? 'active' : ''}" data-image="${image}" alt="${car.name}" onerror="this.style.display='none'" />
-      `).join('');
-      document.querySelectorAll('#modalThumbs .thumb').forEach((thumb) => {
-        thumb.addEventListener('click', () => selectModalImage(thumb.getAttribute('data-image')));
-      });
-    }
-
-    function openModal(car) {
-      document.getElementById('modalImage').src = car.image || window.placeholderCar;
-      document.getElementById('modalImage').onerror = function () { this.src = window.placeholderCar; };
-      document.getElementById('modalName').textContent = car.name || '';
-      document.getElementById('modalCategory').textContent = car.category || '';
-      document.getElementById('modalDescription').textContent = car.description || '';
-      document.getElementById('modalWhatsappLink').href = whatsappLink(car);
-      document.getElementById('modalDetails').innerHTML = `
-        <div class="detail-box"><span>الماركة</span><strong>${car.brand || ''}</strong></div>
-        <div class="detail-box"><span>الطراز</span><strong>${car.model || ''}</strong></div>
-        <div class="detail-box"><span>سنة الصنع</span><strong>${car.year || ''}</strong></div>
-        <div class="detail-box"><span>عدد الكيلومترات</span><strong>${car.mileage || ''}</strong></div>
-        <div class="detail-box"><span>الحالة</span><strong>${car.condition || ''}</strong></div>
-        <div class="detail-box"><span>السعر المطلوب</span><strong>${car.price || ''}</strong></div>`;
-      renderThumbs(car);
-      document.getElementById('carModal').classList.add('show');
-    }
-
-    function closeModal() {
-      document.getElementById('carModal').classList.remove('show');
-    }
-
-    async function loadCars() {
-      try {
-        const { data, error } = await supabase.from('cars').select('*').order('id', { ascending: true });
-        if (error) throw error;
-        if (Array.isArray(data) && data.length) {
-          cars = data.map((row) => ({
-            ...row,
-            image: row.image || window.placeholderCar,
-            gallery: Array.isArray(row.gallery) && row.gallery.length ? row.gallery : [row.image || window.placeholderCar]
-          }));
-        }
-      } catch (e) {
-        cars = [...defaultCars];
-      }
-      renderInventory();
-    }
-
-    function updateBusinessStatus() {
-      const now = new Date();
-      const day = now.getDay();
-      const hour = now.getHours();
-      const minute = now.getMinutes();
-      const currentMinutes = hour * 60 + minute;
-      const weekdayNames = {0:'الأحد',1:'الاثنين',2:'الثلاثاء',3:'الأربعاء',4:'الخميس',5:'الجمعة',6:'السبت'};
-      const openMinutes = 10 * 60;
-      const closeMinutes = 18 * 60;
-      const dot = document.getElementById('statusDot');
-      const text = document.getElementById('statusText');
-      const contact = document.getElementById('contactBusinessStatus');
-      const todayName = weekdayNames[day];
-      let message = '';
-      let color = '#ef4444';
-
-      if (day >= 1 && day <= 5) {
-        if (currentMinutes >= openMinutes && currentMinutes < closeMinutes) {
-          color = '#22c55e';
-          const remaining = closeMinutes - currentMinutes;
-          const hoursLeft = Math.floor(remaining / 60);
-          const minsLeft = remaining % 60;
-          message = hoursLeft > 0 ? `مفتوح الآن • اليوم ${todayName} • يغلق عند 18:00 • متبقي ${hoursLeft} س و ${minsLeft} د` : `مفتوح الآن • اليوم ${todayName} • يغلق عند 18:00 • متبقي ${minsLeft} دقيقة`;
-        } else if (currentMinutes < openMinutes) {
-          const remaining = openMinutes - currentMinutes;
-          const hoursLeft = Math.floor(remaining / 60);
-          const minsLeft = remaining % 60;
-          message = `مغلق الآن • اليوم ${todayName} • يفتح عند 10:00 • بعد ${hoursLeft} س و ${minsLeft} د`;
-        } else {
-          let nextDay = day + 1;
-          while (nextDay === 6 || nextDay === 0) nextDay += 1;
-          if (nextDay > 6) nextDay = 1;
-          message = `مغلق الآن • اليوم ${todayName} • يفتح ${weekdayNames[nextDay]} عند 10:00`;
-        }
-      } else if (day === 6) {
-        message = 'مغلق الآن • اليوم السبت • يفتح الاثنين عند 10:00';
-      } else {
-        message = 'مغلق الآن • اليوم الأحد • يفتح الاثنين عند 10:00';
-      }
-
-      dot.style.background = color;
-      dot.style.boxShadow = `0 0 10px ${color}`;
-      text.textContent = message;
-      contact.textContent = message;
-      contact.style.color = color;
-    }
-
-    document.getElementById('searchInput').addEventListener('input', () => { currentPage = 1; renderInventory(); });
-    document.getElementById('categoryFilter').addEventListener('change', () => { currentPage = 1; renderInventory(); });
-    document.getElementById('prevPageBtn').addEventListener('click', () => { if (currentPage > 1) { currentPage -= 1; renderInventory(); } });
-    document.getElementById('nextPageBtn').addEventListener('click', () => {
-      const search = document.getElementById('searchInput').value.toLowerCase().trim();
-      const category = document.getElementById('categoryFilter').value;
-      const filtered = cars.filter((car) => `${car.name || ''} ${car.brand || ''} ${car.model || ''}`.toLowerCase().includes(search) && (category === 'all' || car.category === category));
-      const totalPages = Math.max(1, Math.ceil(filtered.length / carsPerPage));
-      if (currentPage < totalPages) { currentPage += 1; renderInventory(); }
+    const filtered = cars.filter((car) => {
+      const matchesSearch = `${car.name || ''} ${car.brand || ''} ${car.model || ''}`.toLowerCase().includes(search);
+      const matchesCategory = category === 'all' || car.category === category;
+      return matchesSearch && matchesCategory;
     });
-    document.getElementById('carModal').addEventListener('click', (e) => { if (e.target.id === 'carModal') closeModal(); });
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / carsPerPage));
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const startIndex = (currentPage - 1) * carsPerPage;
+    const paginatedCars = filtered.slice(startIndex, startIndex + carsPerPage);
+
+    inventory.innerHTML = paginatedCars.length
+      ? paginatedCars.map(createCarCard).join('')
+      : '<div class="empty-box">لا توجد سيارات مطابقة حالياً.</div>';
+
+    const pagerInfo = document.getElementById('pagerInfo');
+    const prevBtn = document.getElementById('prevPageBtn');
+    const nextBtn = document.getElementById('nextPageBtn');
+
+    if (pagerInfo) pagerInfo.textContent = `الصفحة ${currentPage} من ${totalPages}`;
+    if (prevBtn) prevBtn.disabled = currentPage === 1;
+    if (nextBtn) nextBtn.disabled = currentPage === totalPages;
+  }
+
+  function selectModalImage(image) {
+    const modalImage = document.getElementById('modalImage');
+    if (!modalImage) return;
+    modalImage.src = image || window.placeholderCar;
+    document.querySelectorAll('#modalThumbs .thumb').forEach((thumb) => {
+      thumb.classList.toggle('active', thumb.getAttribute('data-image') === image);
+    });
+  }
+
+  function renderThumbs(car) {
+    const thumbs = document.getElementById('modalThumbs');
+    if (!thumbs) return;
+
+    const gallery = Array.isArray(car.gallery) && car.gallery.length ? car.gallery : [car.image || window.placeholderCar];
+    thumbs.innerHTML = gallery.map((image, index) => `
+      <img src="${image}" class="thumb ${index === 0 ? 'active' : ''}" data-image="${image}" alt="${car.name}" onerror="this.style.display='none'" />
+    `).join('');
+
+    document.querySelectorAll('#modalThumbs .thumb').forEach((thumb) => {
+      thumb.addEventListener('click', () => selectModalImage(thumb.getAttribute('data-image')));
+    });
+  }
+
+  function openModal(car) {
+    const modalImage = document.getElementById('modalImage');
+    const modalName = document.getElementById('modalName');
+    const modalCategory = document.getElementById('modalCategory');
+    const modalDescription = document.getElementById('modalDescription');
+    const modalWhatsappLink = document.getElementById('modalWhatsappLink');
+    const modalDetails = document.getElementById('modalDetails');
+    const modal = document.getElementById('carModal');
+
+    if (!modalImage || !modalName || !modalCategory || !modalDescription || !modalWhatsappLink || !modalDetails || !modal) return;
+
+    modalImage.src = car.image || window.placeholderCar;
+    modalImage.onerror = function () { this.src = window.placeholderCar; };
+    modalName.textContent = car.name || '';
+    modalCategory.textContent = car.category || '';
+    modalDescription.textContent = car.description || '';
+    modalWhatsappLink.href = whatsappLink(car);
+    modalDetails.innerHTML = `
+      <div class="detail-box"><span>الماركة</span><strong>${car.brand || ''}</strong></div>
+      <div class="detail-box"><span>الطراز</span><strong>${car.model || ''}</strong></div>
+      <div class="detail-box"><span>سنة الصنع</span><strong>${car.year || ''}</strong></div>
+      <div class="detail-box"><span>عدد الكيلومترات</span><strong>${car.mileage || ''}</strong></div>
+      <div class="detail-box"><span>الحالة</span><strong>${car.condition || ''}</strong></div>
+      <div class="detail-box"><span>السعر المطلوب</span><strong>${car.price || ''}</strong></div>`;
+
+    renderThumbs(car);
+    modal.classList.add('show');
+  }
+
+  function closeModal() {
+    const modal = document.getElementById('carModal');
+    if (modal) modal.classList.remove('show');
+  }
+
+  window.closeModal = closeModal;
+
+  async function loadCars() {
+    cars = [...defaultCars];
+    renderInventory();
+
+    if (!supabase) return;
+
+    try {
+      const { data, error } = await supabase.from('cars').select('*').order('id', { ascending: true });
+      if (error) throw error;
+
+      if (Array.isArray(data) && data.length) {
+        cars = data.map((row) => ({
+          ...row,
+          image: row.image || `${imageBase}/auto${row.id}.jpg`,
+          gallery: Array.isArray(row.gallery) && row.gallery.length ? row.gallery : [row.image || `${imageBase}/auto${row.id}.jpg`]
+        }));
+        renderInventory();
+      }
+    } catch (error) {
+      console.error('loadCars failed:', error);
+    }
+  }
+
+  function updateBusinessStatus() {
+    const dot = document.getElementById('statusDot');
+    const text = document.getElementById('statusText');
+    const contact = document.getElementById('contactBusinessStatus');
+    if (!dot || !text || !contact) return;
+
+    const now = new Date();
+    const day = now.getDay();
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+    const currentMinutes = hour * 60 + minute;
+    const weekdayNames = {0:'الأحد',1:'الاثنين',2:'الثلاثاء',3:'الأربعاء',4:'الخميس',5:'الجمعة',6:'السبت'};
+    const openMinutes = 10 * 60;
+    const closeMinutes = 18 * 60;
+    const todayName = weekdayNames[day];
+
+    let message = '';
+    let color = '#ef4444';
+
+    if (day >= 1 && day <= 5) {
+      if (currentMinutes >= openMinutes && currentMinutes < closeMinutes) {
+        color = '#22c55e';
+        const remaining = closeMinutes - currentMinutes;
+        const hoursLeft = Math.floor(remaining / 60);
+        const minsLeft = remaining % 60;
+        message = hoursLeft > 0
+          ? `مفتوح الآن • اليوم ${todayName} • يغلق عند 18:00 • متبقي ${hoursLeft} س و ${minsLeft} د`
+          : `مفتوح الآن • اليوم ${todayName} • يغلق عند 18:00 • متبقي ${minsLeft} دقيقة`;
+      } else if (currentMinutes < openMinutes) {
+        const remaining = openMinutes - currentMinutes;
+        const hoursLeft = Math.floor(remaining / 60);
+        const minsLeft = remaining % 60;
+        message = `مغلق الآن • اليوم ${todayName} • يفتح عند 10:00 • بعد ${hoursLeft} س و ${minsLeft} د`;
+      } else {
+        let nextDay = day + 1;
+        while (nextDay === 6 || nextDay === 0) nextDay += 1;
+        if (nextDay > 6) nextDay = 1;
+        message = `مغلق الآن • اليوم ${todayName} • يفتح ${weekdayNames[nextDay]} عند 10:00`;
+      }
+    } else if (day === 6) {
+      message = 'مغلق الآن • اليوم السبت • يفتح الاثنين عند 10:00';
+    } else {
+      message = 'مغلق الآن • اليوم الأحد • يفتح الاثنين عند 10:00';
+    }
+
+    dot.style.background = color;
+    dot.style.boxShadow = `0 0 10px ${color}`;
+    text.textContent = message;
+    contact.textContent = message;
+    contact.style.color = color;
+  }
+
+  function initPage() {
+    try {
+      if (window.supabase?.createClient) {
+        supabase = window.supabase.createClient(
+          'https://mbesnbkludynomgdzfhw.supabase.co',
+          'sb_publishable_EfwicNkVNrNBXKBgoiMXjA_VqTcfnTm'
+        );
+      }
+    } catch (error) {
+      console.error('supabase init failed:', error);
+      supabase = null;
+    }
+
+    cars = [...defaultCars];
+    renderInventory();
+    updateBusinessStatus();
+    setInterval(updateBusinessStatus, 60000);
+    loadCars();
+
+    document.getElementById('searchInput')?.addEventListener('input', () => {
+      currentPage = 1;
+      renderInventory();
+    });
+
+    document.getElementById('categoryFilter')?.addEventListener('change', () => {
+      currentPage = 1;
+      renderInventory();
+    });
+
+    document.getElementById('prevPageBtn')?.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage -= 1;
+        renderInventory();
+      }
+    });
+
+    document.getElementById('nextPageBtn')?.addEventListener('click', () => {
+      const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+      const category = document.getElementById('categoryFilter')?.value || 'all';
+      const filtered = cars.filter((car) =>
+        `${car.name || ''} ${car.brand || ''} ${car.model || ''}`.toLowerCase().includes(search) &&
+        (category === 'all' || car.category === category)
+      );
+      const totalPages = Math.max(1, Math.ceil(filtered.length / carsPerPage));
+      if (currentPage < totalPages) {
+        currentPage += 1;
+        renderInventory();
+      }
+    });
+
+    document.getElementById('carModal')?.addEventListener('click', (e) => {
+      if (e.target.id === 'carModal') closeModal();
+    });
+
     document.addEventListener('click', (e) => {
       const image = e.target.closest('.car-image');
       if (!image) return;
       const car = findCarById(image.getAttribute('data-car-id'));
       if (car) openModal(car);
     });
+  }
 
-    renderInventory();
-    updateBusinessStatus();
-    setInterval(updateBusinessStatus, 60000);
-    loadCars();
-  </script>
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPage);
+  } else {
+    initPage();
+  }
+</script>
 </body>
 </html>
