@@ -13,13 +13,13 @@
     body {
       margin: 0;
       font-family: 'Tajawal', Arial, sans-serif;
-      background: linear-gradient(135deg, #020617 0%, #0b1f3a 50%, #000 100%);
+      background: linear-gradient(135deg, #020617 0%, #0b1f3a 50%, #000000 100%);
       color: #fff;
     }
-    a { color: inherit; text-decoration: none; }
+    a { text-decoration: none; color: inherit; }
     .container { width: min(1200px, calc(100% - 32px)); margin: 0 auto; }
     .section { padding: 56px 0; }
-    section { scroll-margin-top: 100px; }
+    section { scroll-margin-top: 90px; }
 
     .top-nav {
       position: sticky;
@@ -44,19 +44,28 @@
       min-width: 0;
     }
     .logo {
-      width: 120px;
-      height: 78px;
+      width: 140px;
+      height: 90px;
       object-fit: cover;
       border-radius: 18px;
       background: rgba(255,255,255,.10);
       padding: 6px;
       border: 1px solid rgba(255,255,255,.18);
       box-shadow: 0 18px 50px rgba(0,0,0,.65), 0 0 24px rgba(59,130,246,.35);
+      animation: logoGlow 3s ease-in-out infinite alternate, logoFloat 4s ease-in-out infinite;
       flex-shrink: 0;
+    }
+    @keyframes logoGlow {
+      from { box-shadow: 0 18px 50px rgba(0,0,0,.65), 0 0 12px rgba(59,130,246,.25); }
+      to { box-shadow: 0 20px 54px rgba(0,0,0,.72), 0 0 26px rgba(59,130,246,.48); }
+    }
+    @keyframes logoFloat {
+      0%,100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-4px) scale(1.02); }
     }
     .brand-text strong {
       display: block;
-      font-size: 26px;
+      font-size: 28px;
       line-height: 1.05;
     }
     .status-row {
@@ -80,15 +89,18 @@
     .nav-menu {
       display: flex;
       align-items: center;
-      gap: 28px;
+      gap: 34px;
       flex-wrap: wrap;
     }
     .nav-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 0;
       color: #e5e7eb;
       font-size: 15px;
       font-weight: 700;
       position: relative;
-      padding: 8px 0;
     }
     .nav-link::after {
       content: "";
@@ -97,7 +109,7 @@
       bottom: -14px;
       width: 0;
       height: 2px;
-      background: #fff;
+      background: #ffffff;
       transition: width .2s ease;
     }
     .nav-link:hover::after { width: 100%; }
@@ -108,6 +120,7 @@
       padding: 12px 16px;
       border-radius: 16px;
       background: rgba(255,255,255,.08);
+      color: #fff;
       border: 1px solid rgba(255,255,255,.12);
       font-weight: 800;
     }
@@ -118,9 +131,12 @@
       background:
         radial-gradient(circle at 20% 20%, rgba(59,130,246,.20), transparent 30%),
         radial-gradient(circle at 80% 0%, rgba(255,255,255,.08), transparent 25%),
-        linear-gradient(135deg, #020617 0%, #0b1f3a 50%, #000 100%);
+        linear-gradient(135deg, #020617 0%, #0b1f3a 50%, #000000 100%);
     }
-    .hero-box { padding: 48px 0 24px; text-align: center; }
+    .hero-box {
+      padding: 48px 0 24px;
+      text-align: center;
+    }
     h1 {
       margin: 0;
       font-size: clamp(42px, 6vw, 86px);
@@ -131,7 +147,6 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-
     .section-head {
       display: flex;
       align-items: end;
@@ -144,11 +159,16 @@
       margin: 0;
       font-size: 36px;
       font-weight: 900;
-      background: linear-gradient(90deg,#fff,#60a5fa,#93c5fd);
+      background: linear-gradient(90deg,#ffffff,#60a5fa,#93c5fd);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .section-head p { margin: 10px 0 0; color: #cbd5e1; max-width: 720px; line-height: 1.8; }
+    .section-head p {
+      margin: 10px 0 0;
+      color: #cbd5e1;
+      max-width: 720px;
+      line-height: 1.8;
+    }
 
     .inventory-wrap {
       background: rgba(255,255,255,.03);
@@ -315,12 +335,18 @@
       background: rgba(255,255,255,.06);
       color: #fff;
     }
-    .cta-btn.primary {
-      background: #22c55e;
-      border-color: rgba(34,197,94,.25);
+    .cta-btn.primary { background: #22c55e; border-color: rgba(34,197,94,.25); }
+
+    .legal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
     }
-    .legal-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
-    .legal-card p { color: #cbd5e1; line-height: 1.9; margin-top: 10px; }
+    .legal-card p {
+      color: #cbd5e1;
+      line-height: 1.9;
+      margin-top: 10px;
+    }
 
     .modal {
       position: fixed;
@@ -371,7 +397,12 @@
       border-radius: 24px;
       display: block;
     }
-    .thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 12px; }
+    .thumbs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
     .thumb {
       width: 100%;
       height: 90px;
@@ -407,7 +438,7 @@
       .top-nav-inner { flex-direction: column; align-items: flex-start; }
       .nav-menu { gap: 18px; }
       .brand-text strong { font-size: 22px; }
-      .logo { width: 108px; height: 72px; }
+      .logo { width: 120px; height: 80px; }
       .about-grid, .legal-grid, .modal-grid { grid-template-columns: 1fr; }
       .thumbs { grid-template-columns: repeat(2, 1fr); }
       .details-grid { grid-template-columns: 1fr; }
@@ -421,29 +452,27 @@
       <div class="brand-pill">
         <img src="images/logo.png" class="logo" alt="logo" onerror="this.src=window.placeholderLogo" />
         <div class="brand-text">
-          <strong>Emotion Car &amp; Service UG</strong>
+          <strong>Emotion Car & Service UG</strong>
           <div id="liveBusinessStatus" class="status-row">
             <span id="statusDot" class="status-dot"></span>
             <span id="statusText">جاري التحميل...</span>
           </div>
         </div>
       </div>
-
       <nav class="nav-menu">
         <a class="nav-link" href="#cars">Fahrzeuge</a>
         <a class="nav-link" href="#about">Über uns</a>
         <a class="nav-link" href="#terms">Service</a>
         <a class="nav-link" href="#contact">Kontakt</a>
       </nav>
-
-      <a class="login-link" href="#contact">تواصل معنا</a>
+      <a class="login-link" href="login.html">تسجيل</a>
     </div>
   </header>
 
   <section class="hero">
     <div class="container">
       <div class="hero-box">
-        <h1>Emotion Car &amp; Service UG</h1>
+        <h1>Emotion Car & Service UG</h1>
       </div>
     </div>
   </section>
@@ -453,7 +482,7 @@
       <div class="section-head">
         <div>
           <h2 class="section-title">معرض السيارات</h2>
-          <p>يعرض الموقع السيارات المتاحة مع صور واضحة وتفاصيل مرتبة وسهولة الوصول لكل سيارة.</p>
+          <p>يعرض الموقع السيارات المتاحة للتأجير مع تفاصيل واضحة وصور مرتبة وسهولة الوصول إلى كل سيارة.</p>
         </div>
       </div>
 
@@ -486,10 +515,9 @@
 
     <div class="about-grid">
       <div class="about-card">
-        <h3>نحن وكالة متخصصة في السيارات</h3>
+        <h3>نحن وكالة متخصصة في تأجير السيارات</h3>
         <p style="margin-top:14px; line-height:1.9; color:#cbd5e1;">
-          نحن وكالة احترافية في مجال السيارات، نقدم لك مجموعة متنوعة من المركبات الحديثة والمجهزة بأعلى المعايير،
-          مع حرصنا على توفير تجربة سهلة وسريعة وموثوقة تساعدك على اختيار السيارة المناسبة بكل راحة وثقة.
+          نحن وكالة احترافية في مجال تأجير السيارات، نقدم لك مجموعة متنوعة من السيارات الحديثة والمجهزة بأعلى المعايير، مع حرصنا على توفير تجربة سهلة وسريعة وموثوقة، تساعدك على اختيار السيارة المناسبة بكل راحة وثقة.
         </p>
       </div>
 
@@ -497,14 +525,14 @@
         <h3>معلومات التواصل</h3>
         <div class="contact-list">
           <div class="contact-row"><span>الحالة الآن</span><strong id="contactBusinessStatus">جاري التحقق...</strong></div>
-          <div class="contact-row"><span>اسم النشاط</span><strong>Emotion Car &amp; Service UG</strong></div>
+          <div class="contact-row"><span>اسم النشاط</span><strong>Emotion Car & Service UG</strong></div>
           <div class="contact-row"><span>الهاتف</span><strong>+49 1573 6645354</strong></div>
           <div class="contact-row"><span>البريد</span><strong>emotion.service@icloud.com</strong></div>
           <div class="contact-row"><span>العنوان</span><strong>Eulerstraße 25, 13357 Berlin</strong></div>
           <div class="contact-row"><span>ساعات العمل</span><strong>الاثنين - الجمعة: 10:00 - 18:00<br>السبت: مغلق<br>الأحد: مغلق</strong></div>
         </div>
         <div class="cta-bar">
-          <a class="cta-btn primary" href="https://wa.me/4915736645354" target="_blank" rel="noopener">تواصل عبر واتساب</a>
+          <a class="cta-btn primary" href="https://wa.me/4915736645354" target="_blank">تواصل عبر واتساب</a>
           <a class="cta-btn" href="mailto:emotion.service@icloud.com">إرسال بريد</a>
         </div>
       </div>
@@ -517,6 +545,7 @@
         <h2 class="section-title">الشروط والأحكام</h2>
       </div>
     </div>
+
     <div class="legal-grid">
       <div class="legal-card">
         <h3>شروط استخدام الموقع</h3>
@@ -524,7 +553,7 @@
       </div>
       <div class="legal-card">
         <h3>معلومات البيع والتواصل</h3>
-        <p>يتم تأكيد المواصفات النهائية وحالة السيارة والسعر النهائي عند التواصل المباشر. يمكن للعميل طلب معلومات إضافية أو صور أكثر عبر واتساب أو البريد الإلكتروني.</p>
+        <p>يتم تأكيد المواصفات النهائية، حالة السيارة، وسعر التأجير النهائي عند التواصل المباشر. يمكن للعميل طلب معلومات إضافية أو صور أكثر عبر واتساب أو البريد الإلكتروني.</p>
       </div>
     </div>
   </section>
@@ -546,7 +575,7 @@
       <button class="close-btn" onclick="closeModal()">إغلاق</button>
       <div class="modal-grid">
         <div>
-          <a id="modalWhatsappLink" target="_blank" rel="noopener">
+          <a id="modalWhatsappLink" target="_blank">
             <img id="modalImage" class="modal-image" src="" alt="car" />
             <div class="whatsapp-banner">إن كنت مهتماً يمكننا مساعدتك عبر واتساب</div>
           </a>
@@ -562,7 +591,7 @@
     </div>
   </div>
 
-  <footer>© 2026 Emotion Car &amp; Service UG. جميع الحقوق محفوظة.</footer>
+  <footer>© 2026 Emotion Car & Service UG. جميع الحقوق محفوظة.</footer>
 
   <script>
     window.placeholderLogo = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
@@ -591,41 +620,20 @@
       </svg>
     `);
 
-    const imageBase = 'https://raw.githubusercontent.com/wahebwahbe100-byte/A/main/images';
     const WHATSAPP_NUMBER = '4915736645354';
     const carsPerPage = 8;
     let currentPage = 1;
-    let cars = [];
 
-    const carSeed = [
-      ['Mercedes', 'S-Class', 'Sedan', '€128,000', 2024, '8,000 km', 'ممتازة'],
-      ['BMW', 'X7', 'SUV', '€102,500', 2023, '14,500 km', 'ممتازة'],
-      ['Audi', 'RS7', 'Sport', '€119,900', 2024, '5,200 km', 'ممتازة'],
-      ['Range Rover', 'Sport', 'SUV', '€115,300', 2023, '18,100 km', 'ممتازة'],
-      ['Porsche', 'Taycan', 'Sport', '€134,800', 2024, '3,700 km', 'ممتازة'],
-      ['Lexus', 'LX', 'SUV', '€92,000', 2022, '21,000 km', 'جيدة جداً'],
-      ['Cadillac', 'Escalade', 'SUV', '€97,000', 2021, '26,000 km', 'جيدة جداً'],
-      ['Bentley', 'Bentayga', 'SUV', '€154,000', 2022, '19,500 km', 'ممتازة'],
-      ['Rolls-Royce', 'Ghost', 'Sedan', '€210,000', 2021, '17,800 km', 'ممتازة'],
-      ['Tesla', 'Model S', 'Sedan', '€88,000', 2023, '12,300 km', 'ممتازة'],
-      ['Ferrari', 'Roma', 'Sport', '€199,000', 2022, '7,400 km', 'ممتازة'],
-      ['Lamborghini', 'Urus', 'SUV', '€239,000', 2023, '6,900 km', 'ممتازة']
+    const cars = [
+      { id: 1, brand: 'Mercedes', model: 'S-Class', category: 'Sedan', price: '€128,000', year: 2024, mileage: '8,000 km', condition: 'ممتازة', name: 'Mercedes S-Class', description: 'سيارة فاخرة مناسبة للتنقل المريح والأنيق.', image: 'images/auto1.jpg', gallery: ['images/auto1.jpg', 'images/auto1.jpg'] },
+      { id: 2, brand: 'BMW', model: 'X7', category: 'SUV', price: '€102,500', year: 2023, mileage: '14,500 km', condition: 'ممتازة', name: 'BMW X7', description: 'سيارة SUV واسعة ومناسبة للعائلات والرحلات.', image: 'images/auto2.jpg', gallery: ['images/auto2.jpg', 'images/auto2.jpg'] },
+      { id: 3, brand: 'Audi', model: 'RS7', category: 'Sport', price: '€119,900', year: 2024, mileage: '5,200 km', condition: 'ممتازة', name: 'Audi RS7', description: 'أداء رياضي قوي مع تصميم عصري جذاب.', image: 'images/auto3.jpg', gallery: ['images/auto3.jpg', 'images/auto3.jpg'] },
+      { id: 4, brand: 'Range Rover', model: 'Sport', category: 'SUV', price: '€115,300', year: 2023, mileage: '18,100 km', condition: 'ممتازة', name: 'Range Rover Sport', description: 'فخامة وقوة على الطريق داخل المدينة وخارجها.', image: 'images/auto4.jpg', gallery: ['images/auto4.jpg', 'images/auto4.jpg'] },
+      { id: 5, brand: 'Porsche', model: 'Taycan', category: 'Sport', price: '€134,800', year: 2024, mileage: '3,700 km', condition: 'ممتازة', name: 'Porsche Taycan', description: 'سيارة كهربائية رياضية بتقنيات حديثة.', image: 'images/auto5.jpg', gallery: ['images/auto5.jpg', 'images/auto5.jpg'] },
+      { id: 6, brand: 'Lexus', model: 'LX', category: 'SUV', price: '€92,000', year: 2022, mileage: '21,000 km', condition: 'جيدة جداً', name: 'Lexus LX', description: 'اعتمادية عالية ومساحة ممتازة للرحلات.', image: 'images/auto6.jpg', gallery: ['images/auto6.jpg', 'images/auto6.jpg'] },
+      { id: 7, brand: 'Tesla', model: 'Model S', category: 'Sedan', price: '€88,000', year: 2023, mileage: '12,300 km', condition: 'ممتازة', name: 'Tesla Model S', description: 'تقنيات متطورة وتجربة قيادة هادئة وسريعة.', image: 'images/auto7.jpg', gallery: ['images/auto7.jpg', 'images/auto7.jpg'] },
+      { id: 8, brand: 'Lamborghini', model: 'Urus', category: 'SUV', price: '€239,000', year: 2023, mileage: '6,900 km', condition: 'ممتازة', name: 'Lamborghini Urus', description: 'SUV رياضية فاخرة بمظهر ملفت وأداء قوي.', image: 'images/auto8.jpg', gallery: ['images/auto8.jpg', 'images/auto8.jpg'] }
     ];
-
-    const defaultCars = carSeed.map((item, index) => ({
-      id: index + 1,
-      brand: item[0],
-      model: item[1],
-      category: item[2],
-      price: item[3],
-      year: item[4],
-      mileage: item[5],
-      condition: item[6],
-      name: `${item[0]} ${item[1]}`,
-      description: 'سيارة معروضة بحالة ممتازة مع مواصفات واضحة. يمكنك تعديل الصور والأسعار والمعلومات لاحقاً بسهولة.',
-      image: `${imageBase}/auto${index + 1}.jpg`,
-      gallery: [`${imageBase}/auto${index + 1}.jpg`]
-    }));
 
     function whatsappLink(car) {
       const message = `مرحباً، كنت مهتماً بسيارة ${car.name}. يمكننا مساعدتك وتزويدك بكل التفاصيل.`;
@@ -657,7 +665,7 @@
               <div class="detail-box"><span>سنة الصنع</span><strong>${car.year || ''}</strong></div>
               <div class="detail-box"><span>عدد الكيلومترات</span><strong>${car.mileage || ''}</strong></div>
               <div class="detail-box"><span>الحالة</span><strong>${car.condition || ''}</strong></div>
-              <div class="detail-box"><span>السعر</span><strong>${car.price || ''}</strong></div>
+              <div class="detail-box"><span>السعر المطلوب</span><strong>${car.price || ''}</strong></div>
             </div>
           </div>
         </div>
@@ -672,7 +680,8 @@
       const category = document.getElementById('categoryFilter')?.value || 'all';
 
       const filtered = cars.filter((car) => {
-        const matchesSearch = `${car.name || ''} ${car.brand || ''} ${car.model || ''}`.toLowerCase().includes(search);
+        const searchable = `${car.name || ''} ${car.brand || ''} ${car.model || ''}`.toLowerCase();
+        const matchesSearch = searchable.includes(search);
         const matchesCategory = category === 'all' || car.category === category;
         return matchesSearch && matchesCategory;
       });
@@ -699,6 +708,7 @@
     function selectModalImage(image) {
       const modalImage = document.getElementById('modalImage');
       if (!modalImage) return;
+
       modalImage.src = image || window.placeholderCar;
       document.querySelectorAll('#modalThumbs .thumb').forEach((thumb) => {
         thumb.classList.toggle('active', thumb.getAttribute('data-image') === image);
@@ -714,7 +724,7 @@
         : [car.image || window.placeholderCar];
 
       thumbs.innerHTML = gallery.map((image, index) => `
-        <img src="${image}" class="thumb ${index === 0 ? 'active' : ''}" data-image="${image}" alt="${car.name}" onerror="this.style.display='none'" />
+        <img src="${image}" class="thumb ${index === 0 ? 'active' : ''}" data-image="${image}" alt="${car.name}" onerror="this.onerror=null;this.src=window.placeholderCar" />
       `).join('');
 
       document.querySelectorAll('#modalThumbs .thumb').forEach((thumb) => {
@@ -730,7 +740,6 @@
       const modalWhatsappLink = document.getElementById('modalWhatsappLink');
       const modalDetails = document.getElementById('modalDetails');
       const modal = document.getElementById('carModal');
-
       if (!modalImage || !modalName || !modalCategory || !modalDescription || !modalWhatsappLink || !modalDetails || !modal) return;
 
       modalImage.src = car.image || window.placeholderCar;
@@ -745,7 +754,7 @@
         <div class="detail-box"><span>سنة الصنع</span><strong>${car.year || ''}</strong></div>
         <div class="detail-box"><span>عدد الكيلومترات</span><strong>${car.mileage || ''}</strong></div>
         <div class="detail-box"><span>الحالة</span><strong>${car.condition || ''}</strong></div>
-        <div class="detail-box"><span>السعر</span><strong>${car.price || ''}</strong></div>
+        <div class="detail-box"><span>السعر المطلوب</span><strong>${car.price || ''}</strong></div>
       `;
       renderThumbs(car);
       modal.classList.add('show');
@@ -755,31 +764,7 @@
       const modal = document.getElementById('carModal');
       if (modal) modal.classList.remove('show');
     }
-
     window.closeModal = closeModal;
-
-    function getBerlinTimeParts() {
-      const now = new Date();
-      const formatter = new Intl.DateTimeFormat('en-GB', {
-        timeZone: 'Europe/Berlin',
-        weekday: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      });
-
-      const parts = formatter.formatToParts(now);
-      const map = {};
-      parts.forEach((part) => { map[part.type] = part.value; });
-
-      const weekdayMap = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
-
-      return {
-        day: weekdayMap[map.weekday],
-        hour: parseInt(map.hour, 10),
-        minute: parseInt(map.minute, 10)
-      };
-    }
 
     function updateBusinessStatus() {
       const dot = document.getElementById('statusDot');
@@ -787,9 +772,16 @@
       const contact = document.getElementById('contactBusinessStatus');
       if (!dot || !text || !contact) return;
 
-      const { day, hour, minute } = getBerlinTimeParts();
-      const currentMinutes = hour * 60 + minute;
+      const now = new Date();
+      const berlinParts = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Europe/Berlin',
+        weekday: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).formatToParts(now);
 
+      const weekdayMap = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
       const weekdayNames = {
         0: 'الأحد',
         1: 'الاثنين',
@@ -800,8 +792,14 @@
         6: 'السبت'
       };
 
+      const weekdayStr = berlinParts.find((p) => p.type === 'weekday')?.value;
+      const hour = parseInt(berlinParts.find((p) => p.type === 'hour')?.value || '0', 10);
+      const minute = parseInt(berlinParts.find((p) => p.type === 'minute')?.value || '0', 10);
+      const day = weekdayMap[weekdayStr];
+      const currentMinutes = hour * 60 + minute;
       const openMinutes = 10 * 60;
       const closeMinutes = 18 * 60;
+
       let message = '';
       let color = '#ef4444';
 
@@ -811,23 +809,19 @@
           const remaining = closeMinutes - currentMinutes;
           const hoursLeft = Math.floor(remaining / 60);
           const minsLeft = remaining % 60;
-
-          if (hoursLeft > 0) {
-            message = `مفتوح الآن • اليوم ${weekdayNames[day]} • يغلق عند 18:00 • متبقي ${hoursLeft} س و ${minsLeft} د`;
-          } else {
-            message = `مفتوح الآن • اليوم ${weekdayNames[day]} • يغلق عند 18:00 • متبقي ${minsLeft} د`;
-          }
+          message = hoursLeft > 0
+            ? `مفتوح الآن • اليوم ${weekdayNames[day]} • يغلق عند 18:00 • متبقي ${hoursLeft} س و ${minsLeft} د`
+            : `مفتوح الآن • اليوم ${weekdayNames[day]} • يغلق عند 18:00 • متبقي ${minsLeft} دقيقة`;
         } else if (currentMinutes < openMinutes) {
           const remaining = openMinutes - currentMinutes;
           const hoursLeft = Math.floor(remaining / 60);
           const minsLeft = remaining % 60;
           message = `مغلق الآن • اليوم ${weekdayNames[day]} • يفتح عند 10:00 • بعد ${hoursLeft} س و ${minsLeft} د`;
         } else {
-          if (day === 5) {
-            message = 'مغلق الآن • اليوم الجمعة • يفتح الاثنين عند 10:00';
-          } else {
-            message = `مغلق الآن • اليوم ${weekdayNames[day]} • يفتح ${weekdayNames[day + 1]} عند 10:00`;
-          }
+          let nextDay = day + 1;
+          while (nextDay === 6 || nextDay === 0) nextDay += 1;
+          if (nextDay > 6) nextDay = 1;
+          message = `مغلق الآن • اليوم ${weekdayNames[day]} • يفتح ${weekdayNames[nextDay]} عند 10:00`;
         }
       } else if (day === 6) {
         message = 'مغلق الآن • اليوم السبت • يفتح الاثنين عند 10:00';
@@ -836,14 +830,13 @@
       }
 
       dot.style.background = color;
-      dot.style.boxShadow = `0 0 12px ${color}`;
+      dot.style.boxShadow = `0 0 10px ${color}`;
       text.textContent = message;
       contact.textContent = message;
       contact.style.color = color;
     }
 
     function initPage() {
-      cars = [...defaultCars];
       renderInventory();
       updateBusinessStatus();
       setInterval(updateBusinessStatus, 60000);
@@ -868,12 +861,10 @@
       document.getElementById('nextPageBtn')?.addEventListener('click', () => {
         const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
         const category = document.getElementById('categoryFilter')?.value || 'all';
-
-        const filtered = cars.filter((car) =>
-          `${car.name || ''} ${car.brand || ''} ${car.model || ''}`.toLowerCase().includes(search) &&
-          (category === 'all' || car.category === category)
-        );
-
+        const filtered = cars.filter((car) => {
+          const searchable = `${car.name || ''} ${car.brand || ''} ${car.model || ''}`.toLowerCase();
+          return searchable.includes(search) && (category === 'all' || car.category === category);
+        });
         const totalPages = Math.max(1, Math.ceil(filtered.length / carsPerPage));
         if (currentPage < totalPages) {
           currentPage += 1;
