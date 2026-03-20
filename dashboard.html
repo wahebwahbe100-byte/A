@@ -3,115 +3,667 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>لوحة التحكم</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Emotion Car & Service UG</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: 'Tajawal', Arial, sans-serif;
+      background: linear-gradient(135deg, #020617 0%, #0b1f3a 50%, #000000 100%);
+      color: #fff;
+    }
+    a { text-decoration: none; color: inherit; }
+    .container { width: min(1200px, calc(100% - 32px)); margin: 0 auto; }
+    .section { padding: 56px 0; }
+    section { scroll-margin-top: 90px; }
+
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(7,16,32,.96);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(0,0,0,.28);
+    }
+
+    .top-nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      padding: 14px 0;
+    }
+
+    .brand-pill {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .logo {
+      width: 140px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 18px;
+      background: rgba(255,255,255,.10);
+      padding: 6px;
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 18px 50px rgba(0,0,0,.65), 0 0 24px rgba(59,130,246,.35);
+      animation: logoGlow 3s ease-in-out infinite alternate, logoFloat 4s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes logoGlow {
+      from { box-shadow: 0 18px 50px rgba(0,0,0,.65), 0 0 12px rgba(59,130,246,.25); }
+      to { box-shadow: 0 20px 54px rgba(0,0,0,.72), 0 0 26px rgba(59,130,246,.48); }
+    }
+
+    @keyframes logoFloat {
+      0%,100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-4px) scale(1.02); }
+    }
+
+    .brand-text strong {
+      display: block;
+      font-size: 28px;
+      line-height: 1.05;
+    }
+
+    .status-row {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #dbeafe;
+      flex-wrap: wrap;
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+      background: #999;
+      box-shadow: 0 0 10px rgba(255,255,255,.3);
+      flex-shrink: 0;
+    }
+
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 34px;
+      flex-wrap: wrap;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 0;
+      color: #e5e7eb;
+      font-size: 15px;
+      font-weight: 700;
+      position: relative;
+    }
+
+    .nav-link::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -14px;
+      width: 0;
+      height: 2px;
+      background: #ffffff;
+      transition: width .2s ease;
+    }
+
+    .nav-link:hover::after { width: 100%; }
+
+    .login-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.08);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.12);
+      font-weight: 800;
+    }
+
+    .hero {
+      padding: 34px 0 30px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(59,130,246,.20), transparent 30%),
+        radial-gradient(circle at 80% 0%, rgba(255,255,255,.08), transparent 25%),
+        linear-gradient(135deg, #020617 0%, #0b1f3a 50%, #000000 100%);
+    }
+
+    .hero-box {
+      padding: 48px 0 24px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(42px, 6vw, 86px);
+      line-height: 1.08;
+      font-weight: 900;
+      letter-spacing: -1px;
+      background: linear-gradient(90deg, #fff, #93c5fd, #22c55e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 36px;
+      font-weight: 900;
+      background: linear-gradient(90deg,#ffffff,#60a5fa,#93c5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .section-head p {
+      margin: 10px 0 0;
+      color: #cbd5e1;
+      max-width: 720px;
+      line-height: 1.8;
+    }
+
+    .inventory-wrap {
+      background: rgba(255,255,255,.03);
+      border-top: 1px solid rgba(255,255,255,.08);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .filters {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    input, select {
+      background: #0f172a;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 15px;
+      min-width: 190px;
+      font-family: inherit;
+    }
+
+    .grid { display: grid; gap: 20px; }
+    .cars-grid { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+
+    .car-card {
+      background: linear-gradient(180deg,#020617,#0f172a);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 26px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,.6);
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+
+    .car-card:hover {
+      transform: translateY(-6px) scale(1.01);
+      box-shadow: 0 24px 70px rgba(0,0,0,.75);
+    }
+
+    .car-image-wrap { position: relative; overflow: hidden; }
+
+    .car-image {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+      cursor: pointer;
+      transition: transform .3s ease;
+    }
+
+    .car-card:hover .car-image { transform: scale(1.04); }
+
+    .car-badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 34px;
+      height: 34px;
+      background: rgba(15,23,42,.7);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.14);
+      padding: 0 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      backdrop-filter: blur(8px);
+    }
+
+    .car-content { padding: 18px; }
+
+    .car-top {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .price {
+      background: rgba(34,197,94,.14);
+      color: #bbf7d0;
+      border: 1px solid rgba(34,197,94,.18);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    .category {
+      color: #94a3b8;
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .detail-box {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .detail-box span {
+      display: block;
+      color: #94a3b8;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .pager {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 28px;
+      flex-wrap: wrap;
+    }
+
+    .pager button {
+      background: rgba(255,255,255,.06);
+      color: white;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+    }
+
+    .pager button:disabled { opacity: .45; cursor: not-allowed; }
+    .pager-info { color: #cbd5e1; font-size: 14px; }
+
+    .empty-box {
+      padding: 28px;
+      text-align: center;
+      color: #cbd5e1;
+      border: 1px dashed rgba(255,255,255,.12);
+      border-radius: 18px;
+      background: rgba(255,255,255,.02);
+      grid-column: 1 / -1;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+
+    .about-card, .contact-card, .legal-card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 24px;
+      padding: 24px;
+    }
+
+    .contact-list { display: grid; gap: 14px; margin-top: 18px; }
+
+    .contact-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: #e2e8f0;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .contact-row span { color: #94a3b8; }
+    .cta-bar { margin-top: 18px; display: flex; gap: 12px; flex-wrap: wrap; }
+
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.06);
+      color: #fff;
+    }
+
+    .cta-btn.primary { background: #22c55e; border-color: rgba(34,197,94,.25); }
+
+    .legal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+    .legal-card p {
+      color: #cbd5e1;
+      line-height: 1.9;
+      margin-top: 10px;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 999;
+    }
+
+    .modal.show { display: flex; }
+
+    .modal-card {
+      width: min(1000px, 100%);
+      max-height: 92vh;
+      overflow: auto;
+      background: #0f172a;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 28px;
+      position: relative;
+    }
+
+    .close-btn {
+      position: sticky;
+      top: 14px;
+      margin: 14px 14px 0 auto;
+      display: block;
+      width: fit-content;
+      background: rgba(255,255,255,.08);
+      color: white;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+      z-index: 2;
+      font-family: inherit;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 26px;
+      padding: 22px;
+    }
+
+    .modal-image {
+      width: 100%;
+      min-height: 340px;
+      max-height: 560px;
+      object-fit: cover;
+      border-radius: 24px;
+      display: block;
+    }
+
+    .thumbs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .thumb {
+      width: 100%;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 14px;
+      border: 2px solid rgba(255,255,255,.08);
+      cursor: pointer;
+      background: #111827;
+    }
+
+    .thumb.active { border-color: #22c55e; }
+
+    .whatsapp-banner {
+      margin-top: 14px;
+      background: #22c55e;
+      color: white;
+      text-align: center;
+      padding: 16px;
+      border-radius: 18px;
+      font-weight: bold;
+    }
+
+    .modal-title { font-size: 32px; margin-bottom: 8px; }
+    .modal-desc { color: #cbd5e1; line-height: 1.9; margin: 18px 0; }
+
+    footer {
+      padding: 40px 0 50px;
+      color: #cbd5e1;
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,.08);
+      margin-top: 40px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 900px) {
+      .top-nav-inner { flex-direction: column; align-items: flex-start; }
+      .nav-menu { gap: 18px; }
+      .brand-text strong { font-size: 22px; }
+      .logo { width: 120px; height: 80px; }
+      .about-grid, .legal-grid, .modal-grid { grid-template-columns: 1fr; }
+      .thumbs { grid-template-columns: repeat(2, 1fr); }
+      .details-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 42px; }
+    }
+  </style>
 </head>
-<body class="min-h-screen bg-slate-950 text-white p-4 md:p-8">
-  <div class="max-w-7xl mx-auto space-y-8">
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-      <div>
-        <h1 class="text-3xl font-black">لوحة التحكم</h1>
-        <p class="text-white/70 mt-2">بعد تسجيل الدخول يمكنك تعديل صور 30 سيارة والسعر والتفاصيل نفسها الموجودة في الموقع.</p>
+<body>
+  <header class="top-nav">
+    <div class="container top-nav-inner">
+      <div class="brand-pill">
+        <img src="images/logo.png" class="logo" alt="logo" onerror="this.src=window.placeholderLogo" />
+        <div class="brand-text">
+          <strong>Emotion Car & Service UG</strong>
+          <div id="liveBusinessStatus" class="status-row">
+            <span id="statusDot" class="status-dot"></span>
+            <span id="statusText">...</span>
+          </div>
+        </div>
       </div>
-      <div class="flex gap-3 flex-wrap">
-        <a href="index.html" class="px-5 py-3 rounded-2xl bg-white/10 border border-white/10">عرض الموقع</a>
-        <button id="logoutBtn" class="px-5 py-3 rounded-2xl bg-red-600 hover:bg-red-700">تسجيل خروج</button>
+
+      <nav class="nav-menu">
+        <a class="nav-link" href="#cars">Fahrzeuge</a>
+        <a class="nav-link" href="#about">Über uns</a>
+        <a class="nav-link" href="#terms">Service</a>
+        <a class="nav-link" href="#contact">Kontakt</a>
+      </nav>
+
+      <a class="login-link" href="login.html">تسجيل</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <div class="hero-box">
+        <h1>Emotion Car & Service UG</h1>
+      </div>
+    </div>
+  </section>
+
+  <section id="cars" class="section inventory-wrap">
+    <div class="container">
+      <div class="section-head">
+        <div>
+          <h2 class="section-title">معرض السيارات</h2>
+          <p>يعرض الموقع السيارات المتاحة للتأجير مع تفاصيل واضحة وصور مرتبة وسهولة الوصول إلى كل سيارة.</p>
+        </div>
+      </div>
+
+      <div class="filters">
+        <input id="searchInput" type="text" placeholder="ابحث عن سيارة..." />
+        <select id="categoryFilter">
+          <option value="all">كل الفئات</option>
+          <option value="SUV">SUV</option>
+          <option value="Sedan">Sedan</option>
+          <option value="Sport">Sport</option>
+        </select>
+      </div>
+
+      <div id="inventoryCars" class="grid cars-grid"></div>
+
+      <div class="pager">
+        <button id="nextPageBtn">التالي ←</button>
+        <div id="pagerInfo" class="pager-info"></div>
+        <button id="prevPageBtn">→ السابق</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="section container">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">من نحن</h2>
       </div>
     </div>
 
-    <div id="msg" class="text-sm"></div>
-
-    <div class="grid lg:grid-cols-[340px,1fr] gap-8">
-      <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
-        <h2 class="text-2xl font-black mb-4">اختيار السيارة</h2>
-        <div class="space-y-4">
-          <select id="carSelect" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10"></select>
-          <div class="text-white/70 text-sm leading-7">
-            اختر السيارة التي تريد تعديلها، ثم غيّر الصورة والسعر والوصف وباقي البيانات، وبعدها اضغط حفظ.
-          </div>
-          <div class="rounded-2xl border border-white/10 bg-slate-900/70 p-4">
-            <div class="text-sm text-white/60 mb-2">الصورة الحالية</div>
-            <img id="preview" class="w-full h-56 object-cover rounded-2xl bg-slate-950" alt="preview">
-          </div>
-        </div>
+    <div class="about-grid">
+      <div class="about-card">
+        <h3>نحن وكالة متخصصة في تأجير السيارات</h3>
+        <p style="margin-top:14px; line-height:1.9; color:#cbd5e1;">
+          نحن وكالة احترافية في مجال تأجير السيارات، نقدم لك مجموعة متنوعة من السيارات الحديثة والمجهزة بأعلى المعايير، مع حرصنا على توفير تجربة سهلة وسريعة وموثوقة، تساعدك على اختيار السيارة المناسبة بكل راحة وثقة.
+        </p>
       </div>
 
-      <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
-        <h2 class="text-2xl font-black mb-4">تعديل السيارة</h2>
-
-        <div class="grid md:grid-cols-2 gap-4">
-          <div>
-            <label class="block mb-2 text-sm text-white/80">الاسم الكامل</label>
-            <input id="name" type="text" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="Mercedes S-Class">
-          </div>
-
-          <div>
-            <label class="block mb-2 text-sm text-white/80">الفئة</label>
-            <select id="category" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10">
-              <option value="SUV">SUV</option>
-              <option value="Sedan">Sedan</option>
-              <option value="Sport">Sport</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block mb-2 text-sm text-white/80">السعر</label>
-            <input id="price" type="text" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="€128,000">
-          </div>
-
-          <div>
-            <label class="block mb-2 text-sm text-white/80">سنة الصنع</label>
-            <input id="year" type="number" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="2024">
-          </div>
-
-          <div>
-            <label class="block mb-2 text-sm text-white/80">عدد الكيلومترات</label>
-            <input id="mileage" type="text" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="8,000 km">
-          </div>
-
-          <div>
-            <label class="block mb-2 text-sm text-white/80">الحالة</label>
-            <input id="condition" type="text" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="ممتازة">
-          </div>
-
-          <div class="md:col-span-2">
-            <label class="block mb-2 text-sm text-white/80">الوصف</label>
-            <textarea id="description" rows="6" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="اكتب وصف السيارة هنا..."></textarea>
-          </div>
-
-          <div class="md:col-span-2">
-            <label class="block mb-2 text-sm text-white/80">الصورة الرئيسية</label>
-            <input id="imageFile" type="file" accept="image/*" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10">
-          </div>
-
-          <div class="md:col-span-2">
-            <label class="flex items-center gap-3 rounded-2xl p-4 bg-slate-900 border border-white/10 cursor-pointer">
-              <input id="isHidden" type="checkbox" class="h-5 w-5">
-              <span class="text-white/90 font-bold">إخفاء السيارة مؤقتًا من الموقع</span>
-            </label>
-            <p class="text-xs text-white/50 mt-2">عند التفعيل تختفي السيارة من الموقع فقط، ويمكن إرجاعها لاحقًا بإزالة العلامة ثم الحفظ.</p>
-          </div>
+      <div id="contact" class="contact-card">
+        <h3>معلومات التواصل</h3>
+        <div class="contact-list">
+          <div class="contact-row"><span>الحالة الآن</span><strong id="contactBusinessStatus">...</strong></div>
+          <div class="contact-row"><span>اسم النشاط</span><strong>Emotion Car & Service UG</strong></div>
+          <div class="contact-row"><span>الهاتف</span><strong>+49 1573 6645354</strong></div>
+          <div class="contact-row"><span>البريد</span><strong>emotion.service@icloud.com</strong></div>
+          <div class="contact-row"><span>العنوان</span><strong>Eulerstraße 25, 13357 Berlin</strong></div>
+          <div class="contact-row"><span>ساعات العمل</span><strong>الاثنين - الجمعة: 10:00 - 18:00<br>السبت: مغلق<br>الأحد: مغلق</strong></div>
         </div>
+        <div class="cta-bar">
+          <a class="cta-btn primary" href="https://wa.me/4915736645354" target="_blank">تواصل عبر واتساب</a>
+          <a class="cta-btn" href="mailto:emotion.service@icloud.com">إرسال بريد</a>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        <div class="flex gap-4 flex-wrap mt-6">
-          <button id="saveBtn" class="px-6 py-4 rounded-2xl bg-lime-500 hover:bg-lime-600 font-black text-slate-950">حفظ التعديلات</button>
-          <button id="reloadBtn" class="px-6 py-4 rounded-2xl bg-white/10 border border-white/10 font-black">إعادة تحميل البيانات</button>
+  <section id="terms" class="section container">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">الشروط والأحكام</h2>
+      </div>
+    </div>
+
+    <div class="legal-grid">
+      <div class="legal-card">
+        <h3>شروط استخدام الموقع</h3>
+        <p>جميع المعلومات والصور والأسعار المعروضة هدفها التعريف بالسيارات المتاحة. قد تتغير بعض التفاصيل أو الأسعار حسب حالة المركبة والتوفر الفعلي وقت التواصل.</p>
+      </div>
+      <div class="legal-card">
+        <h3>معلومات البيع والتواصل</h3>
+        <p>يتم تأكيد المواصفات النهائية، حالة السيارة، وسعر التأجير النهائي عند التواصل المباشر. يمكن للعميل طلب معلومات إضافية أو صور أكثر عبر واتساب أو البريد الإلكتروني.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section container">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">موقعنا على الخريطة</h2>
+        <p>يمكنك زيارة موقعنا مباشرة عبر الخريطة.</p>
+      </div>
+    </div>
+    <div style="border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.1)">
+      <iframe src="https://www.google.com/maps?q=Eulerstraße+25,+13357+Berlin&output=embed" width="100%" height="400" style="border:0" loading="lazy"></iframe>
+    </div>
+  </section>
+
+  <div id="carModal" class="modal">
+    <div class="modal-card">
+      <button class="close-btn" onclick="closeModal()">إغلاق</button>
+      <div class="modal-grid">
+        <div>
+          <a id="modalWhatsappLink" target="_blank">
+            <img id="modalImage" class="modal-image" src="" alt="car" />
+            <div class="whatsapp-banner">إن كنت مهتماً يمكننا مساعدتك عبر واتساب</div>
+          </a>
+          <div id="modalThumbs" class="thumbs"></div>
+        </div>
+        <div>
+          <h2 id="modalName" class="modal-title"></h2>
+          <p id="modalCategory" class="category"></p>
+          <p id="modalDescription" class="modal-desc"></p>
+          <div id="modalDetails" class="details-grid"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+  <footer>© 2026 Emotion Car & Service UG. جميع الحقوق محفوظة.</footer>
 
-    const supabase = createClient(
-      'https://mbesnbkludynomgdzfhw.supabase.co',
-      'sb_publishable_EfwicNkVNrNBXKBgoiMXjA_VqTcfnTm'
-    );
+  <script>
+    window.placeholderLogo = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="160" height="100" viewBox="0 0 160 100">
+        <rect width="160" height="100" rx="16" fill="#0f172a"/>
+        <path d="M28 58c14-16 34-24 60-24 11 0 23 2 34 7" fill="none" stroke="#3b82f6" stroke-width="7" stroke-linecap="round"/>
+        <path d="M34 64h72c12 0 22-6 28-16" fill="none" stroke="#22c55e" stroke-width="7" stroke-linecap="round"/>
+        <text x="80" y="86" text-anchor="middle" fill="white" font-size="20" font-family="Arial">EC</text>
+      </svg>
+    `);
 
-    const STORAGE_BUCKET = 'site-images';
-
-    const fallbackImage = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+    window.placeholderCar = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
         <defs>
           <linearGradient id="g" x1="0" x2="1">
@@ -120,11 +672,29 @@
           </linearGradient>
         </defs>
         <rect width="1200" height="700" fill="url(#g)"/>
-        <text x="600" y="350" fill="#cbd5e1" font-size="42" text-anchor="middle" font-family="Arial">No Image Available</text>
+        <path d="M275 420c42-78 116-118 240-118h150c67 0 118 18 166 56l59 46h60c31 0 55 22 55 50v22H201v-18c0-20 10-38 28-48l46-26z" fill="#334155"/>
+        <circle cx="372" cy="486" r="58" fill="#0f172a" stroke="#60a5fa" stroke-width="10"/>
+        <circle cx="847" cy="486" r="58" fill="#0f172a" stroke="#22c55e" stroke-width="10"/>
+        <text x="600" y="610" fill="#cbd5e1" font-size="46" text-anchor="middle" font-family="Arial">Emotion Cars</text>
+        <text x="600" y="655" fill="#94a3b8" font-size="28" text-anchor="middle" font-family="Arial">No Image Available</text>
       </svg>
     `);
 
-    const defaultCars = [
+    const SUPABASE_URL = 'https://mbesnbkludynomgdzfhw.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_EfwicNkVNrNBXKBgoiMXjA_VqTcfnTm';
+    const STORAGE_BUCKET = 'site-images';
+    const imageBase = 'https://raw.githubusercontent.com/wahebwahbe100-byte/A/main/images';
+    const WHATSAPP_NUMBER = '4915736645354';
+    const carsPerPage = 8;
+
+    // ضعي هنا أرقام السيارات التي تريدين إخفاءها مؤقتًا
+    const hiddenCarIds = [];
+
+    let currentPage = 1;
+    let cars = [];
+    let supabaseClient = null;
+
+    const carSeed = [
       ['Mercedes', 'S-Class', 'Sedan', '€128,000', 2024, '8,000 km', 'ممتازة'],
       ['BMW', 'X7', 'SUV', '€102,500', 2023, '14,500 km', 'ممتازة'],
       ['Audi', 'RS7', 'Sport', '€119,900', 2024, '5,200 km', 'ممتازة'],
@@ -155,7 +725,9 @@
       ['Hyundai', 'Palisade', 'SUV', '€46,800', 2022, '25,600 km', 'جيدة جداً'],
       ['Nissan', 'Patrol', 'SUV', '€68,900', 2021, '37,700 km', 'جيدة جداً'],
       ['Chevrolet', 'Tahoe', 'SUV', '€61,500', 2022, '23,900 km', 'جيدة جداً']
-    ].map((item, index) => ({
+    ];
+
+    const defaultCars = carSeed.map((item, index) => ({
       id: index + 1,
       brand: item[0],
       model: item[1],
@@ -166,180 +738,370 @@
       condition: item[6],
       name: `${item[0]} ${item[1]}`,
       description: 'سيارة معروضة بحالة ممتازة مع مواصفات واضحة. يمكنك تعديل الصور والأسعار والمعلومات لاحقاً بسهولة.',
-      image: fallbackImage,
-      gallery: [fallbackImage],
-      is_hidden: false
+      image: `${imageBase}/auto${index + 1}.jpg`,
+      gallery: [`${imageBase}/auto${index + 1}.jpg`]
     }));
 
-    const msg = document.getElementById('msg');
-    const carSelect = document.getElementById('carSelect');
-    const preview = document.getElementById('preview');
-    const nameInput = document.getElementById('name');
-    const categoryInput = document.getElementById('category');
-    const priceInput = document.getElementById('price');
-    const yearInput = document.getElementById('year');
-    const mileageInput = document.getElementById('mileage');
-    const conditionInput = document.getElementById('condition');
-    const descriptionInput = document.getElementById('description');
-    const imageInput = document.getElementById('imageFile');
-    const isHiddenInput = document.getElementById('isHidden');
-    const saveBtn = document.getElementById('saveBtn');
-    const reloadBtn = document.getElementById('reloadBtn');
-
-    let cars = [];
-
-    function showMessage(text, ok = true) {
-      msg.textContent = text;
-      msg.className = ok ? 'text-sm text-emerald-300' : 'text-sm text-red-300';
+    function getPublicImage(value) {
+      if (!value || typeof value !== 'string') return '';
+      const trimmed = value.trim();
+      if (!trimmed) return '';
+      if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith('data:')) return trimmed;
+      if (!supabaseClient) return trimmed;
+      const cleanPath = trimmed.replace(/^\/+/, '');
+      const { data } = supabaseClient.storage.from(STORAGE_BUCKET).getPublicUrl(cleanPath);
+      return data?.publicUrl || trimmed;
     }
 
-    async function requireLogin() {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) {
-        window.location.href = './login.html';
-      }
-    }
+    function normalizeGallery(row, fallbackImage) {
+      let gallery = [];
 
-    async function seedCarsIfEmpty() {
-      const { data, error } = await supabase.from('cars').select('id').limit(1);
-      if (error) return;
-      if (Array.isArray(data) && data.length === 0) {
-        await supabase.from('cars').upsert(defaultCars, { onConflict: 'id' });
-      }
-    }
-
-    function renderSelect() {
-      carSelect.innerHTML = cars.map(car => {
-        const hiddenLabel = car.is_hidden ? ' (مخفية)' : '';
-        return `<option value="${car.id}">سيارة ${car.id} - ${car.name}${hiddenLabel}</option>`;
-      }).join('');
-      if (cars.length) fillForm(cars[0].id);
-    }
-
-    function findCar(id) {
-      return cars.find(car => String(car.id) === String(id));
-    }
-
-    function fillForm(id) {
-      const car = findCar(id);
-      if (!car) return;
-
-      nameInput.value = car.name || '';
-      categoryInput.value = car.category || 'SUV';
-      priceInput.value = car.price || '';
-      yearInput.value = car.year || '';
-      mileageInput.value = car.mileage || '';
-      conditionInput.value = car.condition || '';
-      descriptionInput.value = car.description || '';
-      isHiddenInput.checked = !!car.is_hidden;
-
-      preview.src = car.image || fallbackImage;
-      preview.onerror = () => preview.src = fallbackImage;
-    }
-
-    async function loadCars() {
-      showMessage('جاري تحميل السيارات...');
-      const { data, error } = await supabase.from('cars').select('*').order('id', { ascending: true });
-      if (error) {
-        showMessage(error.message, false);
-        return;
+      if (Array.isArray(row.gallery)) {
+        gallery = row.gallery;
+      } else if (typeof row.gallery === 'string' && row.gallery.trim()) {
+        try {
+          const parsed = JSON.parse(row.gallery);
+          gallery = Array.isArray(parsed) ? parsed : [row.gallery];
+        } catch (error) {
+          gallery = [row.gallery];
+        }
       }
 
-      cars = (data || []).map(row => ({
-        ...row,
-        image: row.image || fallbackImage,
-        gallery: Array.isArray(row.gallery) && row.gallery.length ? row.gallery : [row.image || fallbackImage],
-        is_hidden: !!row.is_hidden
-      }));
+      const normalized = gallery.map((item) => getPublicImage(item)).filter(Boolean);
+      const mainImage = getPublicImage(row.image) || fallbackImage;
 
-      renderSelect();
-      showMessage('تم تحميل السيارات بنجاح');
+      if (mainImage && !normalized.includes(mainImage)) {
+        normalized.unshift(mainImage);
+      }
+
+      return normalized.length ? normalized : [fallbackImage];
     }
 
-    async function uploadImageIfNeeded(carId) {
-      const file = imageInput.files?.[0];
-      if (!file) return null;
+    function whatsappLink(car) {
+      const message = `مرحباً، كنت مهتماً بسيارة ${car.name}. يمكننا مساعدتك وتزويدك بكل التفاصيل.`;
+      return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+    }
 
-      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
-      const path = `cars/car-${carId}-${Date.now()}.${ext}`;
+    function findCarById(id) {
+      return cars.find((car) => String(car.id) === String(id));
+    }
 
-      const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file, {
-        upsert: true,
-        contentType: file.type || 'image/jpeg'
+    function createCarCard(car) {
+      return `
+        <div class="car-card">
+          <div class="car-image-wrap">
+            <img
+              class="car-image"
+              src="${car.image || window.placeholderCar}"
+              alt="${car.name}"
+              data-car-id="${car.id}"
+              onerror="this.onerror=null;this.src=window.placeholderCar"
+            />
+            <div class="car-badge">${car.id}</div>
+          </div>
+          <div class="car-content">
+            <div class="car-top">
+              <div class="price">${car.price || ''}</div>
+              <div>
+                <h3>${car.name || ''}</h3>
+                <div class="category">${car.category || ''}</div>
+              </div>
+            </div>
+            <div class="details-grid">
+              <div class="detail-box"><span>الماركة</span><strong>${car.brand || ''}</strong></div>
+              <div class="detail-box"><span>الطراز</span><strong>${car.model || ''}</strong></div>
+              <div class="detail-box"><span>سنة الصنع</span><strong>${car.year || ''}</strong></div>
+              <div class="detail-box"><span>عدد الكيلومترات</span><strong>${car.mileage || ''}</strong></div>
+              <div class="detail-box"><span>الحالة</span><strong>${car.condition || ''}</strong></div>
+              <div class="detail-box"><span>السعر المطلوب</span><strong>${car.price || ''}</strong></div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderInventory() {
+      const inventory = document.getElementById('inventoryCars');
+      if (!inventory) return;
+
+      const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+      const category = document.getElementById('categoryFilter')?.value || 'all';
+
+      const filtered = cars.filter((car) => {
+        if (hiddenCarIds.includes(Number(car.id))) return false;
+
+        const searchable = `${car.name || ''} ${car.brand || ''} ${car.model || ''}`.toLowerCase();
+        const matchesSearch = searchable.includes(search);
+        const matchesCategory = category === 'all' || car.category === category;
+        return matchesSearch && matchesCategory;
       });
 
-      if (error) throw error;
+      const totalPages = Math.max(1, Math.ceil(filtered.length / carsPerPage));
+      if (currentPage > totalPages) currentPage = totalPages;
 
-      const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
-      return data.publicUrl;
+      const startIndex = (currentPage - 1) * carsPerPage;
+      const paginatedCars = filtered.slice(startIndex, startIndex + carsPerPage);
+
+      inventory.innerHTML = paginatedCars.length
+        ? paginatedCars.map(createCarCard).join('')
+        : '<div class="empty-box">لا توجد سيارات مطابقة حالياً.</div>';
+
+      const pagerInfo = document.getElementById('pagerInfo');
+      const prevBtn = document.getElementById('prevPageBtn');
+      const nextBtn = document.getElementById('nextPageBtn');
+
+      if (pagerInfo) pagerInfo.textContent = `الصفحة ${currentPage} من ${totalPages}`;
+      if (prevBtn) prevBtn.disabled = currentPage === 1;
+      if (nextBtn) nextBtn.disabled = currentPage === totalPages;
     }
 
-    async function saveCar() {
-      const id = Number(carSelect.value);
-      const car = findCar(id);
-      if (!car) return;
+    function selectModalImage(image) {
+      const modalImage = document.getElementById('modalImage');
+      if (!modalImage) return;
 
-      saveBtn.disabled = true;
-      saveBtn.textContent = 'جاري الحفظ...';
-      showMessage('جاري حفظ التعديلات...');
+      modalImage.src = image || window.placeholderCar;
+
+      document.querySelectorAll('#modalThumbs .thumb').forEach((thumb) => {
+        thumb.classList.toggle('active', thumb.getAttribute('data-image') === image);
+      });
+    }
+
+    function renderThumbs(car) {
+      const thumbs = document.getElementById('modalThumbs');
+      if (!thumbs) return;
+
+      const gallery = Array.isArray(car.gallery) && car.gallery.length
+        ? car.gallery
+        : [car.image || window.placeholderCar];
+
+      thumbs.innerHTML = gallery.map((image, index) => `
+        <img
+          src="${image}"
+          class="thumb ${index === 0 ? 'active' : ''}"
+          data-image="${image}"
+          alt="${car.name}"
+          onerror="this.onerror=null;this.style.display='none'"
+        />
+      `).join('');
+
+      document.querySelectorAll('#modalThumbs .thumb').forEach((thumb) => {
+        thumb.addEventListener('click', () => selectModalImage(thumb.getAttribute('data-image')));
+      });
+    }
+
+    function openModal(car) {
+      const modalImage = document.getElementById('modalImage');
+      const modalName = document.getElementById('modalName');
+      const modalCategory = document.getElementById('modalCategory');
+      const modalDescription = document.getElementById('modalDescription');
+      const modalWhatsappLink = document.getElementById('modalWhatsappLink');
+      const modalDetails = document.getElementById('modalDetails');
+      const modal = document.getElementById('carModal');
+
+      if (!modalImage || !modalName || !modalCategory || !modalDescription || !modalWhatsappLink || !modalDetails || !modal) return;
+
+      modalImage.src = car.image || window.placeholderCar;
+      modalImage.onerror = function () { this.src = window.placeholderCar; };
+      modalName.textContent = car.name || '';
+      modalCategory.textContent = car.category || '';
+      modalDescription.textContent = car.description || '';
+      modalWhatsappLink.href = whatsappLink(car);
+
+      modalDetails.innerHTML = `
+        <div class="detail-box"><span>الماركة</span><strong>${car.brand || ''}</strong></div>
+        <div class="detail-box"><span>الطراز</span><strong>${car.model || ''}</strong></div>
+        <div class="detail-box"><span>سنة الصنع</span><strong>${car.year || ''}</strong></div>
+        <div class="detail-box"><span>عدد الكيلومترات</span><strong>${car.mileage || ''}</strong></div>
+        <div class="detail-box"><span>الحالة</span><strong>${car.condition || ''}</strong></div>
+        <div class="detail-box"><span>السعر المطلوب</span><strong>${car.price || ''}</strong></div>
+      `;
+
+      renderThumbs(car);
+      modal.classList.add('show');
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('carModal');
+      if (modal) modal.classList.remove('show');
+    }
+
+    window.closeModal = closeModal;
+
+    async function loadCars() {
+      cars = [...defaultCars];
+      renderInventory();
+
+      if (!supabaseClient) return;
 
       try {
-        const uploadedImage = await uploadImageIfNeeded(id);
-        const fullName = nameInput.value.trim();
-        const parts = fullName.split(/\s+/).filter(Boolean);
+        const { data, error } = await supabaseClient
+          .from('cars')
+          .select('*')
+          .order('id', { ascending: true });
 
-        const updated = {
-          id,
-          name: fullName || car.name,
-          brand: parts[0] || car.brand,
-          model: parts.slice(1).join(' ') || car.model,
-          category: categoryInput.value,
-          price: priceInput.value.trim(),
-          year: Number(yearInput.value) || car.year,
-          mileage: mileageInput.value.trim(),
-          condition: conditionInput.value.trim(),
-          description: descriptionInput.value.trim(),
-          image: uploadedImage || car.image,
-          gallery: uploadedImage
-            ? [uploadedImage]
-            : (Array.isArray(car.gallery) && car.gallery.length ? car.gallery : [car.image || fallbackImage]),
-          is_hidden: isHiddenInput.checked
-        };
-
-        const { error } = await supabase.from('cars').upsert(updated, { onConflict: 'id' });
         if (error) throw error;
+        if (!Array.isArray(data) || !data.length) return;
 
-        showMessage(isHiddenInput.checked ? 'تم حفظ التعديلات وإخفاء السيارة مؤقتًا' : 'تم حفظ التعديلات بنجاح');
-        await loadCars();
-        carSelect.value = String(id);
-        fillForm(id);
-        imageInput.value = '';
+        cars = data.map((row, index) => {
+          const fallbackImage = `${imageBase}/auto${row.id || index + 1}.jpg`;
+          const normalizedImage = getPublicImage(row.image) || fallbackImage;
+
+          return {
+            ...row,
+            id: row.id ?? index + 1,
+            name: row.name || `${row.brand || ''} ${row.model || ''}`.trim() || `سيارة ${index + 1}`,
+            image: normalizedImage,
+            gallery: normalizeGallery(row, normalizedImage)
+          };
+        });
+
+        renderInventory();
       } catch (error) {
-        showMessage(error.message || 'حدث خطأ أثناء الحفظ', false);
+        console.error('loadCars failed:', error);
       }
-
-      saveBtn.disabled = false;
-      saveBtn.textContent = 'حفظ التعديلات';
     }
 
-    document.getElementById('logoutBtn').addEventListener('click', async () => {
-      await supabase.auth.signOut();
-      window.location.href = './login.html';
-    });
+    function updateBusinessStatus() {
+      const dot = document.getElementById('statusDot');
+      const text = document.getElementById('statusText');
+      const contact = document.getElementById('contactBusinessStatus');
+      if (!dot || !text || !contact) return;
 
-    carSelect.addEventListener('change', (e) => fillForm(e.target.value));
-    reloadBtn.addEventListener('click', loadCars);
-    saveBtn.addEventListener('click', saveCar);
+      const now = new Date();
+      const berlinParts = new Intl.DateTimeFormat('en-GB', {
+        timeZone: 'Europe/Berlin',
+        weekday: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }).formatToParts(now);
 
-    imageInput.addEventListener('change', () => {
-      const file = imageInput.files?.[0];
-      if (!file) return;
-      preview.src = URL.createObjectURL(file);
-    });
+      const weekdayMap = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+      const weekdayNames = {
+        0: 'الأحد',
+        1: 'الاثنين',
+        2: 'الثلاثاء',
+        3: 'الأربعاء',
+        4: 'الخميس',
+        5: 'الجمعة',
+        6: 'السبت'
+      };
 
-    await requireLogin();
-    await seedCarsIfEmpty();
-    await loadCars();
+      const weekdayStr = berlinParts.find((p) => p.type === 'weekday')?.value;
+      const hour = parseInt(berlinParts.find((p) => p.type === 'hour')?.value || '0', 10);
+      const minute = parseInt(berlinParts.find((p) => p.type === 'minute')?.value || '0', 10);
+
+      const day = weekdayMap[weekdayStr];
+      const currentMinutes = hour * 60 + minute;
+      const openMinutes = 10 * 60;
+      const closeMinutes = 18 * 60;
+
+      let message = '';
+      let color = '#ef4444';
+
+      if (day >= 1 && day <= 5) {
+        if (currentMinutes >= openMinutes && currentMinutes < closeMinutes) {
+          color = '#22c55e';
+          const remaining = closeMinutes - currentMinutes;
+          const hoursLeft = Math.floor(remaining / 60);
+          const minsLeft = remaining % 60;
+
+          message = hoursLeft > 0
+            ? `مفتوح الآن • اليوم ${weekdayNames[day]} • يغلق عند 18:00 • متبقي ${hoursLeft} س و ${minsLeft} د`
+            : `مفتوح الآن • اليوم ${weekdayNames[day]} • يغلق عند 18:00 • متبقي ${minsLeft} دقيقة`;
+        } else if (currentMinutes < openMinutes) {
+          const remaining = openMinutes - currentMinutes;
+          const hoursLeft = Math.floor(remaining / 60);
+          const minsLeft = remaining % 60;
+          message = `مغلق الآن • اليوم ${weekdayNames[day]} • يفتح عند 10:00 • بعد ${hoursLeft} س و ${minsLeft} د`;
+        } else {
+          let nextDay = day + 1;
+          while (nextDay === 6 || nextDay === 0) nextDay += 1;
+          if (nextDay > 6) nextDay = 1;
+          message = `مغلق الآن • اليوم ${weekdayNames[day]} • يفتح ${weekdayNames[nextDay]} عند 10:00`;
+        }
+      } else if (day === 6) {
+        message = 'مغلق الآن • اليوم السبت • يفتح الاثنين عند 10:00';
+      } else {
+        message = 'مغلق الآن • اليوم الأحد • يفتح الاثنين عند 10:00';
+      }
+
+      dot.style.background = color;
+      dot.style.boxShadow = `0 0 10px ${color}`;
+      text.textContent = message;
+      contact.textContent = message;
+      contact.style.color = color;
+    }
+
+    function initPage() {
+      try {
+        if (window.supabase?.createClient) {
+          supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        }
+      } catch (error) {
+        console.error('supabase init failed:', error);
+        supabaseClient = null;
+      }
+
+      cars = [...defaultCars];
+      renderInventory();
+      updateBusinessStatus();
+      setInterval(updateBusinessStatus, 60000);
+      loadCars();
+
+      document.getElementById('searchInput')?.addEventListener('input', () => {
+        currentPage = 1;
+        renderInventory();
+      });
+
+      document.getElementById('categoryFilter')?.addEventListener('change', () => {
+        currentPage = 1;
+        renderInventory();
+      });
+
+      document.getElementById('prevPageBtn')?.addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage -= 1;
+          renderInventory();
+        }
+      });
+
+      document.getElementById('nextPageBtn')?.addEventListener('click', () => {
+        const search = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+        const category = document.getElementById('categoryFilter')?.value || 'all';
+
+        const filtered = cars.filter((car) => {
+          if (hiddenCarIds.includes(Number(car.id))) return false;
+
+          const searchable = `${car.name || ''} ${car.brand || ''} ${car.model || ''}`.toLowerCase();
+          return searchable.includes(search) && (category === 'all' || car.category === category);
+        });
+
+        const totalPages = Math.max(1, Math.ceil(filtered.length / carsPerPage));
+        if (currentPage < totalPages) {
+          currentPage += 1;
+          renderInventory();
+        }
+      });
+
+      document.getElementById('carModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'carModal') closeModal();
+      });
+
+      document.addEventListener('click', (e) => {
+        const image = e.target.closest('.car-image');
+        if (!image) return;
+
+        const car = findCarById(image.getAttribute('data-car-id'));
+        if (car) openModal(car);
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initPage);
+    } else {
+      initPage();
+    }
   </script>
 </body>
 </html>
