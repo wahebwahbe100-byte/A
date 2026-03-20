@@ -687,6 +687,9 @@
     const WHATSAPP_NUMBER = '4915736645354';
     const carsPerPage = 8;
 
+    // ضعي هنا أرقام السيارات التي تريدين إخفاءها مؤقتًا
+    const hiddenCarIds = [];
+
     let currentPage = 1;
     let cars = [];
     let supabaseClient = null;
@@ -825,6 +828,8 @@
       const category = document.getElementById('categoryFilter')?.value || 'all';
 
       const filtered = cars.filter((car) => {
+        if (hiddenCarIds.includes(Number(car.id))) return false;
+
         const searchable = `${car.name || ''} ${car.brand || ''} ${car.model || ''}`.toLowerCase();
         const matchesSearch = searchable.includes(search);
         const matchesCategory = category === 'all' || car.category === category;
@@ -1066,6 +1071,8 @@
         const category = document.getElementById('categoryFilter')?.value || 'all';
 
         const filtered = cars.filter((car) => {
+          if (hiddenCarIds.includes(Number(car.id))) return false;
+
           const searchable = `${car.name || ''} ${car.brand || ''} ${car.model || ''}`.toLowerCase();
           return searchable.includes(search) && (category === 'all' || car.category === category);
         });
