@@ -633,7 +633,7 @@
       <span id="statusText">...</span>
      </div>
      <div class="nav-meta">
-      <span class="mini-badge">🚗 <strong>30</strong> سيارة جاهزة</span>
+      <span class="mini-badge">🚗 <strong id="availableCarsCount">0</strong> سيارة متاحة</span>
       <span class="mini-badge">⭐ خدمة مميزة وسريعة</span>
      </div>
     </div>
@@ -1251,47 +1251,57 @@
 
 <script>
 (function () {
-  function getCarsData() {
+  const DASHBOARD_STATE_KEY = 'emotion_dashboard_state';
+
+  function getDashboardState() {
     try {
-      const keys = ['carsData', 'cars', 'emotionCars', 'siteCars'];
-      for (const key of keys) {
-        const raw = localStorage.getItem(key);
-        if (!raw) continue;
-        const data = JSON.parse(raw);
-        if (Array.isArray(data)) return data;
-      }
-    } catch (e) {}
-    return null;
+      return JSON.parse(localStorage.getItem(DASHBOARD_STATE_KEY) || '{}');
+    } catch (e) {
+      return {};
+    }
   }
 
-  function countAvailableCars() {
-    const stored = getCarsData();
-    if (Array.isArray(stored) && stored.length) {
-      return stored.filter(car => !car || car.isHidden !== true).length;
-    }
+  function countFromDashboardState() {
+    const state = getDashboardState();
+    const ids = Object.keys(state);
+    if (!ids.length) return null;
+    return ids.filter((id) => !state[id]?.isHidden).length;
+  }
 
-    const cards = Array.from(document.querySelectorAll('.car-card, .vehicle-card, .car-item, [data-car-card]'));
-    if (cards.length) {
-      return cards.filter(el => {
-        const hiddenByClass = el.classList.contains('hidden');
-        const hiddenByAttr = el.hidden || el.getAttribute('aria-hidden') === 'true';
-        const hiddenByStyle = window.getComputedStyle(el).display === 'none';
-        return !(hiddenByClass || hiddenByAttr || hiddenByStyle);
-      }).length;
-    }
+  function countFromRenderedCards() {
+    const cards = Array.from(document.querySelectorAll('.car-card'));
+    if (!cards.length) return null;
 
-    return 0;
+    return cards.filter((el) => {
+      const hiddenByAttr = el.hidden || el.getAttribute('aria-hidden') === 'true';
+      const hiddenByClass = el.classList.contains('hidden');
+      const hiddenByStyle = window.getComputedStyle(el).display === 'none';
+      return !(hiddenByAttr || hiddenByClass || hiddenByStyle);
+    }).length;
   }
 
   function updateAvailableCarsCount() {
     const el = document.getElementById('availableCarsCount');
     if (!el) return;
-    el.textContent = countAvailableCars();
+
+    let count = countFromDashboardState();
+    if (count === null) {
+      count = countFromRenderedCards();
+    }
+    if (count === null) {
+      count = 0;
+    }
+
+    el.textContent = count;
   }
 
-  document.addEventListener('DOMContentLoaded', updateAvailableCarsCount);
+  document.addEventListener('DOMContentLoaded', function () {
+    updateAvailableCarsCount();
+    setTimeout(updateAvailableCarsCount, 400);
+    setTimeout(updateAvailableCarsCount, 1200);
+  });
+
   window.addEventListener('storage', updateAvailableCarsCount);
-  setTimeout(updateAvailableCarsCount, 300);
 })();
 </script>
 
