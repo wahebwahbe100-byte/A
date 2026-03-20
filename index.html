@@ -478,24 +478,35 @@
 
     .admin-fab {
       position: fixed;
+      top: 18px;
       left: 18px;
-      bottom: 18px;
       z-index: 1100;
-      background: #22c55e;
-      color: #04111f;
-      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(15,23,42,.92);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.12);
       border-radius: 999px;
-      padding: 14px 18px;
+      padding: 12px 16px;
       font-family: 'Tajawal', Arial, sans-serif;
       font-size: 15px;
       font-weight: 800;
       cursor: pointer;
-      box-shadow: 0 16px 40px rgba(34,197,94,.35);
+      box-shadow: 0 16px 40px rgba(0,0,0,.35);
+      backdrop-filter: blur(10px);
+    }
+    .admin-fab img {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      object-fit: cover;
+      flex-shrink: 0;
     }
     .admin-panel {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,.72);
+      background: rgba(0,0,0,.76);
       display: none;
       align-items: center;
       justify-content: center;
@@ -600,6 +611,12 @@
       color: #cbd5e1;
       font-size: 14px;
       min-height: 24px;
+    }
+    .admin-section-title {
+      margin: 10px 0 0;
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
     }
     .edit-car-btn {
       margin-top: 14px;
@@ -796,85 +813,95 @@
     </div>
   </div>
 
-  <button id="adminOpenBtn" class="admin-fab">لوحة التعديل</button>
+  <button id="adminOpenBtn" class="admin-fab">
+    <img src="images/logo.png" alt="logo" onerror="this.src=placeholderLogo" />
+    <span id="adminOpenLabel">تسجيل</span>
+  </button>
 
   <div id="adminPanel" class="admin-panel">
     <div class="admin-card">
       <div class="admin-head">
-        <h3>لوحة تعديل السيارات</h3>
+        <h3 id="adminPanelTitle">تسجيل الدخول</h3>
         <button id="adminCloseBtn" class="admin-close">إغلاق</button>
       </div>
 
       <div class="admin-stack">
-        <div class="admin-grid">
-          <label>
-            البريد الإلكتروني
-            <input id="adminEmail" type="email" placeholder="admin@email.com" />
-          </label>
-          <label>
-            كلمة المرور
-            <input id="adminPassword" type="password" placeholder="••••••••" />
-          </label>
+        <div id="loginSection">
+          <div class="admin-grid">
+            <label>
+              البريد الإلكتروني
+              <input id="adminEmail" type="email" placeholder="admin@email.com" />
+            </label>
+            <label>
+              كلمة المرور
+              <input id="adminPassword" type="password" placeholder="••••••••" />
+            </label>
+          </div>
+
+          <div class="admin-actions">
+            <button id="adminLoginBtn" class="admin-btn primary">تسجيل الدخول</button>
+          </div>
+
+          <div class="admin-note">
+            تسجيل مباشر عبر Supabase لحساب مدير واحد فقط. بعد الدخول ستظهر لك أدوات تعديل السيارة والصورة والتفاصيل.
+          </div>
         </div>
 
-        <div class="admin-actions">
-          <button id="adminLoginBtn" class="admin-btn primary">دخول المدير</button>
-          <button id="adminLogoutBtn" class="admin-btn secondary" type="button">تسجيل الخروج</button>
+        <div id="editorSection" style="display:none;">
+          <div class="admin-head" style="margin-bottom:0;">
+            <div class="admin-section-title">تعديل بيانات السيارات</div>
+            <button id="adminLogoutBtn" class="admin-btn secondary" type="button">تسجيل الخروج</button>
+          </div>
+
+          <div class="admin-grid">
+            <label>
+              اختر السيارة
+              <select id="adminCarSelect"></select>
+            </label>
+            <label>
+              الفئة
+              <select id="adminCategory">
+                <option value="SUV">SUV</option>
+                <option value="Sedan">Sedan</option>
+                <option value="Sport">Sport</option>
+              </select>
+            </label>
+            <label>
+              الاسم الكامل
+              <input id="adminName" type="text" placeholder="Mercedes S-Class" />
+            </label>
+            <label>
+              السعر
+              <input id="adminPrice" type="text" placeholder="€128,000" />
+            </label>
+            <label>
+              سنة الصنع
+              <input id="adminYear" type="number" placeholder="2024" />
+            </label>
+            <label>
+              عدد الكيلومترات
+              <input id="adminMileage" type="text" placeholder="8,000 km" />
+            </label>
+            <label>
+              الحالة
+              <input id="adminCondition" type="text" placeholder="ممتازة" />
+            </label>
+            <label>
+              الصورة الرئيسية
+              <input id="adminImageFile" type="file" accept="image/*" />
+            </label>
+          </div>
+
+          <label>
+            الوصف
+            <textarea id="adminDescription" placeholder="اكتب وصف السيارة هنا..."></textarea>
+          </label>
+
+          <div class="admin-actions">
+            <button id="adminSaveBtn" class="admin-btn primary" type="button">حفظ التعديلات</button>
+          </div>
         </div>
 
-        <div class="admin-note">
-          هذه اللوحة مخصصة لشخص واحد فقط. بعد تسجيل الدخول يمكنك اختيار السيارة وتعديل التفاصيل ورفع صورة جديدة.
-        </div>
-
-        <hr style="border-color: rgba(255,255,255,.08); width:100%; border-style:solid; border-width:1px 0 0 0;">
-
-        <div class="admin-grid">
-          <label>
-            اختر السيارة
-            <select id="adminCarSelect"></select>
-          </label>
-          <label>
-            الفئة
-            <select id="adminCategory">
-              <option value="SUV">SUV</option>
-              <option value="Sedan">Sedan</option>
-              <option value="Sport">Sport</option>
-            </select>
-          </label>
-          <label>
-            الاسم الكامل
-            <input id="adminName" type="text" placeholder="Mercedes S-Class" />
-          </label>
-          <label>
-            السعر
-            <input id="adminPrice" type="text" placeholder="€128,000" />
-          </label>
-          <label>
-            سنة الصنع
-            <input id="adminYear" type="number" placeholder="2024" />
-          </label>
-          <label>
-            عدد الكيلومترات
-            <input id="adminMileage" type="text" placeholder="8,000 km" />
-          </label>
-          <label>
-            الحالة
-            <input id="adminCondition" type="text" placeholder="ممتازة" />
-          </label>
-          <label>
-            الصورة الرئيسية
-            <input id="adminImageFile" type="file" accept="image/*" />
-          </label>
-        </div>
-
-        <label>
-          الوصف
-          <textarea id="adminDescription" placeholder="اكتب وصف السيارة هنا..."></textarea>
-        </label>
-
-        <div class="admin-actions">
-          <button id="adminSaveBtn" class="admin-btn primary" type="button">حفظ التعديلات</button>
-        </div>
         <div id="adminStatus" class="admin-status"></div>
       </div>
     </div>
@@ -918,13 +945,13 @@
       </svg>
     `);
 
-    const WHATSAPP_NUMBER = '4915736645354';
-    const whatsappLink = (car) => {
-      const message = `مرحباً، كنت مهتماً بسيارة ${car.name}. يمكننا مساعدتك وتزويدك بكل التفاصيل.`;
-      return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
-    };
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let adminUser = null;
+    let currentModalCar = null;
+    let currentPage = 1;
+    const carsPerPage = 8;
 
-    const carSeed = [
+    const defaultCars = [
       ['Mercedes', 'S-Class', 'Sedan', '€128,000', 2024, '8,000 km', 'ممتازة'],
       ['BMW', 'X7', 'SUV', '€102,500', 2023, '14,500 km', 'ممتازة'],
       ['Audi', 'RS7', 'Sport', '€119,900', 2024, '5,200 km', 'ممتازة'],
@@ -957,7 +984,7 @@
       ['Chevrolet', 'Tahoe', 'SUV', '€61,500', 2022, '23,900 km', 'جيدة جداً']
     ];
 
-    let cars = carSeed.map((item, index) => ({
+    let cars = defaultCars.map((item, index) => ({
       id: index + 1,
       brand: item[0],
       model: item[1],
@@ -977,18 +1004,43 @@
       ]
     }));
 
-    let supabase = null;
-    if (window.supabase && !SUPABASE_URL.includes('ضع-') && !SUPABASE_ANON_KEY.includes('ضع-')) {
-      supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    }
-
-    let currentModalCar = null;
-    let currentPage = 1;
-    const carsPerPage = 8;
-    let adminUser = null;
+    const WHATSAPP_NUMBER = '4915736645354';
+    const whatsappLink = (car) => {
+      const message = `مرحباً، كنت مهتماً بسيارة ${car.name}. يمكننا مساعدتك وتزويدك بكل التفاصيل.`;
+      return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+    };
 
     function carImage(src) {
       return src || placeholderCar;
+    }
+
+    function setAdminStatus(message, ok = true) {
+      const el = document.getElementById('adminStatus');
+      el.textContent = message;
+      el.style.color = ok ? '#86efac' : '#fca5a5';
+    }
+
+    function updateAdminUI() {
+      const label = document.getElementById('adminOpenLabel');
+      const title = document.getElementById('adminPanelTitle');
+      const loginSection = document.getElementById('loginSection');
+      const editorSection = document.getElementById('editorSection');
+
+      if (adminUser) {
+        label.textContent = 'الإدارة';
+        title.textContent = 'إدارة السيارات';
+        loginSection.style.display = 'none';
+        editorSection.style.display = 'block';
+      } else {
+        label.textContent = 'تسجيل';
+        title.textContent = 'تسجيل الدخول';
+        loginSection.style.display = 'block';
+        editorSection.style.display = 'none';
+      }
+    }
+
+    function findCarById(id) {
+      return cars.find((car) => String(car.id) === String(id));
     }
 
     function createCarCard(car) {
@@ -1041,10 +1093,6 @@
       fillAdminCarSelect();
     }
 
-    function findCarById(id) {
-      return cars.find((car) => String(car.id) === String(id));
-    }
-
     function selectModalImage(image) {
       document.getElementById('modalImage').src = image;
       const thumbs = document.querySelectorAll('#modalThumbs .thumb');
@@ -1089,13 +1137,8 @@
       currentModalCar = null;
     }
 
-    function setAdminStatus(message, ok = true) {
-      const el = document.getElementById('adminStatus');
-      el.textContent = message;
-      el.style.color = ok ? '#86efac' : '#fca5a5';
-    }
-
     function openAdminPanel() {
+      updateAdminUI();
       document.getElementById('adminPanel').classList.add('show');
     }
 
@@ -1108,15 +1151,15 @@
       if (!select) return;
       const current = select.value;
       select.innerHTML = cars.map(car => `<option value="${car.id}">${car.id} - ${car.name}</option>`).join('');
-      if (current && findCarById(current)) {
-        select.value = current;
-      }
+      if (current && findCarById(current)) select.value = current;
+      if (!select.value && cars[0]) select.value = cars[0].id;
       loadSelectedCarToForm();
     }
 
     function loadSelectedCarToForm() {
-      const id = document.getElementById('adminCarSelect').value;
-      const car = findCarById(id);
+      const select = document.getElementById('adminCarSelect');
+      if (!select) return;
+      const car = findCarById(select.value);
       if (!car) return;
       document.getElementById('adminName').value = car.name || '';
       document.getElementById('adminCategory').value = car.category || 'SUV';
@@ -1131,7 +1174,6 @@
       const input = document.getElementById('adminImageFile');
       const file = input.files?.[0];
       if (!file) return null;
-      if (!supabase) throw new Error('أضف رابط مشروع Supabase ومفتاح anon أولاً.');
       const ext = file.name.split('.').pop();
       const filePath = `cars/car-${carId}-${Date.now()}.${ext}`;
       const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file, { upsert: true });
@@ -1152,41 +1194,41 @@
 
       try {
         setAdminStatus('جاري حفظ التعديلات...');
-        const uploadedImage = await uploadImageIfNeeded(id);
+        const newImage = await uploadImageIfNeeded(id);
+        const name = document.getElementById('adminName').value.trim();
+        const parts = name.split(' ');
         const updatedCar = {
           ...car,
-          name: document.getElementById('adminName').value.trim(),
+          name,
+          brand: parts[0] || car.brand,
+          model: parts.slice(1).join(' ') || car.model,
           category: document.getElementById('adminCategory').value,
           price: document.getElementById('adminPrice').value.trim(),
           year: Number(document.getElementById('adminYear').value) || car.year,
           mileage: document.getElementById('adminMileage').value.trim(),
           condition: document.getElementById('adminCondition').value.trim(),
           description: document.getElementById('adminDescription').value.trim(),
-          image: uploadedImage || car.image,
-          gallery: uploadedImage ? [uploadedImage, ...(car.gallery || []).slice(1)] : car.gallery
+          image: newImage || car.image,
+          gallery: newImage ? [newImage, ...(car.gallery || []).slice(1)] : car.gallery
         };
 
+        const { error } = await supabase.from('cars').upsert({
+          id: updatedCar.id,
+          brand: updatedCar.brand,
+          model: updatedCar.model,
+          category: updatedCar.category,
+          price: updatedCar.price,
+          year: updatedCar.year,
+          mileage: updatedCar.mileage,
+          condition: updatedCar.condition,
+          name: updatedCar.name,
+          description: updatedCar.description,
+          image: updatedCar.image,
+          gallery: updatedCar.gallery
+        }, { onConflict: 'id' });
+
+        if (error) throw error;
         cars = cars.map(item => item.id === id ? updatedCar : item);
-
-        if (supabase) {
-          const payload = {
-            id: updatedCar.id,
-            brand: updatedCar.brand,
-            model: updatedCar.model,
-            category: updatedCar.category,
-            price: updatedCar.price,
-            year: updatedCar.year,
-            mileage: updatedCar.mileage,
-            condition: updatedCar.condition,
-            name: updatedCar.name,
-            description: updatedCar.description,
-            image: updatedCar.image,
-            gallery: updatedCar.gallery
-          };
-          const { error } = await supabase.from('cars').upsert(payload, { onConflict: 'id' });
-          if (error) throw error;
-        }
-
         renderInventory();
         setAdminStatus('تم حفظ التعديلات بنجاح.');
       } catch (error) {
@@ -1197,8 +1239,8 @@
     async function loginAdmin() {
       const email = document.getElementById('adminEmail').value.trim();
       const password = document.getElementById('adminPassword').value;
-      if (!supabase) {
-        setAdminStatus('أضف بيانات Supabase في أعلى الكود أولاً.', false);
+      if (!email || !password) {
+        setAdminStatus('أدخل البريد الإلكتروني وكلمة المرور.', false);
         return;
       }
       try {
@@ -1207,25 +1249,48 @@
         if (error) throw error;
         if (ADMIN_EMAIL && !ADMIN_EMAIL.includes('ضع-') && data.user.email !== ADMIN_EMAIL) {
           await supabase.auth.signOut();
-          throw new Error('هذا الحساب غير مصرح له بالتعديل.');
+          throw new Error('هذا الحساب غير مصرح له بالدخول.');
         }
         adminUser = data.user;
+        updateAdminUI();
         renderInventory();
-        setAdminStatus('تم تسجيل الدخول كمدير.');
+        setAdminStatus('تم تسجيل الدخول بنجاح.');
       } catch (error) {
-        setAdminStatus(error.message || 'تعذر تسجيل الدخول.', false);
+        setAdminStatus(error.message || 'فشل تسجيل الدخول.', false);
       }
     }
 
     async function logoutAdmin() {
-      if (supabase) await supabase.auth.signOut();
+      await supabase.auth.signOut();
       adminUser = null;
+      updateAdminUI();
       renderInventory();
       setAdminStatus('تم تسجيل الخروج.');
     }
 
+    async function seedCarsIfTableEmpty() {
+      const { data, error } = await supabase.from('cars').select('id').limit(1);
+      if (error) return;
+      if (Array.isArray(data) && data.length === 0) {
+        const payload = cars.map(car => ({
+          id: car.id,
+          brand: car.brand,
+          model: car.model,
+          category: car.category,
+          price: car.price,
+          year: car.year,
+          mileage: car.mileage,
+          condition: car.condition,
+          name: car.name,
+          description: car.description,
+          image: car.image,
+          gallery: car.gallery
+        }));
+        await supabase.from('cars').upsert(payload, { onConflict: 'id' });
+      }
+    }
+
     async function loadCarsFromSupabase() {
-      if (!supabase) return;
       const { data, error } = await supabase.from('cars').select('*').order('id', { ascending: true });
       if (!error && Array.isArray(data) && data.length) {
         cars = data.map(row => ({
@@ -1247,33 +1312,33 @@
     }
 
     async function checkSession() {
-      if (!supabase) return;
       const { data } = await supabase.auth.getSession();
       const user = data.session?.user || null;
       if (user && (!ADMIN_EMAIL || ADMIN_EMAIL.includes('ضع-') || user.email === ADMIN_EMAIL)) {
         adminUser = user;
       }
+      updateAdminUI();
       renderInventory();
     }
 
-    document.getElementById('searchInput').addEventListener('input', function () {
+    document.getElementById('searchInput').addEventListener('input', () => {
       currentPage = 1;
       renderInventory();
     });
 
-    document.getElementById('categoryFilter').addEventListener('change', function () {
+    document.getElementById('categoryFilter').addEventListener('change', () => {
       currentPage = 1;
       renderInventory();
     });
 
-    document.getElementById('prevPageBtn').addEventListener('click', function () {
+    document.getElementById('prevPageBtn').addEventListener('click', () => {
       if (currentPage > 1) {
         currentPage -= 1;
         renderInventory();
       }
     });
 
-    document.getElementById('nextPageBtn').addEventListener('click', function () {
+    document.getElementById('nextPageBtn').addEventListener('click', () => {
       const search = document.getElementById('searchInput').value.toLowerCase().trim();
       const category = document.getElementById('categoryFilter').value;
       const filtered = cars.filter((car) => {
@@ -1281,25 +1346,25 @@
         const matchesCategory = category === 'all' || car.category === category;
         return matchesSearch && matchesCategory;
       });
-      const totalPages = Math.ceil(filtered.length / carsPerPage);
+      const totalPages = Math.max(1, Math.ceil(filtered.length / carsPerPage));
       if (currentPage < totalPages) {
         currentPage += 1;
         renderInventory();
       }
     });
 
-    document.getElementById('carModal').addEventListener('click', function (e) {
+    document.getElementById('carModal').addEventListener('click', (e) => {
       if (e.target.id === 'carModal') closeModal();
     });
 
-    document.addEventListener('click', function (e) {
+    document.addEventListener('click', (e) => {
       const image = e.target.closest('.car-image');
       if (image) {
-        const carId = image.getAttribute('data-car-id');
-        const car = findCarById(carId);
+        const car = findCarById(image.getAttribute('data-car-id'));
         if (car) openModal(car);
         return;
       }
+
       const editButton = e.target.closest('[data-edit-id]');
       if (editButton) {
         openAdminPanel();
@@ -1314,7 +1379,7 @@
     document.getElementById('adminLogoutBtn').addEventListener('click', logoutAdmin);
     document.getElementById('adminSaveBtn').addEventListener('click', saveCarChanges);
     document.getElementById('adminCarSelect').addEventListener('change', loadSelectedCarToForm);
-    document.getElementById('adminPanel').addEventListener('click', function (e) {
+    document.getElementById('adminPanel').addEventListener('click', (e) => {
       if (e.target.id === 'adminPanel') closeAdminPanel();
     });
 
@@ -1324,9 +1389,7 @@
       const hour = now.getHours();
       const minute = now.getMinutes();
       const currentMinutes = hour * 60 + minute;
-      const weekdayNames = {
-        0: 'الأحد', 1: 'الاثنين', 2: 'الثلاثاء', 3: 'الأربعاء', 4: 'الخميس', 5: 'الجمعة', 6: 'السبت'
-      };
+      const weekdayNames = { 0: 'الأحد', 1: 'الاثنين', 2: 'الثلاثاء', 3: 'الأربعاء', 4: 'الخميس', 5: 'الجمعة', 6: 'السبت' };
       const openMinutes = 10 * 60;
       const closeMinutes = 18 * 60;
       const dot = document.getElementById('statusDot');
@@ -1374,21 +1437,30 @@
       }
     }
 
-    renderInventory();
-    fillAdminCarSelect();
-    updateBusinessStatus();
-    setInterval(updateBusinessStatus, 60000);
-
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) entry.target.classList.add('visible');
       });
     }, { threshold: 0.12 });
-
     document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
 
-    checkSession();
-    loadCarsFromSupabase();
+    renderInventory();
+    updateAdminUI();
+    updateBusinessStatus();
+    setInterval(updateBusinessStatus, 60000);
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user || null;
+      adminUser = user && (!ADMIN_EMAIL || ADMIN_EMAIL.includes('ضع-') || user.email === ADMIN_EMAIL) ? user : null;
+      updateAdminUI();
+      renderInventory();
+    });
+
+    (async function init() {
+      await checkSession();
+      await seedCarsIfTableEmpty();
+      await loadCarsFromSupabase();
+    })();
   </script>
 </body>
 </html>
