@@ -9,8 +9,14 @@
  <style>
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
+  :root {
+   --header-height: 132px;
+   --header-height-scrolled: 74px;
+  }
+
   body {
    margin: 0;
+   padding-top: var(--header-height);
    font-family: 'Inter', Arial, sans-serif;
    background: linear-gradient(135deg, #020617 0%, #0b1f3a 50%, #000000 100%);
    color: #fff;
@@ -21,8 +27,11 @@
   section { scroll-margin-top: 90px; }
 
   .top-nav {
-   position: sticky;
+   position: fixed;
    top: 0;
+   left: 0;
+   right: 0;
+   width: 100%;
    z-index: 100;
    background:
     linear-gradient(135deg, rgba(2,6,23,.96), rgba(8,24,52,.95) 45%, rgba(2,6,23,.96)),
@@ -46,7 +55,8 @@
    grid-template-columns: auto 1fr auto;
    align-items: center;
    gap: 20px;
-   padding: 14px 0;
+   min-height: var(--header-height);
+   padding: 12px 0;
   }
 
   .brand-pill {
@@ -54,6 +64,7 @@
    align-items: center;
    gap: 16px;
    min-width: 0;
+   overflow: hidden;
    padding: 12px 16px;
    border-radius: 26px;
    background: linear-gradient(135deg, rgba(255,255,255,.08), rgba(148,163,184,.04));
@@ -245,8 +256,9 @@
   .login-link,
   .logo {
    transition: background .28s ease, border-color .28s ease, box-shadow .28s ease,
-    padding .28s ease, gap .28s ease, transform .28s ease, opacity .28s ease,
-    font-size .28s ease, width .28s ease, height .28s ease, margin .28s ease;
+    padding .28s ease, gap .28s ease, transform .28s ease, opacity .22s ease,
+    font-size .24s ease, margin .24s ease;
+   will-change: transform, opacity;
   }
 
   .menu-toggle {
@@ -280,51 +292,74 @@
 
   .top-nav.scrolled {
    background:
-    linear-gradient(135deg, rgba(2,6,23,.985), rgba(8,24,52,.97) 45%, rgba(2,6,23,.985)),
-    rgba(7,16,32,.98);
-   box-shadow: 0 18px 44px rgba(0,0,0,.46);
+    linear-gradient(135deg, rgba(2,6,23,.992), rgba(8,24,52,.982) 45%, rgba(2,6,23,.992)),
+    rgba(7,16,32,.985);
+   box-shadow: 0 20px 50px rgba(0,0,0,.52);
   }
 
   .top-nav.scrolled .top-nav-inner {
-   gap: 16px;
-   padding: 10px 0;
+   gap: 12px;
+   min-height: var(--header-height-scrolled);
+   padding: 6px 0;
   }
 
   .top-nav.scrolled .brand-pill {
-   padding: 10px 14px;
-   border-radius: 22px;
-   gap: 12px;
-   background: linear-gradient(135deg, rgba(255,255,255,.09), rgba(148,163,184,.05));
+   padding: 6px 10px;
+   border-radius: 18px;
+   gap: 10px;
+   background: linear-gradient(135deg, rgba(255,255,255,.08), rgba(148,163,184,.03));
   }
 
   .top-nav.scrolled .logo {
-   width: 84px;
-   height: 56px;
-   border-radius: 18px;
-   padding: 6px;
+   border-radius: 12px;
+   padding: 3px;
    animation: none;
-   transform: scale(.98);
+   transform: scale(.42);
+   transform-origin: center left;
+   box-shadow: 0 8px 20px rgba(0,0,0,.35);
   }
 
-  .top-nav.scrolled .brand-kicker {
-   margin-bottom: 6px;
-   padding: 5px 10px;
-   font-size: 11px;
+  .top-nav.scrolled .brand-text {
+   display: flex;
+   align-items: center;
+   min-width: 0;
+  }
+
+  .top-nav.scrolled .brand-kicker,
+  .top-nav.scrolled .status-row,
+  .top-nav.scrolled .nav-meta {
+   opacity: 0;
+   max-width: 0;
+   max-height: 0;
+   margin: 0;
+   overflow: hidden;
+   transform: translateY(-8px);
+   pointer-events: none;
   }
 
   .top-nav.scrolled .brand-text strong {
-   font-size: clamp(18px, 1.6vw, 24px);
+   font-size: 13px;
+   white-space: nowrap;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   letter-spacing: -.15px;
   }
 
-  .top-nav.scrolled .status-row,
-  .top-nav.scrolled .nav-meta {
-   margin-top: 6px;
-   gap: 8px;
-   font-size: 12px;
+  .top-nav.scrolled .nav-menu {
+   padding: 5px;
+   gap: 6px;
   }
 
-  .top-nav.scrolled .mini-badge {
-   padding: 6px 10px;
+  .top-nav.scrolled .nav-link {
+   padding: 9px 12px;
+   font-size: 13px;
+  }
+
+  .top-nav.scrolled .login-link {
+   padding: 10px 14px;
+   border-radius: 14px;
+   font-size: 13px;
+   gap: 7px;
   }
 
   .hero {
@@ -683,38 +718,48 @@
   }
 
   @media (max-width: 900px) {
-   section { scroll-margin-top: 120px; }
+   :root {
+    --header-height: 118px;
+    --header-height-scrolled: 68px;
+   }
+   section { scroll-margin-top: 98px; }
    .top-nav-inner {
     grid-template-columns: 1fr auto;
-    gap: 12px;
-    padding: 10px 0;
+    gap: 10px;
+    padding: 9px 0;
    }
    .brand-pill {
     width: 100%;
     min-width: 0;
-    padding: 10px 12px;
-    border-radius: 20px;
-    gap: 12px;
+    padding: 9px 10px;
+    border-radius: 18px;
+    gap: 10px;
    }
-   .brand-text strong { font-size: 20px; }
+   .brand-text {
+    min-width: 0;
+   }
+   .brand-text strong {
+    font-size: 18px;
+    line-height: 1.15;
+   }
    .brand-kicker {
-    font-size: 10px;
-    padding: 4px 8px;
-    margin-bottom: 8px;
+    font-size: 9px;
+    padding: 4px 7px;
+    margin-bottom: 6px;
    }
    .status-row, .nav-meta {
-    gap: 6px;
-    font-size: 11px;
+    gap: 5px;
+    font-size: 10px;
    }
    .mini-badge {
-    padding: 6px 9px;
-    font-size: 11px;
+    padding: 5px 8px;
+    font-size: 10px;
    }
    .logo {
-    width: 84px;
-    height: 58px;
-    border-radius: 16px;
-    padding: 5px;
+    width: 72px;
+    height: 48px;
+    border-radius: 14px;
+    padding: 4px;
    }
    .menu-toggle {
     display: inline-flex;
@@ -727,8 +772,8 @@
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     justify-content: stretch;
-    border-radius: 22px;
-    padding: 10px;
+    border-radius: 20px;
+    padding: 0 10px;
     gap: 8px;
     max-height: 0;
     opacity: 0;
@@ -738,8 +783,8 @@
    .nav-link {
     width: 100%;
     min-width: 0;
-    padding: 12px 14px;
-    font-size: 14px;
+    padding: 11px 12px;
+    font-size: 13px;
    }
    .login-link {
     max-height: 0;
@@ -753,13 +798,14 @@
     max-height: 320px;
     opacity: 1;
     pointer-events: auto;
-    margin-top: 2px;
+    margin-top: 4px;
+    padding: 10px;
    }
    .top-nav.nav-open .login-link {
     max-height: 80px;
     opacity: 1;
     pointer-events: auto;
-    padding: 14px 20px;
+    padding: 12px 16px;
     margin-top: 4px;
    }
    .top-nav.nav-open .menu-toggle .bar:nth-child(1) {
@@ -772,29 +818,32 @@
     transform: translateY(-6px) rotate(-45deg);
    }
    .top-nav.scrolled .top-nav-inner {
-    padding: 8px 0;
+    padding: 5px 0;
+    gap: 8px;
    }
    .top-nav.scrolled .brand-pill {
-    gap: 10px;
-    padding: 8px 10px;
+    gap: 8px;
+    padding: 5px 8px;
+    border-radius: 14px;
    }
    .top-nav.scrolled .logo {
-    width: 58px;
-    height: 40px;
-    border-radius: 12px;
-    padding: 4px;
-   }
-   .top-nav.scrolled .brand-kicker,
-   .top-nav.scrolled .status-row,
-   .top-nav.scrolled .nav-meta {
-    opacity: 0;
-    max-height: 0;
-    margin: 0;
-    overflow: hidden;
+    width: 42px;
+    height: 28px;
+    border-radius: 10px;
+    padding: 2px;
    }
    .top-nav.scrolled .brand-text strong {
-    font-size: 15px;
-    line-height: 1.2;
+    font-size: 11px;
+    line-height: 1.1;
+   }
+   .top-nav.scrolled .nav-menu {
+    padding: 0 8px;
+   }
+   .top-nav.scrolled.nav-open .nav-menu {
+    padding: 8px;
+   }
+   .top-nav.scrolled .login-link {
+    font-size: 12px;
    }
    .about-grid, .legal-grid, .modal-grid { grid-template-columns: 1fr; }
    .thumbs { grid-template-columns: repeat(2, 1fr); }
@@ -803,38 +852,41 @@
   }
 
   @media (max-width: 560px) {
-   .container { width: min(100%, calc(100% - 20px)); }
+   .container { width: min(100%, calc(100% - 18px)); }
    .top-nav-inner {
     grid-template-columns: 1fr auto;
-    gap: 10px;
+    gap: 8px;
    }
    .brand-pill {
-    padding: 8px 10px;
-    gap: 10px;
-    border-radius: 18px;
+    padding: 8px 9px;
+    gap: 8px;
+    border-radius: 16px;
    }
    .logo {
-    width: 68px;
-    height: 48px;
+    width: 60px;
+    height: 40px;
    }
    .brand-text strong {
-    font-size: 17px;
+    font-size: 15px;
     word-break: break-word;
    }
    .nav-menu {
     grid-template-columns: 1fr;
    }
    .menu-toggle {
-    width: 46px;
-    height: 46px;
-    border-radius: 15px;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+   }
+   .top-nav.scrolled .brand-pill {
+    padding: 4px 7px;
    }
    .top-nav.scrolled .logo {
-    width: 50px;
-    height: 34px;
+    width: 36px;
+    height: 24px;
    }
    .top-nav.scrolled .brand-text strong {
-    font-size: 14px;
+    font-size: 10px;
    }
   }
  
@@ -1557,12 +1609,26 @@
   const navLinks = Array.from(document.querySelectorAll('#siteNav .nav-link'));
   if (!header) return;
 
+  let ticking = false;
+  const collapseAt = 96;
+  const expandAt = 52;
+
   const syncHeaderState = () => {
-    if (window.scrollY > 24) {
+    const y = window.scrollY || window.pageYOffset;
+    if (!header.classList.contains('scrolled') && y > collapseAt) {
       header.classList.add('scrolled');
-    } else {
+    } else if (header.classList.contains('scrolled') && y < expandAt) {
       header.classList.remove('scrolled');
     }
+  };
+
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      syncHeaderState();
+      ticking = false;
+    });
   };
 
   const closeMobileMenu = () => {
@@ -1576,7 +1642,7 @@
   };
 
   syncHeaderState();
-  window.addEventListener('scroll', syncHeaderState, { passive: true });
+  window.addEventListener('scroll', onScroll, { passive: true });
 
   if (menuToggle) {
     menuToggle.addEventListener('click', toggleMobileMenu);
