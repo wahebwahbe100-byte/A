@@ -1,0 +1,250 @@
+import { useMemo, useState } from "react";
+
+const WHATSAPP_NUMBER = "4915736645354";
+const whatsappLink = (carName) => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`مرحباً، أنا مهتم بسيارة ${carName}. هل يمكن تزويدي بالتفاصيل؟`)}`;
+
+export default function ProfessionalCarShowcaseSite() {
+  const featuredCars = [
+    {
+      id: 1,
+      name: "Mercedes S-Class",
+      category: "Luxury Sedan",
+      price: "$128,000",
+      year: 2024,
+      mileage: "8,000 km",
+      fuel: "Hybrid",
+      transmission: "Automatic",
+      color: "Obsidian Black",
+      image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80",
+      description:
+        "سيارة فاخرة جداً بمقصورة راقية، تقنيات قيادة حديثة، راحة عالية، وأداء مناسب لفئة رجال الأعمال والمعارض الراقية.",
+    },
+    {
+      id: 2,
+      name: "BMW X7",
+      category: "Premium SUV",
+      price: "$102,500",
+      year: 2023,
+      mileage: "14,500 km",
+      fuel: "Diesel",
+      transmission: "Automatic",
+      color: "Mineral White",
+      image: "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=80",
+      description:
+        "SUV فاخر بمساحة داخلية ممتازة، تجهيزات عالية، وأنظمة أمان متقدمة مناسبة للعائلات والعملاء الباحثين عن الفخامة.",
+    },
+    {
+      id: 3,
+      name: "Audi RS7",
+      category: "Performance Coupe",
+      price: "$119,900",
+      year: 2024,
+      mileage: "5,200 km",
+      fuel: "Petrol",
+      transmission: "Automatic",
+      color: "Nardo Grey",
+      image: "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80",
+      description:
+        "تصميم رياضي قوي مع أداء عالي وتسارع ممتاز، مناسبة للعملاء الذين يبحثون عن الجمع بين الفخامة والقوة.",
+    },
+    {
+      id: 4,
+      name: "Range Rover Sport",
+      category: "Executive SUV",
+      price: "$115,300",
+      year: 2023,
+      mileage: "18,100 km",
+      fuel: "Hybrid",
+      transmission: "Automatic",
+      color: "Santorini Black",
+      image: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=1200&q=80",
+      description:
+        "فخامة بريطانية مع حضور قوي على الطريق وراحة ممتازة في السفر والتنقل داخل المدينة وخارجها.",
+    },
+    {
+      id: 5,
+      name: "Porsche Taycan",
+      category: "Electric Sport",
+      price: "$134,800",
+      year: 2024,
+      mileage: "3,700 km",
+      fuel: "Electric",
+      transmission: "Automatic",
+      color: "Volcano Grey",
+      image: "https://images.unsplash.com/photo-1553440569-bcc63803a83d?auto=format&fit=crop&w=1200&q=80",
+      description:
+        "سيارة كهربائية رياضية بتصميم مستقبلي، استجابة سريعة جداً، ومقصورة فاخرة مناسبة للفئة المميزة.",
+    },
+  ];
+
+  const inventoryNames = [
+    "Mercedes S-Class",
+    "BMW X7",
+    "Audi RS7",
+    "Range Rover Sport",
+    "Porsche Taycan",
+    "Lexus LX",
+    "Cadillac Escalade",
+    "Bentley Bentayga",
+    "Rolls-Royce Ghost",
+    "Tesla Model S",
+    "Ferrari Roma",
+    "Lamborghini Urus",
+    "Maserati Levante",
+    "Jaguar F-Pace",
+    "Genesis G90",
+    "Volvo XC90",
+    "Land Cruiser",
+    "GMC Yukon Denali",
+    "Jeep Grand Wagoneer",
+    "Aston Martin DBX",
+  ];
+
+  const inventory = inventoryNames.map((name, index) => {
+    const base = featuredCars[index % featuredCars.length];
+    return {
+      id: index + 1,
+      name,
+      category: index % 3 === 0 ? "SUV" : index % 3 === 1 ? "Sedan" : "Sport",
+      price: `$${(65000 + index * 3200).toLocaleString()}`,
+      year: 2020 + (index % 5),
+      mileage: `${(9000 + index * 2400).toLocaleString()} km`,
+      fuel: index % 4 === 0 ? "Diesel" : index % 4 === 1 ? "Petrol" : index % 4 === 2 ? "Hybrid" : "Electric",
+      transmission: "Automatic",
+      color: ["Black", "White", "Grey", "Blue", "Silver"][index % 5],
+      image: base.image,
+      description:
+        "سيارة معروضة بحالة ممتازة مع مواصفات قوية وتصميم احترافي داخل الموقع. يمكن إضافة كل التفاصيل الحقيقية لاحقاً مثل المواصفات الكاملة، عدد الملاك، حالة الحوادث، وخدمات التمويل.",
+    };
+  });
+
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [search, setSearch] = useState("");
+  const [selectedCar, setSelectedCar] = useState(null);
+
+  const filteredInventory = useMemo(() => {
+    return inventory.filter((car) => {
+      const matchesCategory = selectedCategory === "all" || car.category === selectedCategory;
+      const matchesSearch = car.name.toLowerCase().includes(search.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [inventory, search, selectedCategory]);
+
+  const openCarDetails = (car) => setSelectedCar(car);
+  const closeCarDetails = () => setSelectedCar(null);
+
+  return (
+    <div dir="rtl" className="min-h-screen bg-slate-950 text-white">
+      {/* Featured */}
+      <section className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+        <div className="mb-8 flex items-end justify-between gap-4">
+          <div>
+            <h2 className="mt-3 text-3xl font-semibold">أفضل السيارات في الواجهة</h2>
+          </div>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {featuredCars.map((car) => (
+            <div key={car.id} className="group overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/5 text-right shadow-2xl backdrop-blur">
+              <button onClick={() => openCarDetails(car)} className="w-full text-right">
+                <div className="overflow-hidden">
+                  <img src={car.image} alt={car.name} className="h-72 w-full object-cover transition duration-500 group-hover:scale-105" />
+                </div>
+                <div className="p-6">
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="rounded-full border border-white/10 bg-black/20 px-4 py-2 text-sm text-slate-200">{car.price}</span>
+                    <div>
+                      <h3 className="text-xl font-semibold">{car.name}</h3>
+                      <p className="mt-1 text-sm text-slate-400">{car.category}</p>
+                    </div>
+                  </div>
+                  <div className="mt-6 w-full rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-center text-sm font-medium">عرض التفاصيل</div>
+                </div>
+              </button>
+              <a href={whatsappLink(car.name)} target="_blank" className="m-4 block rounded-2xl bg-emerald-500 px-4 py-3 text-center text-sm font-semibold text-white hover:opacity-90">
+                ان كنت مهتم يسعدنا مناقشة عبر واتساب +49 1573 6645354
+              </a>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Inventory */}
+      <section className="border-y border-white/10 bg-white/[0.03]">
+        <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+          <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <h2 className="mt-3 text-3xl font-semibold">معرض السيارات</h2>
+            <div className="flex gap-3">
+              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="ابحث عن سيارة..." className="rounded-2xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-white outline-none" />
+              <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="rounded-2xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-white outline-none">
+                <option value="all">كل الفئات</option>
+                <option value="SUV">SUV</option>
+                <option value="Sedan">Sedan</option>
+                <option value="Sport">Sport</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {filteredInventory.map((car) => (
+              <div key={car.id} className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-slate-900/80 text-right">
+                <button onClick={() => openCarDetails(car)} className="w-full text-right">
+                  <img src={car.image} alt={car.name} className="h-52 w-full object-cover" />
+                  <div className="p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <span className="text-sm text-slate-300">{car.price}</span>
+                      <div>
+                        <h3 className="font-semibold">{car.name}</h3>
+                        <p className="mt-1 text-sm text-slate-400">{car.category}</p>
+                      </div>
+                    </div>
+                    <div className="mt-5 w-full rounded-xl bg-white px-4 py-2.5 text-center text-sm font-semibold text-slate-950">عرض السيارة</div>
+                  </div>
+                </button>
+                <a href={whatsappLink(car.name)} target="_blank" className="m-4 block rounded-xl bg-emerald-500 px-4 py-2.5 text-center text-sm font-semibold text-white hover:opacity-90">
+                  واتساب +49 1573 6645354
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Modal */}
+      {selectedCar && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+          <div className="relative max-h-[95vh] w-full max-w-5xl overflow-y-auto rounded-[2rem] border border-white/10 bg-slate-950 shadow-2xl">
+            <button onClick={closeCarDetails} className="absolute left-4 top-4 z-10 rounded-full border border-white/10 bg-black/40 px-4 py-2 text-sm text-white">إغلاق</button>
+
+            <div className="grid gap-8 lg:grid-cols-2">
+              <div className="p-4 lg:p-6">
+                <img src={selectedCar.image} alt={selectedCar.name} className="h-[320px] w-full rounded-[1.5rem] object-cover lg:h-[520px]" />
+              </div>
+
+              <div className="p-6 lg:p-8">
+                <h2 className="mt-3 text-3xl font-semibold">{selectedCar.name}</h2>
+                <p className="mt-2 text-lg text-slate-400">{selectedCar.category}</p>
+                <div className="mt-6 inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-5 py-2 text-lg font-semibold text-emerald-300">{selectedCar.price}</div>
+                <p className="mt-6 leading-8 text-slate-300">{selectedCar.description}</p>
+
+                <div className="mt-8 grid grid-cols-2 gap-4">
+                  {[["الموديل", selectedCar.year],["العداد", selectedCar.mileage],["الوقود", selectedCar.fuel],["ناقل الحركة", selectedCar.transmission],["اللون", selectedCar.color],["الحالة", "ممتازة"]].map(([label, value]) => (
+                    <div key={label} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                      <p className="text-sm text-slate-400">{label}</p>
+                      <p className="mt-2 font-semibold">{value}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-8 flex flex-wrap gap-4">
+                  <a href={whatsappLink(selectedCar.name)} target="_blank" className="rounded-2xl bg-emerald-500 px-6 py-3 font-semibold text-white">تواصل عبر واتساب +49 1573 6645354</a>
+                  <button className="rounded-2xl border border-white/10 bg-white/5 px-6 py-3 font-semibold text-white">حجز السيارة</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
