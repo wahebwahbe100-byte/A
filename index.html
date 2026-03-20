@@ -690,6 +690,24 @@
     let currentPage = 1;
     let cars = [];
     let supabaseClient = null;
+    const DASHBOARD_STATE_KEY = 'dashboard_car_states_v2';
+
+    function getDashboardState() {
+      try {
+        return JSON.parse(localStorage.getItem(DASHBOARD_STATE_KEY) || '{}');
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function applyDashboardState(car) {
+      const state = getDashboardState()[car.id] || {};
+      return {
+        ...car,
+        isHidden: Boolean(state.isHidden),
+        isTemporary: Boolean(state.isTemporary)
+      };
+    }
 
     const carSeed = [
       ['Mercedes', 'S-Class', 'Sedan', '€128,000', 2024, '8,000 km', 'ممتازة'],
@@ -784,6 +802,10 @@
     }
 
     function createCarCard(car) {
+      const temporaryBadge = car.isTemporary
+        ? '<div style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;background:rgba(250,204,21,.14);border:1px solid rgba(250,204,21,.22);font-size:13px;font-weight:800;color:#fde68a;">🔄 سيارة مؤقتة</div>'
+        : '';
+
       return `
         <div class="car-card">
           <div class="car-image-wrap">
@@ -802,6 +824,7 @@
               <div>
                 <h3>${car.name || ''}</h3>
                 <div class="category">${car.category || ''}</div>
+                ${temporaryBadge}
               </div>
             </div>
             <div class="details-grid">
@@ -825,6 +848,7 @@
       const category = document.getElementById('categoryFilter')?.value || 'all';
 
       const filtered = cars.filter((car) => {
+        if (car.isHidden) return false;
         const searchable = `${car.name || ''} ${car.brand || ''} ${car.model || ''}`.toLowerCase();
         const matchesSearch = searchable.includes(search);
         const matchesCategory = category === 'all' || car.category === category;
@@ -923,7 +947,7 @@
     window.closeModal = closeModal;
 
     async function loadCars() {
-      cars = [...defaultCars];
+      cars = defaultCars.map((car) => applyDashboardState(car));
       renderInventory();
 
       if (!supabaseClient) return;
@@ -941,13 +965,13 @@
           const fallbackImage = `${imageBase}/auto${row.id || index + 1}.jpg`;
           const normalizedImage = getPublicImage(row.image) || fallbackImage;
 
-          return {
+          return applyDashboardState({
             ...row,
             id: row.id ?? index + 1,
             name: row.name || `${row.brand || ''} ${row.model || ''}`.trim() || `سيارة ${index + 1}`,
             image: normalizedImage,
             gallery: normalizeGallery(row, normalizedImage)
-          };
+          });
         });
 
         renderInventory();
@@ -1038,7 +1062,7 @@
         supabaseClient = null;
       }
 
-      cars = [...defaultCars];
+      cars = defaultCars.map((car) => applyDashboardState(car));
       renderInventory();
       updateBusinessStatus();
       setInterval(updateBusinessStatus, 60000);
