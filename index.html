@@ -185,6 +185,24 @@
       border-radius: 24px;
       display: block;
     }
+    .thumbs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .thumb {
+      width: 100%;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 14px;
+      border: 2px solid rgba(255,255,255,.08);
+      cursor: pointer;
+      background: #111827;
+    }
+    .thumb.active {
+      border-color: #22c55e;
+    }
     .whatsapp-banner {
       margin-top: 14px;
       background: #22c55e;
@@ -265,10 +283,13 @@
     <div class="modal-card">
       <button class="close-btn" onclick="closeModal()">إغلاق</button>
       <div class="modal-grid">
-        <a id="modalWhatsappLink" class="modal-image-wrap" target="_blank">
-          <img id="modalImage" class="modal-image" src="" alt="car" />
-          <div class="whatsapp-banner">إن كنت مهتماً يمكننا مساعدتك عبر واتساب</div>
-        </a>
+        <div>
+          <a id="modalWhatsappLink" class="modal-image-wrap" target="_blank">
+            <img id="modalImage" class="modal-image" src="" alt="car" />
+            <div class="whatsapp-banner">إن كنت مهتماً يمكننا مساعدتك عبر واتساب</div>
+          </a>
+          <div id="modalThumbs" class="thumbs"></div>
+        </div>
         <div>
           <h2 id="modalName" class="modal-title"></h2>
           <p id="modalCategory" class="category"></p>
@@ -302,6 +323,12 @@
         mileage: '8,000 km',
         condition: 'ممتازة',
         image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80',
+        gallery: [
+          'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1489824904134-891ab64532f1?auto=format&fit=crop&w=1200&q=80'
+        ],
         description: 'سيارة فاخرة جداً بمقصورة راقية، تقنيات قيادة حديثة، راحة عالية، وأداء مناسب لفئة رجال الأعمال والمعارض الراقية.'
       },
       {
@@ -315,6 +342,12 @@
         mileage: '14,500 km',
         condition: 'ممتازة',
         image: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=80',
+        gallery: [
+          'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1502161254066-6c74afbf07aa?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=1200&q=80'
+        ],
         description: 'SUV فاخر بمساحة داخلية ممتازة، تجهيزات عالية، وأنظمة أمان متقدمة مناسبة للعائلات والعملاء الباحثين عن الفخامة.'
       },
       {
@@ -328,6 +361,12 @@
         mileage: '5,200 km',
         condition: 'ممتازة',
         image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80',
+        gallery: [
+          'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1517524008697-84bbe3c3fd98?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1494905998402-395d579af36f?auto=format&fit=crop&w=1200&q=80'
+        ],
         description: 'تصميم رياضي قوي مع أداء عالي وتسارع ممتاز، مناسبة للعملاء الذين يبحثون عن الجمع بين الفخامة والقوة.'
       },
       {
@@ -341,6 +380,12 @@
         mileage: '18,100 km',
         condition: 'ممتازة',
         image: 'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=1200&q=80',
+        gallery: [
+          'https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1507136566006-cfc505b114fc?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1498887960847-2a5e46312788?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=1200&q=80'
+        ],
         description: 'فخامة بريطانية مع حضور قوي على الطريق وراحة ممتازة في السفر والتنقل داخل المدينة وخارجها.'
       },
       {
@@ -354,6 +399,12 @@
         mileage: '3,700 km',
         condition: 'ممتازة',
         image: 'https://images.unsplash.com/photo-1553440569-bcc63803a83d?auto=format&fit=crop&w=1200&q=80',
+        gallery: [
+          'https://images.unsplash.com/photo-1553440569-bcc63803a83d?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80',
+          'https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1200&q=80'
+        ],
         description: 'سيارة كهربائية رياضية بتصميم مستقبلي، استجابة سريعة جداً، ومقصورة فاخرة مناسبة للفئة المميزة.'
       }
     ];
@@ -380,14 +431,18 @@
         mileage: `${(9000 + index * 2400).toLocaleString()} km`,
         condition: index % 2 === 0 ? 'ممتازة' : 'جيدة جداً',
         image: base.image,
+        gallery: [base.image, ...featuredCars[(index + 1) % featuredCars.length].gallery.slice(1, 4)],
         description: 'سيارة معروضة بحالة ممتازة مع مواصفات قوية وتصميم احترافي داخل الموقع.'
       };
     });
 
+    const allCars = [...featuredCars, ...inventory];
+    const findCarById = (id) => allCars.find((car) => String(car.id) === String(id));
+
     function createCarCard(car) {
       return `
         <div class="car-card">
-          <img class="car-image" src="${car.image}" alt="${car.name}" onclick='openModal(${JSON.stringify(car).replace(/'/g, "&#39;")})' />
+          <img class="car-image" src="${car.image}" alt="${car.name}" data-car-id="${car.id}" />
           <div class="car-content">
             <div class="car-top">
               <div class="price">${car.price}</div>
@@ -424,8 +479,23 @@
       document.getElementById('inventoryCars').innerHTML = filtered.map(createCarCard).join('');
     }
 
+    let currentModalCar = null;
+
+    function selectModalImage(image) {
+      document.getElementById('modalImage').src = image;
+      if (currentModalCar) {
+        document.getElementById('modalWhatsappLink').href = whatsappLink(currentModalCar);
+      }
+      const thumbs = document.querySelectorAll('#modalThumbs .thumb');
+      thumbs.forEach((thumb) => {
+        thumb.classList.toggle('active', thumb.getAttribute('data-image') === image);
+      });
+    }
+
     function openModal(car) {
-      document.getElementById('modalImage').src = car.image;
+      currentModalCar = car;
+      const gallery = car.gallery && car.gallery.length ? car.gallery : [car.image];
+      document.getElementById('modalImage').src = gallery[0];
       document.getElementById('modalImage').alt = car.name;
       document.getElementById('modalName').textContent = car.name;
       document.getElementById('modalCategory').textContent = car.category;
@@ -439,6 +509,17 @@
         <div class="detail-box"><span>الحالة</span><strong>${car.condition}</strong></div>
         <div class="detail-box"><span>السعر المطلوب</span><strong>${car.price}</strong></div>
       `;
+      document.getElementById('modalThumbs').innerHTML = gallery.map((image, index) => `
+        <img
+          src="${image}"
+          class="thumb ${index === 0 ? 'active' : ''}"
+          data-image="${image}"
+          alt="${car.name}"
+        />
+      `).join('');
+      document.querySelectorAll('#modalThumbs .thumb').forEach((thumb) => {
+        thumb.addEventListener('click', () => selectModalImage(thumb.getAttribute('data-image')));
+      });
       document.getElementById('carModal').classList.add('show');
     }
 
@@ -450,6 +531,14 @@
     document.getElementById('categoryFilter').addEventListener('change', renderInventory);
     document.getElementById('carModal').addEventListener('click', function (e) {
       if (e.target.id === 'carModal') closeModal();
+    });
+
+    document.addEventListener('click', function (e) {
+      const image = e.target.closest('.car-image');
+      if (!image) return;
+      const carId = image.getAttribute('data-car-id');
+      const car = findCarById(carId);
+      if (car) openModal(car);
     });
 
     renderFeatured();
