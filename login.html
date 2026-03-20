@@ -1,420 +1,45 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>تسجيل الدخول والإدارة</title>
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: 'Tajawal', Arial, sans-serif;
-      background: linear-gradient(135deg, #020617 0%, #0b1f3a 50%, #000000 100%);
-      color: #fff;
-      min-height: 100vh;
-    }
-    .page {
-      width: min(1100px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 32px 0 60px;
-    }
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .brand img {
-      width: 76px;
-      height: 76px;
-      object-fit: contain;
-      border-radius: 18px;
-      background: rgba(255,255,255,.08);
-      padding: 8px;
-      border: 1px solid rgba(255,255,255,.14);
-    }
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 12px 18px;
-      border-radius: 14px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.1);
-      color: #fff;
-      text-decoration: none;
-      font-weight: 700;
-    }
-    .card {
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 28px;
-      padding: 24px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.45);
-    }
-    .login-card {
-      max-width: 720px;
-      margin: 0 auto 24px;
-    }
-    h1, h2, h3 { margin-top: 0; }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 14px;
-    }
-    label {
-      display: grid;
-      gap: 8px;
-      font-size: 14px;
-      font-weight: 700;
-      color: #dbeafe;
-    }
-    input, select, textarea {
-      width: 100%;
-      min-width: 0;
-      background: #0f172a;
-      color: #fff;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 14px;
-      padding: 12px 14px;
-      font-size: 15px;
-      font-family: inherit;
-    }
-    textarea {
-      min-height: 110px;
-      resize: vertical;
-    }
-    .actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 14px;
-    }
-    button {
-      border: none;
-      border-radius: 14px;
-      padding: 12px 18px;
-      font-family: inherit;
-      font-size: 15px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-    .primary {
-      background: #22c55e;
-      color: #04111f;
-    }
-    .secondary {
-      background: rgba(255,255,255,.08);
-      color: #fff;
-      border: 1px solid rgba(255,255,255,.12);
-    }
-    .status {
-      min-height: 24px;
-      margin-top: 12px;
-      color: #cbd5e1;
-      font-size: 14px;
-    }
-    .editor-wrap {
-      display: none;
-      gap: 24px;
-    }
-    .editor-wrap.show {
-      display: grid;
-    }
-    .hint {
-      color: #93c5fd;
-      line-height: 1.8;
-      font-size: 14px;
-    }
-    .preview {
-      width: 100%;
-      height: 240px;
-      object-fit: cover;
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,.1);
-      background: rgba(255,255,255,.04);
-      margin-top: 12px;
-    }
-    .muted { color: #94a3b8; }
-    @media (max-width: 900px) {
-      .grid { grid-template-columns: 1fr; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل الدخول</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+body{margin:0;font-family:'Tajawal';background:#020617;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh}
+.box{background:#0f172a;padding:30px;border-radius:20px;width:350px;text-align:center}
+input{width:100%;padding:12px;margin:10px 0;border-radius:10px;border:1px solid #333;background:#020617;color:#fff}
+button{width:100%;padding:12px;background:#22c55e;border:none;border-radius:10px;font-weight:bold;cursor:pointer}
+</style>
 </head>
 <body>
-  <div class="page">
-    <div class="topbar">
-      <div class="brand">
-        <img src="images/logo.png" alt="logo" onerror="this.src=placeholderLogo">
-        <div>
-          <h2 style="margin-bottom:6px;">Emotion Car & Service UG</h2>
-          <div class="muted">تسجيل الدخول والإدارة</div>
-        </div>
-      </div>
-      <a class="back-link" href="index.html">العودة إلى الموقع</a>
-    </div>
+<div class="box">
+<h2>تسجيل الدخول</h2>
+<input id="email" type="email" placeholder="البريد الإلكتروني">
+<input id="password" type="password" placeholder="كلمة المرور">
+<button onclick="login()">دخول</button>
+<p id="msg"></p>
+</div>
 
-    <div id="loginCard" class="card login-card">
-      <h1>تسجيل الدخول</h1>
-      <p class="hint">هذه الصفحة مخصصة للمدير فقط. بعد تسجيل الدخول ستظهر أدوات تعديل السيارات والصور والحفظ مباشرة في Supabase.</p>
-      <div class="grid">
-        <label>
-          البريد الإلكتروني
-          <input id="email" type="email" placeholder="emotion.service@icloud.com">
-        </label>
-        <label>
-          كلمة المرور
-          <input id="password" type="password" placeholder="••••••••">
-        </label>
-      </div>
-      <div class="actions">
-        <button id="loginBtn" class="primary">تسجيل الدخول</button>
-      </div>
-      <div id="loginStatus" class="status"></div>
-    </div>
+<script>
+const supabase = window.supabase.createClient(
+'https://beyxyvibqzhtyawqrhbv.supabase.co',
+'sb_publishable_iMt3G9iAvXawW3QN6vGWjw_BOw8qLFK'
+);
 
-    <div id="editorWrap" class="editor-wrap">
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-          <div>
-            <h2 style="margin-bottom:6px;">إدارة السيارات</h2>
-            <div class="muted">يمكنك تعديل سيارة واحدة وحفظ التغييرات مباشرة.</div>
-          </div>
-          <button id="logoutBtn" class="secondary">تسجيل الخروج</button>
-        </div>
+async function login(){
+const email=document.getElementById('email').value;
+const password=document.getElementById('password').value;
+const {data,error}=await supabase.auth.signInWithPassword({email,password});
 
-        <div class="grid" style="margin-top:16px;">
-          <label>
-            اختر السيارة
-            <select id="carSelect"></select>
-          </label>
-          <label>
-            الفئة
-            <select id="category">
-              <option value="SUV">SUV</option>
-              <option value="Sedan">Sedan</option>
-              <option value="Sport">Sport</option>
-            </select>
-          </label>
-          <label>
-            الاسم الكامل
-            <input id="name" type="text" placeholder="Mercedes S-Class">
-          </label>
-          <label>
-            السعر
-            <input id="price" type="text" placeholder="€128,000">
-          </label>
-          <label>
-            سنة الصنع
-            <input id="year" type="number" placeholder="2024">
-          </label>
-          <label>
-            عدد الكيلومترات
-            <input id="mileage" type="text" placeholder="8,000 km">
-          </label>
-          <label>
-            الحالة
-            <input id="condition" type="text" placeholder="ممتازة">
-          </label>
-          <label>
-            الصورة الرئيسية
-            <input id="imageFile" type="file" accept="image/*">
-          </label>
-        </div>
-
-        <label style="margin-top:14px; display:grid; gap:8px;">
-          الوصف
-          <textarea id="description" placeholder="اكتب وصف السيارة هنا..."></textarea>
-        </label>
-
-        <div class="actions">
-          <button id="saveBtn" class="primary">حفظ التعديلات</button>
-        </div>
-        <div id="saveStatus" class="status"></div>
-      </div>
-
-      <div class="card">
-        <h3>معاينة الصورة الحالية</h3>
-        <div class="muted">عند رفع صورة جديدة سيتم تحديث الصورة الرئيسية لهذه السيارة.</div>
-        <img id="previewImage" class="preview" src="" alt="preview">
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const SUPABASE_URL = 'https://beyxyvibqzhtyawqrhbv.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_iMt3G9iAvXawW3QN6vGWjw_BOw8qLFK';
-    const ADMIN_EMAIL = 'emotion.service@icloud.com';
-    const STORAGE_BUCKET = 'site-images';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    const placeholderLogo = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120">
-        <rect width="120" height="120" rx="24" fill="#0f172a"/>
-        <path d="M22 72c12-18 30-28 52-28 10 0 19 2 27 6" fill="none" stroke="#3b82f6" stroke-width="7" stroke-linecap="round"/>
-        <path d="M28 77h61c8 0 14-5 16-11" fill="none" stroke="#22c55e" stroke-width="7" stroke-linecap="round"/>
-        <text x="60" y="104" text-anchor="middle" fill="white" font-size="22" font-family="Arial">EC</text>
-      </svg>
-    `);
-    const placeholderCar = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
-      <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
-        <rect width="1200" height="700" fill="#0f172a"/>
-        <text x="600" y="350" fill="#cbd5e1" font-size="48" text-anchor="middle" font-family="Arial">No Image</text>
-      </svg>
-    `);
-
-    let cars = [];
-    let currentUser = null;
-
-    function setStatus(id, message, ok = true) {
-      const el = document.getElementById(id);
-      el.textContent = message;
-      el.style.color = ok ? '#86efac' : '#fca5a5';
-    }
-
-    function toggleUI() {
-      document.getElementById('loginCard').style.display = currentUser ? 'none' : 'block';
-      document.getElementById('editorWrap').classList.toggle('show', !!currentUser);
-    }
-
-    async function login() {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-      if (!email || !password) {
-        setStatus('loginStatus', 'أدخل البريد الإلكتروني وكلمة المرور.', false);
-        return;
-      }
-      try {
-        setStatus('loginStatus', 'جاري تسجيل الدخول...');
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        if (data.user.email !== ADMIN_EMAIL) {
-          await supabase.auth.signOut();
-          throw new Error('هذا الحساب غير مصرح له بالدخول.');
-        }
-        currentUser = data.user;
-        toggleUI();
-        await loadCars();
-        setStatus('loginStatus', 'تم تسجيل الدخول بنجاح.');
-      } catch (error) {
-        setStatus('loginStatus', error.message || 'فشل تسجيل الدخول.', false);
-      }
-    }
-
-    async function logout() {
-      await supabase.auth.signOut();
-      currentUser = null;
-      toggleUI();
-      setStatus('saveStatus', 'تم تسجيل الخروج.', true);
-    }
-
-    async function loadCars() {
-      const { data, error } = await supabase.from('cars').select('*').order('id', { ascending: true });
-      if (error) {
-        setStatus('saveStatus', error.message || 'تعذر تحميل السيارات.', false);
-        return;
-      }
-      cars = Array.isArray(data) ? data : [];
-      const select = document.getElementById('carSelect');
-      select.innerHTML = cars.map(car => `<option value="${car.id}">${car.id} - ${car.name || `${car.brand || ''} ${car.model || ''}`}</option>`).join('');
-      if (cars.length) loadSelectedCar();
-    }
-
-    function findCar(id) {
-      return cars.find(car => String(car.id) === String(id));
-    }
-
-    function loadSelectedCar() {
-      const car = findCar(document.getElementById('carSelect').value);
-      if (!car) return;
-      document.getElementById('name').value = car.name || '';
-      document.getElementById('category').value = car.category || 'SUV';
-      document.getElementById('price').value = car.price || '';
-      document.getElementById('year').value = car.year || '';
-      document.getElementById('mileage').value = car.mileage || '';
-      document.getElementById('condition').value = car.condition || '';
-      document.getElementById('description').value = car.description || '';
-      document.getElementById('previewImage').src = car.image || placeholderCar;
-    }
-
-    async function uploadImageIfNeeded(carId) {
-      const input = document.getElementById('imageFile');
-      const file = input.files?.[0];
-      if (!file) return null;
-      const ext = file.name.split('.').pop();
-      const filePath = `cars/car-${carId}-${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file, { upsert: true });
-      if (error) throw error;
-      const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(filePath);
-      input.value = '';
-      return data.publicUrl;
-    }
-
-    async function saveCar() {
-      const id = document.getElementById('carSelect').value;
-      const car = findCar(id);
-      if (!car) return;
-      try {
-        setStatus('saveStatus', 'جاري حفظ التعديلات...');
-        const imageUrl = await uploadImageIfNeeded(id);
-        const name = document.getElementById('name').value.trim();
-        const parts = name.split(' ');
-        const updatedCar = {
-          id: car.id,
-          name,
-          brand: parts[0] || car.brand,
-          model: parts.slice(1).join(' ') || car.model,
-          category: document.getElementById('category').value,
-          price: document.getElementById('price').value.trim(),
-          year: Number(document.getElementById('year').value) || car.year,
-          mileage: document.getElementById('mileage').value.trim(),
-          condition: document.getElementById('condition').value.trim(),
-          description: document.getElementById('description').value.trim(),
-          image: imageUrl || car.image,
-          gallery: imageUrl ? [imageUrl] : (Array.isArray(car.gallery) ? car.gallery : [car.image].filter(Boolean))
-        };
-
-        const { error } = await supabase.from('cars').upsert(updatedCar, { onConflict: 'id' });
-        if (error) throw error;
-        setStatus('saveStatus', 'تم حفظ التعديلات بنجاح.');
-        await loadCars();
-        document.getElementById('carSelect').value = String(id);
-        loadSelectedCar();
-      } catch (error) {
-        setStatus('saveStatus', error.message || 'حدث خطأ أثناء الحفظ.', false);
-      }
-    }
-
-    document.getElementById('loginBtn').addEventListener('click', login);
-    document.getElementById('logoutBtn').addEventListener('click', logout);
-    document.getElementById('carSelect').addEventListener('change', loadSelectedCar);
-    document.getElementById('saveBtn').addEventListener('click', saveCar);
-    document.getElementById('imageFile').addEventListener('change', (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      const url = URL.createObjectURL(file);
-      document.getElementById('previewImage').src = url;
-    });
-
-    supabase.auth.getSession().then(({ data }) => {
-      const user = data.session?.user || null;
-      if (user && user.email === ADMIN_EMAIL) {
-        currentUser = user;
-        toggleUI();
-        loadCars();
-      } else {
-        toggleUI();
-      }
-    });
-  </script>
+if(error){
+document.getElementById('msg').innerText='خطأ في تسجيل الدخول';
+}else{
+document.getElementById('msg').innerText='تم الدخول';
+window.location.href='index.html';
+}
+}
+</script>
 </body>
 </html>
