@@ -1,17 +1,23 @@
 import { useMemo, useState } from "react";
 
 const WHATSAPP_NUMBER = "4915736645354";
-const whatsappLink = (carName) => `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(`مرحباً، أنا مهتم بسيارة ${carName}. هل يمكن تزويدي بالتفاصيل؟`)}`;
+const whatsappLink = (car) =>
+  `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+    `مرحباً، كنت مهتماً بسيارة ${car.name}. يمكننا مساعدتك وتزويدك بكل التفاصيل.`
+  )}`;
 
 export default function ProfessionalCarShowcaseSite() {
   const featuredCars = [
     {
       id: 1,
       name: "Mercedes S-Class",
+      brand: "Mercedes",
+      model: "S-Class",
       category: "Luxury Sedan",
       price: "$128,000",
       year: 2024,
       mileage: "8,000 km",
+      condition: "ممتازة",
       fuel: "Hybrid",
       transmission: "Automatic",
       color: "Obsidian Black",
@@ -22,10 +28,13 @@ export default function ProfessionalCarShowcaseSite() {
     {
       id: 2,
       name: "BMW X7",
+      brand: "BMW",
+      model: "X7",
       category: "Premium SUV",
       price: "$102,500",
       year: 2023,
       mileage: "14,500 km",
+      condition: "ممتازة",
       fuel: "Diesel",
       transmission: "Automatic",
       color: "Mineral White",
@@ -36,10 +45,13 @@ export default function ProfessionalCarShowcaseSite() {
     {
       id: 3,
       name: "Audi RS7",
+      brand: "Audi",
+      model: "RS7",
       category: "Performance Coupe",
       price: "$119,900",
       year: 2024,
       mileage: "5,200 km",
+      condition: "ممتازة",
       fuel: "Petrol",
       transmission: "Automatic",
       color: "Nardo Grey",
@@ -50,10 +62,13 @@ export default function ProfessionalCarShowcaseSite() {
     {
       id: 4,
       name: "Range Rover Sport",
+      brand: "Range Rover",
+      model: "Sport",
       category: "Executive SUV",
       price: "$115,300",
       year: 2023,
       mileage: "18,100 km",
+      condition: "ممتازة",
       fuel: "Hybrid",
       transmission: "Automatic",
       color: "Santorini Black",
@@ -64,10 +79,13 @@ export default function ProfessionalCarShowcaseSite() {
     {
       id: 5,
       name: "Porsche Taycan",
+      brand: "Porsche",
+      model: "Taycan",
       category: "Electric Sport",
       price: "$134,800",
       year: 2024,
       mileage: "3,700 km",
+      condition: "ممتازة",
       fuel: "Electric",
       transmission: "Automatic",
       color: "Volcano Grey",
@@ -78,37 +96,40 @@ export default function ProfessionalCarShowcaseSite() {
   ];
 
   const inventoryNames = [
-    "Mercedes S-Class",
-    "BMW X7",
-    "Audi RS7",
-    "Range Rover Sport",
-    "Porsche Taycan",
-    "Lexus LX",
-    "Cadillac Escalade",
-    "Bentley Bentayga",
-    "Rolls-Royce Ghost",
-    "Tesla Model S",
-    "Ferrari Roma",
-    "Lamborghini Urus",
-    "Maserati Levante",
-    "Jaguar F-Pace",
-    "Genesis G90",
-    "Volvo XC90",
-    "Land Cruiser",
-    "GMC Yukon Denali",
-    "Jeep Grand Wagoneer",
-    "Aston Martin DBX",
+    ["Mercedes", "S-Class"],
+    ["BMW", "X7"],
+    ["Audi", "RS7"],
+    ["Range Rover", "Sport"],
+    ["Porsche", "Taycan"],
+    ["Lexus", "LX"],
+    ["Cadillac", "Escalade"],
+    ["Bentley", "Bentayga"],
+    ["Rolls-Royce", "Ghost"],
+    ["Tesla", "Model S"],
+    ["Ferrari", "Roma"],
+    ["Lamborghini", "Urus"],
+    ["Maserati", "Levante"],
+    ["Jaguar", "F-Pace"],
+    ["Genesis", "G90"],
+    ["Volvo", "XC90"],
+    ["Toyota", "Land Cruiser"],
+    ["GMC", "Yukon Denali"],
+    ["Jeep", "Grand Wagoneer"],
+    ["Aston Martin", "DBX"],
   ];
 
-  const inventory = inventoryNames.map((name, index) => {
+  const inventory = inventoryNames.map(([brand, model], index) => {
     const base = featuredCars[index % featuredCars.length];
     return {
       id: index + 1,
-      name,
+      name: `${brand} ${model}`,
+      brand,
+      model,
       category: index % 3 === 0 ? "SUV" : index % 3 === 1 ? "Sedan" : "Sport",
       price: `$${(65000 + index * 3200).toLocaleString()}`,
       year: 2020 + (index % 5),
       mileage: `${(9000 + index * 2400).toLocaleString()} km`,
+      condition: index % 2 === 0 ? "ممتازة" : "جيدة جداً",
       fuel: index % 4 === 0 ? "Diesel" : index % 4 === 1 ? "Petrol" : index % 4 === 2 ? "Hybrid" : "Electric",
       transmission: "Automatic",
       color: ["Black", "White", "Grey", "Blue", "Silver"][index % 5],
@@ -125,7 +146,8 @@ export default function ProfessionalCarShowcaseSite() {
   const filteredInventory = useMemo(() => {
     return inventory.filter((car) => {
       const matchesCategory = selectedCategory === "all" || car.category === selectedCategory;
-      const matchesSearch = car.name.toLowerCase().includes(search.toLowerCase());
+      const text = `${car.name} ${car.brand} ${car.model}`.toLowerCase();
+      const matchesSearch = text.includes(search.toLowerCase());
       return matchesCategory && matchesSearch;
     });
   }, [inventory, search, selectedCategory]);
@@ -133,50 +155,82 @@ export default function ProfessionalCarShowcaseSite() {
   const openCarDetails = (car) => setSelectedCar(car);
   const closeCarDetails = () => setSelectedCar(null);
 
+  const CarCard = ({ car, featured = false }) => (
+    <div className={`overflow-hidden rounded-[1.6rem] border border-white/10 bg-slate-900/80 text-right shadow-xl ${featured ? "backdrop-blur" : ""}`}>
+      <button onClick={() => openCarDetails(car)} className="w-full text-right">
+        <div className="overflow-hidden">
+          <img src={car.image} alt={car.name} className={`${featured ? "h-72" : "h-52"} w-full object-cover transition duration-500 hover:scale-105`} />
+        </div>
+        <div className="p-5">
+          <div className="flex items-start justify-between gap-3">
+            <span className="rounded-full border border-white/10 bg-black/20 px-4 py-2 text-sm text-slate-200">{car.price}</span>
+            <div>
+              <h3 className="text-xl font-semibold">{car.name}</h3>
+              <p className="mt-1 text-sm text-slate-400">{car.category}</p>
+            </div>
+          </div>
+
+          <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
+            <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+              <p className="text-slate-400">الماركة</p>
+              <p className="mt-1 font-semibold">{car.brand}</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+              <p className="text-slate-400">الطراز</p>
+              <p className="mt-1 font-semibold">{car.model}</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+              <p className="text-slate-400">سنة الصنع</p>
+              <p className="mt-1 font-semibold">{car.year}</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+              <p className="text-slate-400">الكيلومترات</p>
+              <p className="mt-1 font-semibold">{car.mileage}</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+              <p className="text-slate-400">الحالة</p>
+              <p className="mt-1 font-semibold">{car.condition}</p>
+            </div>
+            <div className="rounded-xl border border-emerald-400/20 bg-emerald-400/10 p-3">
+              <p className="text-emerald-300">السعر المطلوب</p>
+              <p className="mt-1 font-semibold text-white">{car.price}</p>
+            </div>
+          </div>
+        </div>
+      </button>
+    </div>
+  );
+
   return (
     <div dir="rtl" className="min-h-screen bg-slate-950 text-white">
-      {/* Featured */}
       <section className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
-        <div className="mb-8 flex items-end justify-between gap-4">
-          <div>
-            <h2 className="mt-3 text-3xl font-semibold">أفضل السيارات في الواجهة</h2>
-          </div>
+        <div className="mb-8">
+          <h2 className="text-3xl font-semibold">أفضل السيارات في الواجهة</h2>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {featuredCars.map((car) => (
-            <div key={car.id} className="group overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/5 text-right shadow-2xl backdrop-blur">
-              <button onClick={() => openCarDetails(car)} className="w-full text-right">
-                <div className="overflow-hidden">
-                  <img src={car.image} alt={car.name} className="h-72 w-full object-cover transition duration-500 group-hover:scale-105" />
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center justify-between gap-4">
-                    <span className="rounded-full border border-white/10 bg-black/20 px-4 py-2 text-sm text-slate-200">{car.price}</span>
-                    <div>
-                      <h3 className="text-xl font-semibold">{car.name}</h3>
-                      <p className="mt-1 text-sm text-slate-400">{car.category}</p>
-                    </div>
-                  </div>
-                  <div className="mt-6 w-full rounded-2xl border border-white/10 bg-white/10 px-4 py-3 text-center text-sm font-medium">عرض التفاصيل</div>
-                </div>
-              </button>
-              <a href={whatsappLink(car.name)} target="_blank" className="m-4 block rounded-2xl bg-emerald-500 px-4 py-3 text-center text-sm font-semibold text-white hover:opacity-90">
-                ان كنت مهتم يسعدنا مناقشة عبر واتساب +49 1573 6645354
-              </a>
-            </div>
+            <CarCard key={car.id} car={car} featured />
           ))}
         </div>
       </section>
 
-      {/* Inventory */}
       <section className="border-y border-white/10 bg-white/[0.03]">
         <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
           <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <h2 className="mt-3 text-3xl font-semibold">معرض السيارات</h2>
             <div className="flex gap-3">
-              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="ابحث عن سيارة..." className="rounded-2xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-white outline-none" />
-              <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)} className="rounded-2xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-white outline-none">
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="ابحث عن سيارة..."
+                className="rounded-2xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-white outline-none"
+              />
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="rounded-2xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-white outline-none"
+              >
                 <option value="all">كل الفئات</option>
                 <option value="SUV">SUV</option>
                 <option value="Sedan">Sedan</option>
@@ -187,58 +241,58 @@ export default function ProfessionalCarShowcaseSite() {
 
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {filteredInventory.map((car) => (
-              <div key={car.id} className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-slate-900/80 text-right">
-                <button onClick={() => openCarDetails(car)} className="w-full text-right">
-                  <img src={car.image} alt={car.name} className="h-52 w-full object-cover" />
-                  <div className="p-5">
-                    <div className="flex items-start justify-between gap-3">
-                      <span className="text-sm text-slate-300">{car.price}</span>
-                      <div>
-                        <h3 className="font-semibold">{car.name}</h3>
-                        <p className="mt-1 text-sm text-slate-400">{car.category}</p>
-                      </div>
-                    </div>
-                    <div className="mt-5 w-full rounded-xl bg-white px-4 py-2.5 text-center text-sm font-semibold text-slate-950">عرض السيارة</div>
-                  </div>
-                </button>
-                <a href={whatsappLink(car.name)} target="_blank" className="m-4 block rounded-xl bg-emerald-500 px-4 py-2.5 text-center text-sm font-semibold text-white hover:opacity-90">
-                  واتساب +49 1573 6645354
-                </a>
-              </div>
+              <CarCard key={car.id} car={car} />
             ))}
           </div>
         </div>
       </section>
 
-      {/* Modal */}
       {selectedCar && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
           <div className="relative max-h-[95vh] w-full max-w-5xl overflow-y-auto rounded-[2rem] border border-white/10 bg-slate-950 shadow-2xl">
-            <button onClick={closeCarDetails} className="absolute left-4 top-4 z-10 rounded-full border border-white/10 bg-black/40 px-4 py-2 text-sm text-white">إغلاق</button>
+            <button
+              onClick={closeCarDetails}
+              className="absolute left-4 top-4 z-10 rounded-full border border-white/10 bg-black/40 px-4 py-2 text-sm text-white"
+            >
+              إغلاق
+            </button>
 
             <div className="grid gap-8 lg:grid-cols-2">
-              <div className="p-4 lg:p-6">
-                <img src={selectedCar.image} alt={selectedCar.name} className="h-[320px] w-full rounded-[1.5rem] object-cover lg:h-[520px]" />
-              </div>
+              <a href={whatsappLink(selectedCar)} target="_blank" className="block p-4 lg:p-6">
+                <img
+                  src={selectedCar.image}
+                  alt={selectedCar.name}
+                  className="h-[320px] w-full rounded-[1.5rem] object-cover lg:h-[520px]"
+                />
+                <div className="mt-4 rounded-2xl bg-emerald-500 px-6 py-4 text-center font-semibold text-white">
+                  إن كنت مهتماً يمكننا مساعدتك عبر واتساب
+                </div>
+              </a>
 
               <div className="p-6 lg:p-8">
                 <h2 className="mt-3 text-3xl font-semibold">{selectedCar.name}</h2>
                 <p className="mt-2 text-lg text-slate-400">{selectedCar.category}</p>
-                <div className="mt-6 inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-5 py-2 text-lg font-semibold text-emerald-300">{selectedCar.price}</div>
+
+                <div className="mt-6 inline-flex rounded-full border border-emerald-400/20 bg-emerald-400/10 px-5 py-2 text-lg font-semibold text-emerald-300">
+                  {selectedCar.price}
+                </div>
+
                 <p className="mt-6 leading-8 text-slate-300">{selectedCar.description}</p>
 
                 <div className="mt-8 grid grid-cols-2 gap-4">
-                  {[["الموديل", selectedCar.year],["العداد", selectedCar.mileage],["الوقود", selectedCar.fuel],["ناقل الحركة", selectedCar.transmission],["اللون", selectedCar.color],["الحالة", "ممتازة"]].map(([label, value]) => (
+                  {[
+                    ["الماركة", selectedCar.brand],
+                    ["الطراز", selectedCar.model],
+                    ["سنة الصنع", selectedCar.year],
+                    ["عدد الكيلومترات", selectedCar.mileage],
+                    ["الحالة", selectedCar.condition],
+                    ["السعر المطلوب", selectedCar.price],
+                  ].map(([label, value]) => (
                     <div key={label} className="rounded-2xl border border-white/10 bg-white/5 p-4">
                       <p className="text-sm text-slate-400">{label}</p>
                       <p className="mt-2 font-semibold">{value}</p>
                     </div>
                   ))}
-                </div>
-
-                <div className="mt-8 flex flex-wrap gap-4">
-                  <a href={whatsappLink(selectedCar.name)} target="_blank" className="rounded-2xl bg-emerald-500 px-6 py-3 font-semibold text-white">تواصل عبر واتساب +49 1573 6645354</a>
-                  <button className="rounded-2xl border border-white/10 bg-white/5 px-6 py-3 font-semibold text-white">حجز السيارة</button>
                 </div>
               </div>
             </div>
