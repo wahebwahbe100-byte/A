@@ -26,6 +26,35 @@
       box-shadow: 0 24px 80px rgba(0,0,0,.28);
       backdrop-filter: blur(12px);
     }
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+    .nav-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.05);
+      color: #fff;
+      font-size: 14px;
+      transition: .2s ease;
+    }
+    .nav-link:hover {
+      background: rgba(255,255,255,.12);
+      transform: translateY(-1px);
+    }
     .badge {
       display: inline-block; padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.1);
       background: rgba(255,255,255,.05); color: #d1d5db; font-size: 14px; margin-bottom: 16px;
@@ -190,7 +219,24 @@
       background: rgba(255,255,255,.04); border: 1px dashed rgba(255,255,255,.15); border-radius: 24px; padding: 32px; text-align: center; color: #cbd5e1;
     }
     footer { padding: 28px 0 44px; color: #94a3b8; text-align: center; }
+    .legal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+    }
+    .legal-card {
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 24px;
+      padding: 24px;
+    }
+    .legal-card p {
+      color: #cbd5e1;
+      line-height: 1.9;
+      margin-top: 10px;
+    }
     @media (max-width: 900px) {
+      .legal-grid { grid-template-columns: 1fr; }
       .modal-grid { grid-template-columns: 1fr; }
       .stats { grid-template-columns: 1fr; }
       .thumbs { grid-template-columns: repeat(2, 1fr); }
@@ -205,7 +251,16 @@
   <section class="hero">
     <div class="container">
       <div class="hero-card">
-        <div class="badge">Emotion Cars & Service UG</div>
+        <div class="top-nav">
+          <div class="nav-links">
+            <a class="nav-link" href="#about">من نحن</a>
+            <a class="nav-link" href="#cars">السيارات</a>
+            <a class="nav-link" href="#contact">تواصل</a>
+            <a class="nav-link" href="#terms">الشروط والأحكام</a>
+          </div>
+          <div class="badge">Emotion Cars & Service UG</div>
+        </div>
+        
         <h1>موقع سيارات احترافي جاهز لـ GitHub</h1>
         <p>
           أضف صورك داخل مجلد <strong>images</strong>، والموقع سيعرض فقط السيارات التي لها صورة فعلية.
@@ -220,7 +275,7 @@
     </div>
   </section>
 
-  <section class="section inventory-wrap">
+  <section id="cars" class="section inventory-wrap">
     <div class="container">
       <div class="section-head">
         <div>
@@ -246,7 +301,7 @@
     </div>
   </section>
 
-  <section class="section container">
+  <section id="about" class="section container">
     <div class="section-head">
       <div>
         <h2 class="section-title">من نحن</h2>
@@ -271,7 +326,7 @@
           </div>
         </div>
       </div>
-      <div class="contact-card">
+      <div id="contact" class="contact-card">
         <h3>معلومات التواصل</h3>
         <div class="contact-list">
           <div class="contact-row"><span>اسم النشاط</span><strong>Emotion Cars & Service UG</strong></div>
@@ -284,6 +339,25 @@
           <a class="cta-btn primary" href="https://wa.me/4915736645354" target="_blank">تواصل عبر واتساب</a>
           <a class="cta-btn" href="mailto:emotion.service@icloud.com">إرسال بريد</a>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="terms" class="section container">
+    <div class="section-head">
+      <div>
+        <h2 class="section-title">الشروط والأحكام</h2>
+        <p>هذه الأقسام تساعد على جعل الموقع أكثر رسمية ووضوحاً للعميل، ويمكن تعديل النصوص لاحقاً بحسب نشاطك الفعلي ومتطلبات السوق الألماني.</p>
+      </div>
+    </div>
+    <div class="legal-grid">
+      <div class="legal-card">
+        <h3>شروط استخدام الموقع</h3>
+        <p>جميع المعلومات والصور والأسعار المعروضة هدفها التعريف بالسيارات المتاحة. قد تتغير بعض التفاصيل أو الأسعار حسب حالة المركبة والتوفر الفعلي وقت التواصل.</p>
+      </div>
+      <div class="legal-card">
+        <h3>معلومات البيع والتواصل</h3>
+        <p>يتم تأكيد المواصفات النهائية، حالة السيارة، وسعر البيع النهائي عند التواصل المباشر. يمكن للعميل طلب معلومات إضافية أو صور أكثر عبر واتساب أو البريد الإلكتروني.</p>
       </div>
     </div>
   </section>
