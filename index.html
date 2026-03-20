@@ -220,16 +220,6 @@
     </div>
   </section>
 
-  <section class="section container">
-    <div class="section-head">
-      <div>
-        <h2 class="section-title">أفضل السيارات في الواجهة</h2>
-        <p>واجهة عرض منظمة وحديثة تُظهر أهم السيارات أولاً مع تفاصيل مختصرة وواضحة، ثم يمكن للعميل الدخول لتفاصيل أكثر بمجرد الضغط على الصورة.</p>
-      </div>
-    </div>
-    <div id="featuredCars" class="grid cars-grid"></div>
-  </section>
-
   <section class="section inventory-wrap">
     <div class="container">
       <div class="section-head">
@@ -382,7 +372,6 @@
     }));
 
     let availableCars = [];
-    let featuredCars = [];
     let currentModalCar = null;
     let currentPage = 1;
     const carsPerPage = 10;
@@ -415,12 +404,10 @@
       );
 
       availableCars = results.filter(Boolean);
-      featuredCars = availableCars.slice(0, 5);
-
-      document.getElementById('featuredCount').textContent = featuredCars.length;
+      document.getElementById('featuredCount').textContent = availableCars.length;
       document.getElementById('inventoryCount').textContent = availableCars.length;
 
-      renderFeatured();
+      
       renderInventory();
     }
 
@@ -449,13 +436,7 @@
       `;
     }
 
-    function renderFeatured() {
-      const container = document.getElementById('featuredCars');
-      if (!featuredCars.length) {
-        container.innerHTML = '<div class="empty-state">لا توجد سيارات مميزة حالياً. أضف صوراً داخل مجلد images لتظهر هنا.</div>';
-        return;
-      }
-      container.innerHTML = featuredCars.map(createCarCard).join('');
+          container.innerHTML = featuredCars.map(createCarCard).join('');
     }
 
     function renderInventory() {
