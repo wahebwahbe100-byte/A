@@ -3,35 +3,76 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>لوحة التحكم</title>
+  <title>لوحة التحكم - السيارات</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen bg-slate-950 text-white p-4 md:p-8">
   <div class="max-w-7xl mx-auto space-y-8">
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
       <div>
-        <h1 class="text-3xl font-black">لوحة التحكم</h1>
-        <p class="text-white/70 mt-2">بعد تسجيل الدخول يمكنك تعديل صور 30 سيارة والسعر والتفاصيل نفسها الموجودة في الموقع.</p>
+        <h1 class="text-3xl md:text-4xl font-black">لوحة التحكم</h1>
+        <p class="text-white/70 mt-2">إدارة 30 سيارة بسهولة: تعديل البيانات، تحديد السيارة المؤقتة، إخفاء السيارة من الموقع وإرجاعها متى تريد.</p>
       </div>
       <div class="flex gap-3 flex-wrap">
-        <a href="index.html" class="px-5 py-3 rounded-2xl bg-white/10 border border-white/10">عرض الموقع</a>
+        <a href="index.html" class="px-5 py-3 rounded-2xl bg-white/10 border border-white/10 hover:bg-white/15">عرض الموقع</a>
         <button id="logoutBtn" class="px-5 py-3 rounded-2xl bg-red-600 hover:bg-red-700">تسجيل خروج</button>
       </div>
     </div>
 
+    <div class="grid md:grid-cols-3 gap-4">
+      <div class="rounded-3xl border border-white/10 bg-white/10 p-5">
+        <div class="text-white/60 text-sm mb-2">🚗 السيارات</div>
+        <div id="totalCount" class="text-3xl font-black">0</div>
+      </div>
+      <div class="rounded-3xl border border-white/10 bg-white/10 p-5">
+        <div class="text-white/60 text-sm mb-2">👁‍🗨 الظاهرة في الموقع</div>
+        <div id="visibleCount" class="text-3xl font-black text-emerald-300">0</div>
+      </div>
+      <div class="rounded-3xl border border-white/10 bg-white/10 p-5">
+        <div class="text-white/60 text-sm mb-2">👁‍🗨 المخفية</div>
+        <div id="hiddenCount" class="text-3xl font-black text-amber-300">0</div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-sky-400/20 bg-sky-500/10 px-5 py-4 text-sm leading-7 text-sky-100">
+      <span id="summaryLine">🚗 السيارات: 0 | 👁‍🗨 الظاهرة: 0 | 🙈 المخفية: 0 | 🔄 المؤقتة: 0</span>
+      <div class="text-sky-100/75 mt-1">ملاحظة: حالة الإخفاء والمؤقتة محفوظة للإدارة على هذا المتصفح، وتنعكس على صفحة الموقع في نفس الجهاز مباشرة.</div>
+    </div>
+
     <div id="msg" class="text-sm"></div>
 
-    <div class="grid lg:grid-cols-[340px,1fr] gap-8">
-      <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
-        <h2 class="text-2xl font-black mb-4">اختيار السيارة</h2>
-        <div class="space-y-4">
-          <select id="carSelect" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10"></select>
-          <div class="text-white/70 text-sm leading-7">
-            اختر السيارة التي تريد تعديلها، ثم غيّر الصورة والسعر والوصف وباقي البيانات، وبعدها اضغط حفظ.
+    <div class="grid xl:grid-cols-[370px,1fr] gap-8">
+      <div class="space-y-6">
+        <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+          <h2 class="text-2xl font-black mb-4">اختيار السيارة</h2>
+          <div class="space-y-4">
+            <select id="carSelect" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10"></select>
+
+            <div class="grid grid-cols-2 gap-3">
+              <button id="toggleHiddenBtn" class="px-4 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black">🙈 إخفاء مؤقت</button>
+              <button id="restoreBtn" class="px-4 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black">👁‍🗨 إرجاع للموقع</button>
+            </div>
+
+            <div class="rounded-2xl border border-white/10 bg-slate-900/70 p-4 space-y-2 text-sm">
+              <div class="flex items-center justify-between gap-3">
+                <span class="text-white/60">الحالة الحالية</span>
+                <span id="currentFlags" class="font-bold text-white">—</span>
+              </div>
+              <div class="text-white/60">🔄 مؤقتة = تظهر بإيموجي في لوحة التحكم.</div>
+              <div class="text-white/60">🙈 مخفية = لا تظهر في صفحة الموقع.</div>
+            </div>
+
+            <div class="rounded-2xl border border-white/10 bg-slate-900/70 p-4">
+              <div class="text-sm text-white/60 mb-2">الصورة الحالية</div>
+              <img id="preview" class="w-full h-60 object-cover rounded-2xl bg-slate-950" alt="preview">
+            </div>
           </div>
-          <div class="rounded-2xl border border-white/10 bg-slate-900/70 p-4">
-            <div class="text-sm text-white/60 mb-2">الصورة الحالية</div>
-            <img id="preview" class="w-full h-56 object-cover rounded-2xl bg-slate-950" alt="preview">
+        </div>
+
+        <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+          <h3 class="text-xl font-black mb-4">السيارات المخفية</h3>
+          <div id="hiddenCarsList" class="space-y-3 text-sm text-white/70">
+            لا توجد سيارات مخفية حالياً.
           </div>
         </div>
       </div>
@@ -45,11 +86,17 @@
           </div>
           <div>
             <label class="block mb-2 text-sm text-white/80">الفئة</label>
-            <select id="category" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10">
-              <option value="SUV">SUV</option>
-              <option value="Sedan">Sedan</option>
-              <option value="Sport">Sport</option>
-            </select>
+            <input id="category" list="categoryOptions" type="text" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="مثال: SUV أو Sedan أو Luxury">
+            <datalist id="categoryOptions">
+              <option value="SUV"></option>
+              <option value="Sedan"></option>
+              <option value="Sport"></option>
+              <option value="Luxury"></option>
+              <option value="Electric"></option>
+              <option value="Coupe"></option>
+              <option value="Convertible"></option>
+              <option value="Offroad"></option>
+            </datalist>
           </div>
           <div>
             <label class="block mb-2 text-sm text-white/80">السعر</label>
@@ -77,6 +124,15 @@
           </div>
         </div>
 
+        <div class="mt-6 rounded-3xl border border-white/10 bg-slate-900/60 p-5">
+          <div class="font-bold mb-3">خيارات إضافية</div>
+          <label class="flex items-center gap-3 text-white/90">
+            <input id="isTemporary" type="checkbox" class="h-5 w-5 rounded accent-lime-400">
+            <span>🔄 سيارة مؤقتة</span>
+          </label>
+          <p class="text-sm text-white/60 mt-2">عند تفعيلها يظهر رمز 🔄 بجانب السيارة في لوحة التحكم لتعرفها بسرعة.</p>
+        </div>
+
         <div class="flex gap-4 flex-wrap mt-6">
           <button id="saveBtn" class="px-6 py-4 rounded-2xl bg-lime-500 hover:bg-lime-600 font-black text-slate-950">حفظ التعديلات</button>
           <button id="reloadBtn" class="px-6 py-4 rounded-2xl bg-white/10 border border-white/10 font-black">إعادة تحميل البيانات</button>
@@ -94,6 +150,8 @@
     );
 
     const STORAGE_BUCKET = 'site-images';
+    const DASHBOARD_STATE_KEY = 'dashboard_car_states_v2';
+
     const fallbackImage = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
         <defs>
@@ -166,12 +224,55 @@
     const imageInput = document.getElementById('imageFile');
     const saveBtn = document.getElementById('saveBtn');
     const reloadBtn = document.getElementById('reloadBtn');
+    const isTemporaryInput = document.getElementById('isTemporary');
+    const toggleHiddenBtn = document.getElementById('toggleHiddenBtn');
+    const restoreBtn = document.getElementById('restoreBtn');
+    const currentFlags = document.getElementById('currentFlags');
+    const hiddenCarsList = document.getElementById('hiddenCarsList');
 
     let cars = [];
 
     function showMessage(text, ok = true) {
       msg.textContent = text;
       msg.className = ok ? 'text-sm text-emerald-300' : 'text-sm text-red-300';
+    }
+
+    function getStoredState() {
+      try {
+        return JSON.parse(localStorage.getItem(DASHBOARD_STATE_KEY) || '{}');
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function saveStoredState(state) {
+      localStorage.setItem(DASHBOARD_STATE_KEY, JSON.stringify(state));
+    }
+
+    function applyLocalStates(rows) {
+      const state = getStoredState();
+      return rows.map((row) => {
+        const local = state[row.id] || {};
+        return {
+          ...row,
+          isTemporary: Boolean(local.isTemporary),
+          isHidden: Boolean(local.isHidden),
+          image: row.image || fallbackImage,
+          gallery: Array.isArray(row.gallery) && row.gallery.length ? row.gallery : [row.image || fallbackImage]
+        };
+      });
+    }
+
+    function patchState(carId, updates) {
+      const state = getStoredState();
+      state[carId] = { ...(state[carId] || {}), ...updates };
+      saveStoredState(state);
+
+      cars = cars.map((car) => String(car.id) === String(carId) ? { ...car, ...updates } : car);
+      renderSelect();
+      updateSummary();
+      renderHiddenCars();
+      fillForm(carId);
     }
 
     async function requireLogin() {
@@ -189,52 +290,117 @@
       }
     }
 
+    function optionLabel(car) {
+      const temp = car.isTemporary ? ' 🔄' : '';
+      const hidden = car.isHidden ? ' 🙈' : '';
+      return `سيارة ${car.id} - ${car.name || ''}${temp}${hidden}`;
+    }
+
     function renderSelect() {
-      carSelect.innerHTML = cars.map(car => `<option value="${car.id}">سيارة ${car.id} - ${car.name}</option>`).join('');
-      if (cars.length) fillForm(cars[0].id);
+      const currentId = carSelect.value || String(cars[0]?.id || '');
+      carSelect.innerHTML = cars.map((car) => `<option value="${car.id}">${optionLabel(car)}</option>`).join('');
+      if (cars.length) {
+        const exists = cars.some((car) => String(car.id) === String(currentId));
+        carSelect.value = exists ? currentId : String(cars[0].id);
+      }
     }
 
     function findCar(id) {
-      return cars.find(car => String(car.id) === String(id));
+      return cars.find((car) => String(car.id) === String(id));
     }
 
     function fillForm(id) {
       const car = findCar(id);
       if (!car) return;
+
       nameInput.value = car.name || '';
-      categoryInput.value = car.category || 'SUV';
+      categoryInput.value = car.category || '';
       priceInput.value = car.price || '';
       yearInput.value = car.year || '';
       mileageInput.value = car.mileage || '';
       conditionInput.value = car.condition || '';
       descriptionInput.value = car.description || '';
+      isTemporaryInput.checked = Boolean(car.isTemporary);
       preview.src = car.image || fallbackImage;
-      preview.onerror = () => preview.src = fallbackImage;
+      preview.onerror = () => { preview.src = fallbackImage; };
+
+      const flags = [
+        car.isTemporary ? '🔄 مؤقتة' : '✅ عادية',
+        car.isHidden ? '🙈 مخفية من الموقع' : '👁‍🗨 ظاهرة في الموقع'
+      ];
+      currentFlags.textContent = flags.join(' | ');
+
+      toggleHiddenBtn.textContent = car.isHidden ? '🙈 السيارة مخفية الآن' : '🙈 إخفاء مؤقت';
+      restoreBtn.disabled = !car.isHidden;
+      restoreBtn.className = `px-4 py-3 rounded-2xl font-black text-slate-950 ${car.isHidden ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-emerald-500/40 cursor-not-allowed'}`;
+    }
+
+    function updateSummary() {
+      const total = cars.length;
+      const hidden = cars.filter((car) => car.isHidden).length;
+      const visible = total - hidden;
+      const temporary = cars.filter((car) => car.isTemporary).length;
+
+      document.getElementById('totalCount').textContent = total;
+      document.getElementById('visibleCount').textContent = visible;
+      document.getElementById('hiddenCount').textContent = hidden;
+      document.getElementById('summaryLine').textContent = `🚗 السيارات: ${total} | 👁‍🗨 الظاهرة: ${visible} | 🙈 المخفية: ${hidden} | 🔄 المؤقتة: ${temporary}`;
+    }
+
+    function renderHiddenCars() {
+      const hiddenCars = cars.filter((car) => car.isHidden);
+      if (!hiddenCars.length) {
+        hiddenCarsList.innerHTML = '<div class="text-white/60">لا توجد سيارات مخفية حالياً.</div>';
+        return;
+      }
+
+      hiddenCarsList.innerHTML = hiddenCars.map((car) => `
+        <div class="rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 flex items-center justify-between gap-3">
+          <div>
+            <div class="font-bold text-white">${car.name || ''}${car.isTemporary ? ' 🔄' : ''}</div>
+            <div class="text-white/60">سيارة ${car.id} • ${car.category || 'بدون فئة'}</div>
+          </div>
+          <button data-restore-id="${car.id}" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold">
+            👁‍🗨 إرجاع
+          </button>
+        </div>
+      `).join('');
+
+      hiddenCarsList.querySelectorAll('[data-restore-id]').forEach((button) => {
+        button.addEventListener('click', () => restoreCar(button.getAttribute('data-restore-id')));
+      });
     }
 
     async function loadCars() {
       showMessage('جاري تحميل السيارات...');
       const { data, error } = await supabase.from('cars').select('*').order('id', { ascending: true });
+
       if (error) {
-        showMessage(error.message, false);
+        showMessage(error.message || 'تعذر تحميل السيارات', false);
         return;
       }
-      cars = (data || []).map(row => ({
-        ...row,
-        image: row.image || fallbackImage,
-        gallery: Array.isArray(row.gallery) && row.gallery.length ? row.gallery : [row.image || fallbackImage]
-      }));
+
+      cars = applyLocalStates(data || []);
       renderSelect();
+      updateSummary();
+      renderHiddenCars();
+
+      if (cars.length) {
+        fillForm(carSelect.value || cars[0].id);
+      }
+
       showMessage('تم تحميل السيارات بنجاح');
     }
 
     async function uploadImageIfNeeded(carId) {
       const file = imageInput.files?.[0];
       if (!file) return null;
+
       const ext = file.name.split('.').pop();
       const path = `cars/car-${carId}-${Date.now()}.${ext}`;
       const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file, { upsert: true, contentType: file.type });
       if (error) throw error;
+
       const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
       return data.publicUrl;
     }
@@ -251,14 +417,14 @@
       try {
         const uploadedImage = await uploadImageIfNeeded(id);
         const fullName = nameInput.value.trim();
-        const parts = fullName.split(' ');
+        const parts = fullName.split(' ').filter(Boolean);
 
         const updated = {
           id,
           name: fullName,
           brand: parts[0] || car.brand,
           model: parts.slice(1).join(' ') || car.model,
-          category: categoryInput.value,
+          category: categoryInput.value.trim(),
           price: priceInput.value.trim(),
           year: Number(yearInput.value) || car.year,
           mileage: mileageInput.value.trim(),
@@ -271,6 +437,11 @@
         const { error } = await supabase.from('cars').upsert(updated, { onConflict: 'id' });
         if (error) throw error;
 
+        patchState(id, {
+          isTemporary: isTemporaryInput.checked,
+          isHidden: car.isHidden
+        });
+
         showMessage('تم حفظ التعديلات بنجاح');
         await loadCars();
         carSelect.value = String(id);
@@ -278,10 +449,20 @@
         imageInput.value = '';
       } catch (error) {
         showMessage(error.message || 'حدث خطأ أثناء الحفظ', false);
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'حفظ التعديلات';
       }
+    }
 
-      saveBtn.disabled = false;
-      saveBtn.textContent = 'حفظ التعديلات';
+    function hideCar(id) {
+      patchState(Number(id), { isHidden: true });
+      showMessage('تم إخفاء السيارة من الموقع مؤقتاً');
+    }
+
+    function restoreCar(id) {
+      patchState(Number(id), { isHidden: false });
+      showMessage('تمت إعادة السيارة إلى الموقع');
     }
 
     document.getElementById('logoutBtn').addEventListener('click', async () => {
@@ -292,6 +473,27 @@
     carSelect.addEventListener('change', (e) => fillForm(e.target.value));
     reloadBtn.addEventListener('click', loadCars);
     saveBtn.addEventListener('click', saveCar);
+
+    toggleHiddenBtn.addEventListener('click', () => {
+      const id = Number(carSelect.value);
+      const car = findCar(id);
+      if (!car) return;
+      hideCar(id);
+    });
+
+    restoreBtn.addEventListener('click', () => {
+      const id = Number(carSelect.value);
+      restoreCar(id);
+    });
+
+    isTemporaryInput.addEventListener('change', () => {
+      const id = Number(carSelect.value);
+      const car = findCar(id);
+      if (!car) return;
+      patchState(id, { isTemporary: isTemporaryInput.checked, isHidden: car.isHidden });
+      showMessage(isTemporaryInput.checked ? 'تم تعليم السيارة كمؤقتة 🔄' : 'تم إزالة حالة المؤقتة');
+    });
+
     imageInput.addEventListener('change', () => {
       const file = imageInput.files?.[0];
       if (!file) return;
@@ -302,47 +504,5 @@
     await seedCarsIfEmpty();
     await loadCars();
   </script>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const tempCheckbox = document.createElement("label");
-  tempCheckbox.innerHTML = '<input type="checkbox" id="isTemporary"> 🚗 مؤقتة';
-  document.querySelector(".grid.md\:grid-cols-2").appendChild(tempCheckbox);
-
-  const originalSave = window.saveCar || function(){};
-
-  window.saveCar = function(){
-    const isTemporary = document.getElementById("isTemporary").checked;
-
-    let cars = JSON.parse(localStorage.getItem("cars") || "[]");
-
-    const selectedIndex = document.getElementById("carSelect").selectedIndex;
-
-    if(cars[selectedIndex]){
-      cars[selectedIndex].isTemporary = isTemporary;
-    }
-
-    localStorage.setItem("cars", JSON.stringify(cars));
-
-    originalSave();
-    renderCars();
-  };
-
-  function renderCars(){
-    let cars = JSON.parse(localStorage.getItem("cars") || "[]");
-    const select = document.getElementById("carSelect");
-    select.innerHTML = "";
-    cars.forEach((car,i)=>{
-      const opt = document.createElement("option");
-      opt.value = i;
-      opt.textContent = car.name + (car.isTemporary ? " 🔄" : "");
-      select.appendChild(opt);
-    });
-  }
-
-  renderCars();
-});
-</script>
-
 </body>
 </html>
