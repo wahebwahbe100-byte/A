@@ -9,7 +9,12 @@
   <style>
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-    body { margin: 0; font-family: 'Tajawal', Arial, sans-serif; background: linear-gradient(135deg, #020617 0%, #0b1f3a 50%, #000000 100%); color: #fff; }
+    body {
+      margin: 0;
+      font-family: 'Tajawal', Arial, sans-serif;
+      background: linear-gradient(135deg, #020617 0%, #0b1f3a 50%, #000000 100%);
+      color: #fff;
+    }
     a { text-decoration: none; color: inherit; }
     .container { width: min(1200px, calc(100% - 32px)); margin: 0 auto; }
     .section { padding: 56px 0; }
@@ -76,6 +81,7 @@
       gap: 8px;
       font-size: 13px;
       color: #dbeafe;
+      flex-wrap: wrap;
     }
 
     .status-dot {
@@ -507,7 +513,7 @@
           <strong>Emotion Car & Service UG</strong>
           <div id="liveBusinessStatus" class="status-row">
             <span id="statusDot" class="status-dot"></span>
-            <span id="statusText">جاري التحميل...</span>
+            <span id="statusText">...</span>
           </div>
         </div>
       </div>
@@ -578,7 +584,7 @@
       <div id="contact" class="contact-card">
         <h3>معلومات التواصل</h3>
         <div class="contact-list">
-          <div class="contact-row"><span>الحالة الآن</span><strong id="contactBusinessStatus">جاري التحقق...</strong></div>
+          <div class="contact-row"><span>الحالة الآن</span><strong id="contactBusinessStatus">...</strong></div>
           <div class="contact-row"><span>اسم النشاط</span><strong>Emotion Car & Service UG</strong></div>
           <div class="contact-row"><span>الهاتف</span><strong>+49 1573 6645354</strong></div>
           <div class="contact-row"><span>البريد</span><strong>emotion.service@icloud.com</strong></div>
@@ -683,7 +689,7 @@
 
     let currentPage = 1;
     let cars = [];
-    let supabase = null;
+    let supabaseClient = null;
 
     const carSeed = [
       ['Mercedes', 'S-Class', 'Sedan', '€128,000', 2024, '8,000 km', 'ممتازة'],
@@ -738,9 +744,9 @@
       const trimmed = value.trim();
       if (!trimmed) return '';
       if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith('data:')) return trimmed;
-      if (!supabase) return trimmed;
+      if (!supabaseClient) return trimmed;
       const cleanPath = trimmed.replace(/^\/+/, '');
-      const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(cleanPath);
+      const { data } = supabaseClient.storage.from(STORAGE_BUCKET).getPublicUrl(cleanPath);
       return data?.publicUrl || trimmed;
     }
 
@@ -758,7 +764,7 @@
         }
       }
 
-      const normalized = gallery.map(item => getPublicImage(item)).filter(Boolean);
+      const normalized = gallery.map((item) => getPublicImage(item)).filter(Boolean);
       const mainImage = getPublicImage(row.image) || fallbackImage;
 
       if (mainImage && !normalized.includes(mainImage)) {
@@ -847,6 +853,7 @@
     function selectModalImage(image) {
       const modalImage = document.getElementById('modalImage');
       if (!modalImage) return;
+
       modalImage.src = image || window.placeholderCar;
 
       document.querySelectorAll('#modalThumbs .thumb').forEach((thumb) => {
@@ -919,28 +926,31 @@
       cars = [...defaultCars];
       renderInventory();
 
-      if (!supabase) return;
+      if (!supabaseClient) return;
 
       try {
-        const { data, error } = await supabase.from('cars').select('*').order('id', { ascending: true });
+        const { data, error } = await supabaseClient
+          .from('cars')
+          .select('*')
+          .order('id', { ascending: true });
+
         if (error) throw error;
+        if (!Array.isArray(data) || !data.length) return;
 
-        if (Array.isArray(data) && data.length) {
-          cars = data.map((row, index) => {
-            const fallbackImage = `${imageBase}/auto${row.id || index + 1}.jpg`;
-            const normalizedImage = getPublicImage(row.image) || fallbackImage;
+        cars = data.map((row, index) => {
+          const fallbackImage = `${imageBase}/auto${row.id || index + 1}.jpg`;
+          const normalizedImage = getPublicImage(row.image) || fallbackImage;
 
-            return {
-              ...row,
-              id: row.id ?? index + 1,
-              name: row.name || `${row.brand || ''} ${row.model || ''}`.trim() || `سيارة ${index + 1}`,
-              image: normalizedImage,
-              gallery: normalizeGallery(row, normalizedImage)
-            };
-          });
+          return {
+            ...row,
+            id: row.id ?? index + 1,
+            name: row.name || `${row.brand || ''} ${row.model || ''}`.trim() || `سيارة ${index + 1}`,
+            image: normalizedImage,
+            gallery: normalizeGallery(row, normalizedImage)
+          };
+        });
 
-          renderInventory();
-        }
+        renderInventory();
       } catch (error) {
         console.error('loadCars failed:', error);
       }
@@ -953,7 +963,6 @@
       if (!dot || !text || !contact) return;
 
       const now = new Date();
-
       const berlinParts = new Intl.DateTimeFormat('en-GB', {
         timeZone: 'Europe/Berlin',
         weekday: 'short',
@@ -999,13 +1008,11 @@
           const remaining = openMinutes - currentMinutes;
           const hoursLeft = Math.floor(remaining / 60);
           const minsLeft = remaining % 60;
-
           message = `مغلق الآن • اليوم ${weekdayNames[day]} • يفتح عند 10:00 • بعد ${hoursLeft} س و ${minsLeft} د`;
         } else {
           let nextDay = day + 1;
           while (nextDay === 6 || nextDay === 0) nextDay += 1;
           if (nextDay > 6) nextDay = 1;
-
           message = `مغلق الآن • اليوم ${weekdayNames[day]} • يفتح ${weekdayNames[nextDay]} عند 10:00`;
         }
       } else if (day === 6) {
@@ -1024,11 +1031,11 @@
     function initPage() {
       try {
         if (window.supabase?.createClient) {
-          supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+          supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         }
       } catch (error) {
         console.error('supabase init failed:', error);
-        supabase = null;
+        supabaseClient = null;
       }
 
       cars = [...defaultCars];
