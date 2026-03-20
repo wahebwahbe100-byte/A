@@ -14,6 +14,7 @@
    font-family: 'Inter', Arial, sans-serif;
    background: linear-gradient(135deg, #020617 0%, #0b1f3a 50%, #000000 100%);
    color: #fff;
+   overflow-x: hidden;
   }
   a { text-decoration: none; color: inherit; }
   .container { width: min(1200px, calc(100% - 32px)); margin: 0 auto; }
@@ -589,16 +590,209 @@
   }
 
   @media (max-width: 900px) {
-   .top-nav-inner { grid-template-columns: 1fr; }
-   .brand-pill, .nav-menu, .login-link { width: 100%; }
-   .nav-menu { justify-content: flex-start; border-radius: 24px; }
-   .login-link { width: 100%; }
-   .brand-text strong { font-size: 22px; }
-   .logo { width: 120px; height: 80px; }
-   .about-grid, .legal-grid, .modal-grid { grid-template-columns: 1fr; }
+   section { scroll-margin-top: 170px; }
+
+   .top-nav {
+    position: sticky;
+    top: 0;
+   }
+
+   .top-nav-inner {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 10px 0 12px;
+   }
+
+   .brand-pill,
+   .nav-menu,
+   .login-link {
+    width: 100%;
+    min-width: 0;
+   }
+
+   .brand-pill {
+    padding: 10px 12px;
+    gap: 12px;
+    border-radius: 18px;
+    align-items: center;
+   }
+
+   .logo {
+    width: 78px;
+    height: 56px;
+    padding: 5px;
+    border-radius: 14px;
+    object-fit: contain;
+    animation: none;
+   }
+
+   .brand-text {
+    min-width: 0;
+    overflow: hidden;
+   }
+
+   .brand-text strong {
+    font-size: 18px;
+    line-height: 1.25;
+    letter-spacing: 0;
+    overflow-wrap: anywhere;
+   }
+
+   .brand-kicker {
+    max-width: 100%;
+    font-size: 10px;
+    padding: 4px 8px;
+    margin-bottom: 6px;
+    gap: 6px;
+   }
+
+   .status-row,
+   .nav-meta {
+    margin-top: 8px;
+    gap: 6px;
+    font-size: 11px;
+   }
+
+   .mini-badge {
+    max-width: 100%;
+    font-size: 11px;
+    padding: 6px 9px;
+    gap: 6px;
+   }
+
+   .nav-menu {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 8px;
+    border-radius: 18px;
+   }
+
+   .nav-link {
+    width: 100%;
+    min-width: 0;
+    padding: 11px 12px;
+    font-size: 13px;
+    text-align: center;
+   }
+
+   .nav-link::after {
+    inset-inline: 20px;
+    bottom: 6px;
+   }
+
+   .login-link {
+    justify-content: center;
+    padding: 12px 16px;
+    border-radius: 16px;
+    font-size: 14px;
+   }
+
+   .hero {
+    padding: 20px 0 24px;
+   }
+
+   .hero-box {
+    padding: 30px 0 10px;
+   }
+
+   .about-grid,
+   .legal-grid,
+   .modal-grid,
+   .details-grid {
+    grid-template-columns: 1fr;
+   }
+
    .thumbs { grid-template-columns: repeat(2, 1fr); }
-   .details-grid { grid-template-columns: 1fr; }
    h1 { font-size: 42px; }
+  }
+
+  @media (max-width: 560px) {
+   .container {
+    width: min(100%, calc(100% - 20px));
+   }
+
+   section { scroll-margin-top: 205px; }
+
+   .top-nav-inner {
+    gap: 10px;
+    padding: 8px 0 10px;
+   }
+
+   .brand-pill {
+    padding: 10px;
+    gap: 10px;
+   }
+
+   .logo {
+    width: 64px;
+    height: 46px;
+   }
+
+   .brand-text strong {
+    font-size: 16px;
+   }
+
+   .brand-kicker,
+   .status-row,
+   .nav-meta,
+   .mini-badge {
+    font-size: 10px;
+   }
+
+   .nav-menu {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    padding: 6px;
+   }
+
+   .nav-link {
+    padding: 10px 8px;
+    font-size: 12px;
+   }
+
+   .login-link {
+    padding: 11px 14px;
+    font-size: 13px;
+   }
+
+   .section {
+    padding: 42px 0;
+   }
+
+   .filters input,
+   .filters select,
+   input,
+   select {
+    width: 100%;
+    min-width: 0;
+   }
+
+   .contact-row {
+    flex-direction: column;
+    align-items: flex-start;
+   }
+
+   .modal-card {
+    border-radius: 20px;
+   }
+
+   .modal-grid {
+    padding: 14px;
+    gap: 16px;
+   }
+
+   .modal-title {
+    font-size: 24px;
+   }
+
+   .modal-image {
+    min-height: 220px;
+   }
+
+   footer {
+    font-size: 13px;
+   }
   }
  
     .cars-counter-pill {
