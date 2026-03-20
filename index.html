@@ -47,14 +47,21 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 12px 18px;
+      padding: 10px 16px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.08);
       background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
       color: #fff;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 700;
       white-space: nowrap;
+      gap: 10px;
+    }
+    .logo {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      border-radius: 8px;
     }
     .nav-links {
       display: flex;
@@ -298,7 +305,10 @@
     <div class="container">
       <div class="hero-card">
         <div class="top-nav">
-          <div class="brand-pill">Emotion Cars & Service UG</div>
+          <div class="brand-pill">
+            <img src="images/logo.png" class="logo" alt="logo" />
+            Emotion Cars & Service UG
+          </div>
           <div class="nav-links">
             <a class="nav-link" href="#about">من نحن</a>
             <a class="nav-link" href="#cars">السيارات</a>
