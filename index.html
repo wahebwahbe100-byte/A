@@ -588,7 +588,7 @@
             <div>
               <div style="font-size:18px;font-weight:800;line-height:1.1;">Emotion Car & Service UG</div>
               <div id="liveBusinessStatus" style="font-size:13px;color:#dbeafe;opacity:.9;margin-top:4px;display:flex;align-items:center;gap:6px;">
-                <span id="statusDot" style="width:8px;height:8px;border-radius:50%;display:inline-block;background:#999;"></span>
+                <span id="statusDot" style="width:12px;height:12px;border-radius:50%;display:inline-block;background:#999;box-shadow:0 0 10px rgba(255,255,255,.3);"></span>
                 <span id="statusText">مغلق الآن</span>
               </div>
             </div>
@@ -909,7 +909,10 @@
         message = 'مغلق الآن • اليوم الأحد • يفتح الاثنين عند 10:00';
       }
 
-      if (dot) dot.style.background = color;
+      if (dot) {
+        dot.style.background = color;
+        dot.style.boxShadow = `0 0 10px ${color}`;
+      }
       if (text) text.textContent = message;
 
       const liveStatus = document.getElementById('liveBusinessStatus');
