@@ -14,7 +14,6 @@
    font-family: 'Inter', Arial, sans-serif;
    background: linear-gradient(135deg, #020617 0%, #0b1f3a 50%, #000000 100%);
    color: #fff;
-   overflow-x: hidden;
   }
   a { text-decoration: none; color: inherit; }
   .container { width: min(1200px, calc(100% - 32px)); margin: 0 auto; }
@@ -232,6 +231,100 @@
   .mini-badge strong {
    color: #fff;
    font-weight: 800;
+  }
+
+  .top-nav,
+  .top-nav-inner,
+  .brand-pill,
+  .brand-text,
+  .brand-kicker,
+  .status-row,
+  .nav-meta,
+  .nav-menu,
+  .nav-link,
+  .login-link,
+  .logo {
+   transition: background .28s ease, border-color .28s ease, box-shadow .28s ease,
+    padding .28s ease, gap .28s ease, transform .28s ease, opacity .28s ease,
+    font-size .28s ease, width .28s ease, height .28s ease, margin .28s ease;
+  }
+
+  .menu-toggle {
+   display: none;
+   align-items: center;
+   justify-content: center;
+   gap: 10px;
+   width: 52px;
+   height: 52px;
+   border: 1px solid rgba(255,255,255,.12);
+   border-radius: 18px;
+   background: rgba(255,255,255,.06);
+   color: #fff;
+   cursor: pointer;
+   box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+  }
+
+  .menu-toggle .bar {
+   display: block;
+   width: 18px;
+   height: 2px;
+   border-radius: 999px;
+   background: currentColor;
+   transition: transform .25s ease, opacity .25s ease;
+  }
+
+  .menu-toggle-inner {
+   display: grid;
+   gap: 4px;
+  }
+
+  .top-nav.scrolled {
+   background:
+    linear-gradient(135deg, rgba(2,6,23,.985), rgba(8,24,52,.97) 45%, rgba(2,6,23,.985)),
+    rgba(7,16,32,.98);
+   box-shadow: 0 18px 44px rgba(0,0,0,.46);
+  }
+
+  .top-nav.scrolled .top-nav-inner {
+   gap: 16px;
+   padding: 10px 0;
+  }
+
+  .top-nav.scrolled .brand-pill {
+   padding: 10px 14px;
+   border-radius: 22px;
+   gap: 12px;
+   background: linear-gradient(135deg, rgba(255,255,255,.09), rgba(148,163,184,.05));
+  }
+
+  .top-nav.scrolled .logo {
+   width: 84px;
+   height: 56px;
+   border-radius: 18px;
+   padding: 6px;
+   animation: none;
+   transform: scale(.98);
+  }
+
+  .top-nav.scrolled .brand-kicker {
+   margin-bottom: 6px;
+   padding: 5px 10px;
+   font-size: 11px;
+  }
+
+  .top-nav.scrolled .brand-text strong {
+   font-size: clamp(18px, 1.6vw, 24px);
+  }
+
+  .top-nav.scrolled .status-row,
+  .top-nav.scrolled .nav-meta {
+   margin-top: 6px;
+   gap: 8px;
+   font-size: 12px;
+  }
+
+  .top-nav.scrolled .mini-badge {
+   padding: 6px 10px;
   }
 
   .hero {
@@ -590,208 +683,158 @@
   }
 
   @media (max-width: 900px) {
-   section { scroll-margin-top: 170px; }
-
-   .top-nav {
-    position: sticky;
-    top: 0;
-   }
-
+   section { scroll-margin-top: 120px; }
    .top-nav-inner {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr auto;
     gap: 12px;
-    padding: 10px 0 12px;
+    padding: 10px 0;
    }
-
-   .brand-pill,
-   .nav-menu,
-   .login-link {
+   .brand-pill {
     width: 100%;
     min-width: 0;
-   }
-
-   .brand-pill {
     padding: 10px 12px;
+    border-radius: 20px;
     gap: 12px;
-    border-radius: 18px;
-    align-items: center;
    }
-
-   .logo {
-    width: 78px;
-    height: 56px;
-    padding: 5px;
-    border-radius: 14px;
-    object-fit: contain;
-    animation: none;
-   }
-
-   .brand-text {
-    min-width: 0;
-    overflow: hidden;
-   }
-
-   .brand-text strong {
-    font-size: 18px;
-    line-height: 1.25;
-    letter-spacing: 0;
-    overflow-wrap: anywhere;
-   }
-
+   .brand-text strong { font-size: 20px; }
    .brand-kicker {
-    max-width: 100%;
     font-size: 10px;
     padding: 4px 8px;
-    margin-bottom: 6px;
-    gap: 6px;
+    margin-bottom: 8px;
    }
-
-   .status-row,
-   .nav-meta {
-    margin-top: 8px;
+   .status-row, .nav-meta {
     gap: 6px;
     font-size: 11px;
    }
-
    .mini-badge {
-    max-width: 100%;
-    font-size: 11px;
     padding: 6px 9px;
-    gap: 6px;
+    font-size: 11px;
    }
-
+   .logo {
+    width: 84px;
+    height: 58px;
+    border-radius: 16px;
+    padding: 5px;
+   }
+   .menu-toggle {
+    display: inline-flex;
+   }
+   .nav-menu, .login-link {
+    width: 100%;
+    grid-column: 1 / -1;
+   }
    .nav-menu {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-content: stretch;
+    border-radius: 22px;
+    padding: 10px;
     gap: 8px;
-    padding: 8px;
-    border-radius: 18px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
    }
-
    .nav-link {
     width: 100%;
     min-width: 0;
-    padding: 11px 12px;
-    font-size: 13px;
-    text-align: center;
-   }
-
-   .nav-link::after {
-    inset-inline: 20px;
-    bottom: 6px;
-   }
-
-   .login-link {
-    justify-content: center;
-    padding: 12px 16px;
-    border-radius: 16px;
+    padding: 12px 14px;
     font-size: 14px;
    }
-
-   .hero {
-    padding: 20px 0 24px;
+   .login-link {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    padding: 0;
+    margin: 0;
    }
-
-   .hero-box {
-    padding: 30px 0 10px;
+   .top-nav.nav-open .nav-menu {
+    max-height: 320px;
+    opacity: 1;
+    pointer-events: auto;
+    margin-top: 2px;
    }
-
-   .about-grid,
-   .legal-grid,
-   .modal-grid,
-   .details-grid {
-    grid-template-columns: 1fr;
+   .top-nav.nav-open .login-link {
+    max-height: 80px;
+    opacity: 1;
+    pointer-events: auto;
+    padding: 14px 20px;
+    margin-top: 4px;
    }
-
+   .top-nav.nav-open .menu-toggle .bar:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+   }
+   .top-nav.nav-open .menu-toggle .bar:nth-child(2) {
+    opacity: 0;
+   }
+   .top-nav.nav-open .menu-toggle .bar:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+   }
+   .top-nav.scrolled .top-nav-inner {
+    padding: 8px 0;
+   }
+   .top-nav.scrolled .brand-pill {
+    gap: 10px;
+    padding: 8px 10px;
+   }
+   .top-nav.scrolled .logo {
+    width: 58px;
+    height: 40px;
+    border-radius: 12px;
+    padding: 4px;
+   }
+   .top-nav.scrolled .brand-kicker,
+   .top-nav.scrolled .status-row,
+   .top-nav.scrolled .nav-meta {
+    opacity: 0;
+    max-height: 0;
+    margin: 0;
+    overflow: hidden;
+   }
+   .top-nav.scrolled .brand-text strong {
+    font-size: 15px;
+    line-height: 1.2;
+   }
+   .about-grid, .legal-grid, .modal-grid { grid-template-columns: 1fr; }
    .thumbs { grid-template-columns: repeat(2, 1fr); }
+   .details-grid { grid-template-columns: 1fr; }
    h1 { font-size: 42px; }
   }
 
   @media (max-width: 560px) {
-   .container {
-    width: min(100%, calc(100% - 20px));
-   }
-
-   section { scroll-margin-top: 205px; }
-
+   .container { width: min(100%, calc(100% - 20px)); }
    .top-nav-inner {
+    grid-template-columns: 1fr auto;
     gap: 10px;
-    padding: 8px 0 10px;
    }
-
    .brand-pill {
-    padding: 10px;
+    padding: 8px 10px;
     gap: 10px;
+    border-radius: 18px;
    }
-
    .logo {
-    width: 64px;
-    height: 46px;
+    width: 68px;
+    height: 48px;
    }
-
    .brand-text strong {
-    font-size: 16px;
+    font-size: 17px;
+    word-break: break-word;
    }
-
-   .brand-kicker,
-   .status-row,
-   .nav-meta,
-   .mini-badge {
-    font-size: 10px;
-   }
-
    .nav-menu {
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    padding: 6px;
+    grid-template-columns: 1fr;
    }
-
-   .nav-link {
-    padding: 10px 8px;
-    font-size: 12px;
+   .menu-toggle {
+    width: 46px;
+    height: 46px;
+    border-radius: 15px;
    }
-
-   .login-link {
-    padding: 11px 14px;
-    font-size: 13px;
+   .top-nav.scrolled .logo {
+    width: 50px;
+    height: 34px;
    }
-
-   .section {
-    padding: 42px 0;
-   }
-
-   .filters input,
-   .filters select,
-   input,
-   select {
-    width: 100%;
-    min-width: 0;
-   }
-
-   .contact-row {
-    flex-direction: column;
-    align-items: flex-start;
-   }
-
-   .modal-card {
-    border-radius: 20px;
-   }
-
-   .modal-grid {
-    padding: 14px;
-    gap: 16px;
-   }
-
-   .modal-title {
-    font-size: 24px;
-   }
-
-   .modal-image {
-    min-height: 220px;
-   }
-
-   footer {
-    font-size: 13px;
+   .top-nav.scrolled .brand-text strong {
+    font-size: 14px;
    }
   }
  
@@ -815,7 +858,7 @@
 </style>
 </head>
 <body>
- <header class="top-nav">
+ <header class="top-nav" id="siteHeader">
   <div class="container top-nav-inner">
    <div class="brand-pill">
     <img src="images/logo.png" class="logo" alt="logo" onerror="this.src=window.placeholderLogo" />
@@ -833,7 +876,15 @@
     </div>
    </div>
 
-   <nav class="nav-menu">
+   <button class="menu-toggle" id="menuToggle" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="siteNav">
+    <span class="menu-toggle-inner" aria-hidden="true">
+     <span class="bar"></span>
+     <span class="bar"></span>
+     <span class="bar"></span>
+    </span>
+   </button>
+
+   <nav class="nav-menu" id="siteNav">
     <a class="nav-link" href="#cars">Fahrzeuge</a>
     <a class="nav-link" href="#about">Über uns</a>
     <a class="nav-link" href="#terms">Service</a>
@@ -1496,6 +1547,51 @@
   });
 
   window.addEventListener('storage', updateAvailableCarsCount);
+})();
+</script>
+
+<script>
+(function () {
+  const header = document.getElementById('siteHeader');
+  const menuToggle = document.getElementById('menuToggle');
+  const navLinks = Array.from(document.querySelectorAll('#siteNav .nav-link'));
+  if (!header) return;
+
+  const syncHeaderState = () => {
+    if (window.scrollY > 24) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  };
+
+  const closeMobileMenu = () => {
+    header.classList.remove('nav-open');
+    if (menuToggle) menuToggle.setAttribute('aria-expanded', 'false');
+  };
+
+  const toggleMobileMenu = () => {
+    const isOpen = header.classList.toggle('nav-open');
+    if (menuToggle) menuToggle.setAttribute('aria-expanded', String(isOpen));
+  };
+
+  syncHeaderState();
+  window.addEventListener('scroll', syncHeaderState, { passive: true });
+
+  if (menuToggle) {
+    menuToggle.addEventListener('click', toggleMobileMenu);
+  }
+
+  navLinks.forEach((link) => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 900) closeMobileMenu();
+    });
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 900) closeMobileMenu();
+    syncHeaderState();
+  });
 })();
 </script>
 
