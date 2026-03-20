@@ -27,15 +27,38 @@
       backdrop-filter: blur(12px);
     }
     .top-nav {
+      position: sticky;
+      top: 18px;
+      z-index: 50;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 28px;
+      gap: 18px;
+      margin-bottom: 34px;
+      padding: 14px 18px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(4,12,28,.72);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 14px 40px rgba(0,0,0,.2);
       flex-wrap: wrap;
+    }
+    .brand-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 18px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      white-space: nowrap;
     }
     .nav-links {
       display: flex;
+      align-items: center;
       gap: 10px;
       flex-wrap: wrap;
     }
@@ -43,17 +66,29 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 11px 16px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.05);
-      color: #fff;
+      padding: 12px 18px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #dbeafe;
       font-size: 14px;
-      transition: .2s ease;
+      font-weight: 600;
+      transition: .22s ease;
     }
     .nav-link:hover {
-      background: rgba(255,255,255,.12);
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.08);
+      color: #fff;
       transform: translateY(-1px);
+    }
+    .nav-link.primary {
+      background: #22c55e;
+      color: #fff;
+      border-color: rgba(34,197,94,.3);
+      box-shadow: 0 10px 24px rgba(34,197,94,.18);
+    }
+    .nav-link.primary:hover {
+      background: #16a34a;
     }
     .badge {
       display: inline-block; padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.1);
@@ -236,6 +271,17 @@
       margin-top: 10px;
     }
     @media (max-width: 900px) {
+      .top-nav {
+        top: 10px;
+        padding: 12px;
+      }
+      .nav-links {
+        width: 100%;
+        justify-content: center;
+      }
+      .brand-pill {
+        width: 100%;
+      }
       .legal-grid { grid-template-columns: 1fr; }
       .modal-grid { grid-template-columns: 1fr; }
       .stats { grid-template-columns: 1fr; }
@@ -252,15 +298,15 @@
     <div class="container">
       <div class="hero-card">
         <div class="top-nav">
+          <div class="brand-pill">Emotion Cars & Service UG</div>
           <div class="nav-links">
             <a class="nav-link" href="#about">من نحن</a>
             <a class="nav-link" href="#cars">السيارات</a>
             <a class="nav-link" href="#contact">تواصل</a>
             <a class="nav-link" href="#terms">الشروط والأحكام</a>
+            <a class="nav-link primary" href="https://wa.me/4915736645354" target="_blank">واتساب</a>
           </div>
-          <div class="badge">Emotion Cars & Service UG</div>
         </div>
-        
         <h1>موقع سيارات احترافي جاهز لـ GitHub</h1>
         <p>
           أضف صورك داخل مجلد <strong>images</strong>، والموقع سيعرض فقط السيارات التي لها صورة فعلية.
