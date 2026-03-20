@@ -5,7 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>تسجيل الدخول</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">document.getElementById('loginBtn').addEventListener('click', login);
+document.getElementById('password').addEventListener('keydown', (e) => {
+if (e.key === 'Enter') login();
+});
+showMessage('أدخل بيانات الدخول.','success');
+</script>
 <style>
 body{
 margin:0;
@@ -32,8 +37,13 @@ justify-content:space-between;
 margin-bottom:20px;
 }
 .top img{
-width:80px;
-border-radius:15px;
+width:140px;
+height:90px;
+border-radius:16px;
+object-fit:cover;
+border:1px solid rgba(255,255,255,0.12);
+background:rgba(255,255,255,0.06);
+padding:6px;
 }
 .back{
 background:#111;
@@ -54,6 +64,12 @@ border-radius:14px;
 border:1px solid rgba(255,255,255,0.1);
 background:#020617;
 color:#fff;
+outline:none;
+transition:border-color .2s ease, box-shadow .2s ease;
+}
+input:focus{
+border-color:rgba(59,130,246,.6);
+box-shadow:0 0 0 3px rgba(59,130,246,.12);
 }
 button{
 width:100%;
@@ -65,7 +81,28 @@ background:#22c55e;
 font-weight:bold;
 cursor:pointer;
 }
-#msg{margin-top:10px}
+#msg{
+margin-top:12px;
+padding:12px 14px;
+border-radius:12px;
+font-size:14px;
+display:block;
+line-height:1.7;
+min-height:48px;
+background:rgba(255,255,255,0.04);
+border:1px solid rgba(255,255,255,0.08);
+color:#cbd5e1;
+}
+#msg.error{
+background:rgba(239,68,68,.12);
+border:1px solid rgba(239,68,68,.28);
+color:#fecaca;
+}
+#msg.success{
+background:rgba(34,197,94,.12);
+border:1px solid rgba(34,197,94,.28);
+color:#bbf7d0;
+}
 </style>
 </head>
 <body>
@@ -81,10 +118,10 @@ cursor:pointer;
 
 <h1>تسجيل الدخول</h1>
 
-<input id="email" type="email" placeholder="">
+<input id="email" type="email" placeholder="البريد الإلكتروني">
 <input id="password" type="password" placeholder="كلمة المرور">
 
-<button onclick="login()">تسجيل الدخول</button>
+<button id="loginBtn" type="button">تسجيل الدخول</button>
 
 <p id="msg"></p>
 
@@ -98,16 +135,75 @@ const supabase = window.supabase.createClient(
 'sb_publishable_iMt3G9iAvXawW3QN6vGWjw_BOw8qLFK'
 );
 
-async function login(){
-const email=document.getElementById('email').value;
-const password=document.getElementById('password').value;
+function showMessage(text,type='error'){
+const msg=document.getElementById('msg');
+msg.className=type;
+msg.innerText=text;
+}
 
-const {data,error}=await supabase.auth.signInWithPassword({email,password});
+function clearMessage(){
+const msg=document.getElementById('msg');
+msg.className='';
+msg.innerText='';
+}
+
+async function login(){
+const email=document.getElementById('email').value.trim();
+const password=document.getElementById('password').value;
+const btn=document.getElementById('loginBtn');
+
+clearMessage();
+
+if(!email || !password){
+showMessage('يرجى إدخال البريد الإلكتروني وكلمة المرور.');
+return;
+}
+
+btn.disabled=true;
+btn.innerText='جاري الدخول...';
+
+try{
+const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
 if(error){
-document.getElementById('msg').innerText='خطأ في تسجيل الدخول';
-}else{
+showMessage('خطأ: ' + (error.message || 'تعذر تسجيل الدخول'));
+btn.disabled=false;
+btn.innerText='تسجيل الدخول';
+return;
+}
+
+showMessage('تم تسجيل الدخول بنجاح.','success');
+console.log('login success', data);
+setTimeout(()=>{
 window.location.href='index.html';
+},1000);
+}catch(e){
+showMessage('تعذر تسجيل الدخول حالياً: ' + (e.message || 'خطأ غير معروف'));
+btn.disabled=false;
+btn.innerText='تسجيل الدخول';
+}
+}
+
+try{
+const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+if(error){
+if(error.message && error.message.toLowerCase().includes('invalid login credentials')){
+showMessage('البريد الإلكتروني أو كلمة المرور غير صحيحة.');
+}else if(error.message && error.message.toLowerCase().includes('email not confirmed')){
+showMessage('هذا البريد الإلكتروني غير مؤكد بعد.');
+}else{
+showMessage(error.message || 'حدث خطأ أثناء تسجيل الدخول.');
+}
+return;
+}
+
+showMessage('تم تسجيل الدخول بنجاح.','success');
+setTimeout(()=>{
+window.location.href='index.html';
+},700);
+}catch(e){
+showMessage('تعذر تسجيل الدخول حالياً، حاول مرة أخرى.');
 }
 }
 </script>
