@@ -333,10 +333,9 @@
       gallery: [`${imageBase}/auto${index + 1}.jpg`]
     }));
 
-    function getPublicImage(path) {
-      if (!path) return '';
-      if (typeof path !== 'string') return '';
-      const trimmed = path.trim();
+    function getPublicImage(value) {
+      if (!value || typeof value !== 'string') return '';
+      const trimmed = value.trim();
       if (!trimmed) return '';
       if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith('data:')) return trimmed;
       if (!supabase) return trimmed;
@@ -448,7 +447,6 @@
     function selectModalImage(image) {
       const modalImage = document.getElementById('modalImage');
       if (!modalImage) return;
-
       modalImage.src = image || window.placeholderCar;
 
       document.querySelectorAll('#modalThumbs .thumb').forEach((thumb) => {
@@ -575,9 +573,9 @@
         6: 'السبت'
       };
 
-      const weekdayStr = berlinParts.find(p => p.type === 'weekday')?.value;
-      const hour = parseInt(berlinParts.find(p => p.type === 'hour')?.value || '0', 10);
-      const minute = parseInt(berlinParts.find(p => p.type === 'minute')?.value || '0', 10);
+      const weekdayStr = berlinParts.find((p) => p.type === 'weekday')?.value;
+      const hour = parseInt(berlinParts.find((p) => p.type === 'hour')?.value || '0', 10);
+      const minute = parseInt(berlinParts.find((p) => p.type === 'minute')?.value || '0', 10);
 
       const day = weekdayMap[weekdayStr];
       const currentMinutes = hour * 60 + minute;
