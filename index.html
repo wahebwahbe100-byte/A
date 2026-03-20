@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -621,10 +622,14 @@
     `);
 
     const WHATSAPP_NUMBER = '4915736645354';
+    const SUPABASE_URL = 'https://mbesnbkludynomgdzfhw.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_EfwicNkVNrNBXKBgoiMXjA_VqTcfnTm';
+    const SUPABASE_BUCKET = 'cars';
     const carsPerPage = 8;
     let currentPage = 1;
+    let supabase = null;
 
-    const cars = [
+    let cars = [
       { id: 1, brand: 'Mercedes', model: 'S-Class', category: 'Sedan', price: '€128,000', year: 2024, mileage: '8,000 km', condition: 'ممتازة', name: 'Mercedes S-Class', description: 'سيارة فاخرة مناسبة للتنقل المريح والأنيق.', image: 'images/auto1.jpg', gallery: ['images/auto1.jpg', 'images/auto1.jpg'] },
       { id: 2, brand: 'BMW', model: 'X7', category: 'SUV', price: '€102,500', year: 2023, mileage: '14,500 km', condition: 'ممتازة', name: 'BMW X7', description: 'سيارة SUV واسعة ومناسبة للعائلات والرحلات.', image: 'images/auto2.jpg', gallery: ['images/auto2.jpg', 'images/auto2.jpg'] },
       { id: 3, brand: 'Audi', model: 'RS7', category: 'Sport', price: '€119,900', year: 2024, mileage: '5,200 km', condition: 'ممتازة', name: 'Audi RS7', description: 'أداء رياضي قوي مع تصميم عصري جذاب.', image: 'images/auto3.jpg', gallery: ['images/auto3.jpg', 'images/auto3.jpg'] },
@@ -834,6 +839,88 @@
       text.textContent = message;
       contact.textContent = message;
       contact.style.color = color;
+    }
+
+    function initPage() {
+      ensureSupabase();
+      renderInventory();
+      updateBusinessStatus();
+      setInterval(updateBusinessStatus, 60000);
+      loadCars();eateClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+      } catch (error) {
+        console.error('Supabase init failed:', error);
+        supabase = null;
+      }
+    }
+
+    function normalizeImageUrl(value) {
+      if (!value || typeof value !== 'string') return '';
+      const trimmed = value.trim();
+      if (!trimmed) return '';
+      if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith('data:')) return trimmed;
+      if (!supabase) return trimmed;
+      const cleaned = trimmed.replace(/^\/+/, '');
+      const { data } = supabase.storage.from(SUPABASE_BUCKET).getPublicUrl(cleaned);
+      return data?.publicUrl || trimmed;
+    }
+
+    function normalizeGallery(row) {
+      let gallery = [];
+      if (Array.isArray(row.gallery)) {
+        gallery = row.gallery;
+      } else if (typeof row.gallery === 'string' && row.gallery.trim()) {
+        try {
+          const parsed = JSON.parse(row.gallery);
+          if (Array.isArray(parsed)) gallery = parsed;
+        } catch (error) {
+          gallery = [row.gallery];
+        }
+      }
+
+      const normalized = gallery
+        .map((item) => normalizeImageUrl(item))
+        .filter(Boolean);
+
+      const primaryImage = normalizeImageUrl(row.image);
+      if (primaryImage && !normalized.includes(primaryImage)) {
+        normalized.unshift(primaryImage);
+      }
+
+      return normalized.length ? normalized : [window.placeholderCar];
+    }
+
+    async function loadCars() {
+      renderInventory();
+      if (!supabase) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('cars')
+          .select('*')
+          .order('id', { ascending: true });
+
+        if (error) throw error;
+        if (!Array.isArray(data) || !data.length) return;
+
+        cars = data.map((row, index) => {
+          const fallbackImage = `images/auto${index + 1}.jpg`;
+          const image = normalizeImageUrl(row.image) || fallbackImage;
+          const gallery = normalizeGallery({ ...row, image });
+
+          return {
+            ...row,
+            id: row.id ?? index + 1,
+            name: row.name || `${row.brand || ''} ${row.model || ''}`.trim() || `سيارة ${index + 1}`,
+            image,
+            gallery
+          };
+        });
+
+        renderInventory();
+      } catch (error) {
+        console.error('loadCars failed:', error);
+      }
     }
 
     function initPage() {
