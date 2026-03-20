@@ -45,11 +45,9 @@
           </div>
           <div>
             <label class="block mb-2 text-sm text-white/80">الفئة</label>
-            <select id="category" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10">
-              <option value="SUV">SUV</option>
-              <option value="Sedan">Sedan</option>
-              <option value="Sport">Sport</option>
-            </select>
+            <input id="category" list="categoryOptions" type="text" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="مثال: SUV أو Sedan أو Luxury">
+            <datalist id="categoryOptions"></datalist>
+            <div class="mt-2 text-xs text-white/50">يمكنك كتابة فئة جديدة أو اختيار واحدة من القائمة.</div>
           </div>
           <div>
             <label class="block mb-2 text-sm text-white/80">السعر</label>
@@ -168,6 +166,24 @@
     const reloadBtn = document.getElementById('reloadBtn');
 
     let cars = [];
+    const baseCategories = ['SUV', 'Sedan', 'Sport'];
+
+    function uniqueCategories(list = []) {
+      return [...new Set(list.map(item => String(item || '').trim()).filter(Boolean))];
+    }
+
+    function renderCategoryOptions(selectedValue = '') {
+      const datalist = document.getElementById('categoryOptions');
+      if (!datalist) return;
+      const categories = uniqueCategories([
+        ...baseCategories,
+        ...defaultCars.map(car => car.category),
+        ...cars.map(car => car.category),
+        selectedValue
+      ]);
+      datalist.innerHTML = categories.map(category => `<option value="${category}"></option>`).join('');
+    }
+
 
     function showMessage(text, ok = true) {
       msg.textContent = text;
@@ -203,6 +219,7 @@
       if (!car) return;
       nameInput.value = car.name || '';
       categoryInput.value = car.category || 'SUV';
+      renderCategoryOptions(categoryInput.value);
       priceInput.value = car.price || '';
       yearInput.value = car.year || '';
       mileageInput.value = car.mileage || '';
@@ -224,6 +241,7 @@
         image: row.image || fallbackImage,
         gallery: Array.isArray(row.gallery) && row.gallery.length ? row.gallery : [row.image || fallbackImage]
       }));
+      renderCategoryOptions();
       renderSelect();
       showMessage('تم تحميل السيارات بنجاح');
     }
@@ -258,7 +276,7 @@
           name: fullName,
           brand: parts[0] || car.brand,
           model: parts.slice(1).join(' ') || car.model,
-          category: categoryInput.value,
+          category: categoryInput.value.trim() || car.category || 'SUV',
           price: priceInput.value.trim(),
           year: Number(yearInput.value) || car.year,
           mileage: mileageInput.value.trim(),
