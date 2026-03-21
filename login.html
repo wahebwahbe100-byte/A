@@ -74,130 +74,95 @@
       text-decoration: none;
       border: 1px solid rgba(255,255,255,.12);
       font-weight: 700;
-      white-space: nowrap;
     }
     h1 {
       margin: 0;
       font-size: clamp(32px, 4vw, 48px);
-      line-height: 1.1;
       font-weight: 900;
       background: linear-gradient(90deg, #fff, #93c5fd, #22c55e);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    .lead {
-      color: #cbd5e1;
-      line-height: 1.9;
-      margin-top: 14px;
-      font-size: 16px;
-    }
-    .feature-list {
-      display: grid;
-      gap: 14px;
-      margin-top: 26px;
-    }
+    .lead { color: #cbd5e1; margin-top: 14px; }
+    .feature-list { margin-top: 26px; display: grid; gap: 14px; }
     .feature {
       padding: 18px;
       border-radius: 20px;
       border: 1px solid rgba(255,255,255,.08);
       background: rgba(255,255,255,.03);
-      color: #e5e7eb;
     }
-    .feature strong {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 17px;
-    }
-    .login-card {
-      padding: 34px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    .card-head h2 {
-      margin: 0;
-      font-size: 34px;
-      font-weight: 900;
-    }
-    .card-head p {
-      margin: 10px 0 0;
-      color: #cbd5e1;
-      line-height: 1.8;
-    }
-    form {
-      margin-top: 24px;
-      display: grid;
-      gap: 16px;
-    }
-    label {
-      display: grid;
-      gap: 8px;
-      color: #dbeafe;
-      font-size: 14px;
-      font-weight: 700;
-    }
+    .login-card { padding: 34px; }
     input {
       width: 100%;
+      margin-top: 10px;
+      padding: 15px;
       border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.12);
       background: #020617;
+      border: 1px solid rgba(255,255,255,.12);
       color: #fff;
-      padding: 15px 16px;
-      font-size: 16px;
-      font-family: inherit;
-      outline: none;
     }
     .submit-btn {
-      margin-top: 6px;
-      border: none;
+      margin-top: 16px;
+      width: 100%;
+      padding: 16px;
       border-radius: 18px;
       background: #22c55e;
-      color: #04111f;
-      padding: 16px;
-      font-size: 18px;
       font-weight: 900;
       cursor: pointer;
+      border: none;
     }
     .message {
       margin-top: 16px;
-      min-height: 58px;
-      padding: 14px 16px;
+      padding: 14px;
       border-radius: 18px;
       border: 1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.04);
-      color: #cbd5e1;
     }
   </style>
 </head>
 
 <body>
   <div class="shell">
+
+    <!-- 🔥 هذا الجزء رجعناه كما كان -->
     <section class="panel">
-      <!-- نفس تصميمك بالكامل -->
+      <div>
+        <div class="topbar">
+          <div class="brand">
+            <img src="images/logo.png" class="logo">
+            <div>
+              <div style="font-weight:900">Emotion Car</div>
+              <div style="color:#93c5fd">Professionelles Admin-Portal</div>
+            </div>
+          </div>
+          <a href="index.html" class="back-link">Zur Website</a>
+        </div>
+
+        <h1>Willkommen im Admin-Bereich</h1>
+        <p class="lead">
+          Melden Sie sich an, um auf das Dashboard zuzugreifen und Fahrzeuge zu bearbeiten.
+        </p>
+
+        <div class="feature-list">
+          <div class="feature"><strong>Fahrzeugdaten bearbeiten</strong></div>
+          <div class="feature"><strong>Bilder direkt ändern</strong></div>
+          <div class="feature"><strong>Sicherer Zugriff</strong></div>
+        </div>
+      </div>
     </section>
 
+    <!-- 🔥 الفورم كما هو -->
     <section class="login-card">
-      <div class="card-head">
-        <h2>Anmeldung</h2>
-        <p>Geben Sie Ihre E-Mail-Adresse und Ihr Passwort ein, um zum Dashboard zu gelangen.</p>
-      </div>
+      <h2>Anmeldung</h2>
 
-      <div id="loginForm">
-        <label>
-          E-Mail
-          <input id="email" type="email" placeholder="E-Mail">
-        </label>
+      <input id="email" placeholder="E-Mail">
+      <input id="password" type="password" placeholder="Passwort">
 
-        <label>
-          Passwort
-          <input id="password" type="password" placeholder="Passwort">
-        </label>
-
-        <button id="loginBtn" onclick="loginHandler()" class="submit-btn">Anmelden</button>
-      </div>
+      <button onclick="loginHandler()" class="submit-btn">Anmelden</button>
 
       <div id="msg" class="message"></div>
     </section>
+
   </div>
 
 <script>
@@ -206,32 +171,30 @@ const SUPABASE_ANON_KEY = 'sb_publishable_EfwicNkVNrNBXKBgoiMXjA_VqTcfnTm';
 
 let supabase;
 
-async function init() {
+(async () => {
   const mod = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
   supabase = mod.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-}
-init();
-
-function showMessage(text){ document.getElementById('msg').textContent=text; }
+})();
 
 async function loginHandler(){
   const email=document.getElementById('email').value;
   const password=document.getElementById('password').value;
+  const msg=document.getElementById('msg');
 
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-  if(error){ showMessage(error.message); return; }
+  if(error){ msg.textContent=error.message; return; }
 
-  // 🔐 ADMIN CHECK
+  // 🔐 admin check
   const { data: admin } = await supabase
     .from('admin_users')
     .select('*')
     .eq('user_id', data.user.id)
     .maybeSingle();
 
-  if (!admin) {
+  if(!admin){
     await supabase.auth.signOut();
-    showMessage("Kein Zugriff!");
+    msg.textContent="Kein Zugriff!";
     return;
   }
 
