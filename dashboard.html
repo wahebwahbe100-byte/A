@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="robots" content="noindex, nofollow" />
   <title>Dashboard - Fahrzeuge</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -151,8 +150,8 @@
     );
 
     const STORAGE_BUCKET = 'site-images';
-    const DASHBOARD_STATE_KEY = 'dashboard_car_states_v2';
     const ADMIN_EMAIL = 'emotion.service@icloud.com';
+    const DASHBOARD_STATE_KEY = 'dashboard_car_states_v2';
 
     const fallbackImage = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
@@ -296,16 +295,11 @@
     }
 
     async function requireLogin() {
-      const { data } = await supabase.auth.getSession();
-      const session = data?.session;
+      const { data, error } = await supabase.auth.getUser();
+      const user = data?.user;
+      const email = String(user?.email || '').trim().toLowerCase();
 
-      if (!session || !session.user) {
-        window.location.href = './login.html';
-        return false;
-      }
-
-      const currentEmail = String(session.user.email || '').toLowerCase();
-      if (currentEmail !== ADMIN_EMAIL.toLowerCase()) {
+      if (error || !user || email !== ADMIN_EMAIL.toLowerCase()) {
         await supabase.auth.signOut();
         window.location.href = './login.html';
         return false;
@@ -429,19 +423,7 @@
       const file = imageInput.files?.[0];
       if (!file) return null;
 
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-      const maxSizeBytes = 4 * 1024 * 1024;
-
-      if (!allowedTypes.includes(file.type)) {
-        throw new Error('Nur JPG, PNG oder WEBP sind erlaubt.');
-      }
-
-      if (file.size > maxSizeBytes) {
-        throw new Error('Die Bildgröße darf maximal 4 MB betragen.');
-      }
-
-      const rawExt = (file.name.split('.').pop() || '').toLowerCase();
-      const ext = rawExt === 'jpeg' ? 'jpg' : rawExt;
+      const ext = file.name.split('.').pop();
       const path = `cars/car-${carId}-${Date.now()}.${ext}`;
       const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file, { upsert: true, contentType: file.type });
       if (error) throw error;
@@ -559,14 +541,29 @@
     imageInput.addEventListener('change', () => {
       const file = imageInput.files?.[0];
       if (!file) return;
+
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      const maxSize = 4 * 1024 * 1024;
+
+      if (!allowedTypes.includes(file.type)) {
+        showMessage('Bitte nur JPG, PNG oder WEBP hochladen.', false);
+        imageInput.value = '';
+        return;
+      }
+
+      if (file.size > maxSize) {
+        showMessage('Die Datei ist zu groß. Maximal 4 MB sind erlaubt.', false);
+        imageInput.value = '';
+        return;
+      }
+
       preview.src = URL.createObjectURL(file);
     });
 
-    const isAllowed = await requireLogin();
-    if (isAllowed) {
-      await seedCarsIfEmpty();
-      await loadCars();
-    }
+    const isAuthorized = await requireLogin();
+    if (!isAuthorized) return;
+    await seedCarsIfEmpty();
+    await loadCars();
   </script>
 </body>
 </html>
