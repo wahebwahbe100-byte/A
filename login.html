@@ -263,9 +263,7 @@
   <script>
     const SUPABASE_URL = 'https://mbesnbkludynomgdzfhw.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_EfwicNkVNrNBXKBgoiMXjA_VqTcfnTm';
-    const ADMIN_IDS = [
-      'd697f90a-84e3-41b-b6e0-65bdb4e7ac50'
-    ];
+    const ADMIN_EMAIL = 'emotion.service@icloud.com';
 
     const msg = document.getElementById('msg');
     const btn = document.getElementById('loginBtn');
@@ -290,19 +288,31 @@
       }
     }
 
+    function normalizeEmail(value) {
+      return String(value || '').trim().toLowerCase();
+    }
+
     async function initSupabase() {
       try {
         const mod = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
         supabase = mod.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        const { data } = await supabase.auth.getSession();
-        const currentId = data?.session?.user?.id;
-        if (currentId && ADMIN_IDS.includes(currentId)) {
+
+        const { data, error } = await supabase.auth.getUser();
+        if (error) {
+          showMessage('Die Seite ist bereit. Bitte geben Sie Ihre Zugangsdaten ein.', 'neutral');
+          return;
+        }
+
+        const currentEmail = normalizeEmail(data?.user?.email);
+        if (currentEmail && currentEmail === normalizeEmail(ADMIN_EMAIL)) {
           window.location.href = 'dashboard.html';
           return;
         }
-        if (currentId && !ADMIN_IDS.includes(currentId)) {
+
+        if (currentEmail && currentEmail !== normalizeEmail(ADMIN_EMAIL)) {
           await supabase.auth.signOut();
         }
+
         showMessage('Die Seite ist bereit. Bitte geben Sie Ihre Zugangsdaten ein.', 'neutral');
       } catch (e) {
         showMessage('Verbindung konnte nicht initialisiert werden: ' + (e.message || 'Unbekannter Fehler'), 'error');
@@ -344,7 +354,8 @@
           return;
         }
 
-        const isAllowedAdmin = ADMIN_IDS.includes(String(data.user.id || ''));
+        const signedInEmail = normalizeEmail(data.user.email);
+        const isAllowedAdmin = signedInEmail === normalizeEmail(ADMIN_EMAIL);
 
         if (!isAllowedAdmin) {
           await supabase.auth.signOut();
