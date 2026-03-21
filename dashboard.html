@@ -150,6 +150,7 @@
     );
 
     const STORAGE_BUCKET = 'site-images';
+    const LOCAL_FLAGS_KEY = 'cars-dashboard-local-flags';
 
     function readFlag(row, ...keys) {
       for (const key of keys) {
@@ -158,34 +159,53 @@
       return false;
     }
 
-    const flagFieldNames = {
-      isHidden: 'isHidden',
-      isTemporary: 'isTemporary'
-    };
-
-    function detectFlagField(rows, candidates, fallback) {
-      const sample = Array.isArray(rows) ? rows.find((row) => row && typeof row === 'object') : null;
-      if (!sample) return fallback;
-      for (const key of candidates) {
-        if (Object.prototype.hasOwnProperty.call(sample, key)) return key;
-      }
-      return fallback;
-    }
-
-    function syncFlagFieldNames(rows) {
-      flagFieldNames.isHidden = detectFlagField(rows, ['isHidden', 'ishidden', 'is_hidden'], 'isHidden');
-      flagFieldNames.isTemporary = detectFlagField(rows, ['isTemporary', 'istemporary', 'is_temporary'], 'isTemporary');
-    }
-
     function getFlagPayload(updates) {
       const payload = {};
       if (Object.prototype.hasOwnProperty.call(updates, 'isHidden')) {
-        payload[flagFieldNames.isHidden] = Boolean(updates.isHidden);
+        payload.isHidden = Boolean(updates.isHidden);
       }
       if (Object.prototype.hasOwnProperty.call(updates, 'isTemporary')) {
-        payload[flagFieldNames.isTemporary] = Boolean(updates.isTemporary);
+        payload.isTemporary = Boolean(updates.isTemporary);
       }
       return payload;
+    }
+
+    function getLocalFlags() {
+      try {
+        const raw = localStorage.getItem(LOCAL_FLAGS_KEY);
+        const parsed = raw ? JSON.parse(raw) : {};
+        return parsed && typeof parsed === 'object' ? parsed : {};
+      } catch {
+        return {};
+      }
+    }
+
+    function saveLocalFlags(flags) {
+      localStorage.setItem(LOCAL_FLAGS_KEY, JSON.stringify(flags || {}));
+    }
+
+    function setLocalFlags(carId, updates) {
+      const flags = getLocalFlags();
+      const key = String(carId);
+      flags[key] = {
+        ...(flags[key] || {}),
+        ...getFlagPayload(updates)
+      };
+      saveLocalFlags(flags);
+      return flags[key];
+    }
+
+    function clearUnusedLocalFlags(rows) {
+      const ids = new Set((rows || []).map((row) => String(row.id)));
+      const flags = getLocalFlags();
+      let changed = false;
+      Object.keys(flags).forEach((key) => {
+        if (!ids.has(key)) {
+          delete flags[key];
+          changed = true;
+        }
+      });
+      if (changed) saveLocalFlags(flags);
     }
 
     const fallbackImage = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
@@ -271,10 +291,10 @@
 
     function showMessage(text, ok = true) {
       msg.textContent = text;
-      msg.className = ok ? 'text-sm text-emerald-700' : 'text-sm text-red-300';
+      msg.className = ok ? 'text-sm text-emerald-700' : 'text-sm text-red-600';
     }
 
-    function applyRemoteStates(rows) {
+    function normalizeCars(rows) {
       return (rows || []).map((row) => ({
         ...row,
         isTemporary: readFlag(row, 'isTemporary', 'istemporary', 'is_temporary'),
@@ -284,34 +304,68 @@
       }));
     }
 
+    function applyRemoteStates(rows) {
+      return normalizeCars(rows);
+    }
+
+    function applyLocalStates(rows) {
+      const localFlags = getLocalFlags();
+      return normalizeCars(rows).map((row) => {
+        const local = localFlags[String(row.id)] || {};
+        return {
+          ...row,
+          isHidden: Object.prototype.hasOwnProperty.call(local, 'isHidden') ? Boolean(local.isHidden) : row.isHidden,
+          isTemporary: Object.prototype.hasOwnProperty.call(local, 'isTemporary') ? Boolean(local.isTemporary) : row.isTemporary
+        };
+      });
+    }
+
+    function refreshUi(selectedId) {
+      renderSelect();
+      updateSummary();
+      renderHiddenCars();
+      if (cars.length) {
+        fillForm(selectedId || carSelect.value || cars[0].id);
+      }
+    }
 
     async function patchState(carId, updates) {
       const current = findCar(carId);
       if (!current) return false;
 
       const payload = getFlagPayload(updates);
-      const { data, error } = await supabase
-        .from('cars')
-        .update(payload)
-        .eq('id', current.id)
-        .select('*')
-        .single();
 
-      if (error) throw error;
+      if (supportsRemoteFlags) {
+        const { data, error } = await supabase
+          .from('cars')
+          .update(payload)
+          .eq('id', current.id)
+          .select('*')
+          .single();
 
-      cars = cars.map((car) => String(car.id) === String(carId)
-        ? {
-            ...car,
-            ...(data || {}),
-            isHidden: readFlag(data || {}, 'isHidden', 'ishidden', 'is_hidden'),
-            isTemporary: readFlag(data || {}, 'isTemporary', 'istemporary', 'is_temporary')
-          }
-        : car);
+        if (error) throw error;
 
-      renderSelect();
-      updateSummary();
-      renderHiddenCars();
-      fillForm(carId);
+        cars = cars.map((car) => String(car.id) === String(carId)
+          ? {
+              ...car,
+              ...(data || {}),
+              isHidden: readFlag(data || {}, 'isHidden', 'ishidden', 'is_hidden'),
+              isTemporary: readFlag(data || {}, 'isTemporary', 'istemporary', 'is_temporary')
+            }
+          : car);
+      } else {
+        const localState = setLocalFlags(carId, payload);
+        cars = cars.map((car) => String(car.id) === String(carId)
+          ? {
+              ...car,
+              ...localState,
+              isHidden: Boolean(localState.isHidden),
+              isTemporary: Boolean(localState.isTemporary)
+            }
+          : car);
+      }
+
+      refreshUi(carId);
       return true;
     }
 
@@ -370,7 +424,7 @@
       ];
       currentFlags.textContent = flags.join(' | ');
 
-      toggleHiddenBtn.textContent = car.isHidden ? '🙈 Fahrzeug ist jetzt versteckt' : '🙈 Vorübergehend ausblenden';
+      toggleHiddenBtn.textContent = car.isHidden ? '👁‍🗨 Wieder sichtbar machen' : '🙈 Vorübergehend ausblenden';
       restoreBtn.disabled = !car.isHidden;
       restoreBtn.className = `px-4 py-3 rounded-2xl font-black text-slate-900 ${car.isHidden ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-emerald-500/40 cursor-not-allowed'}`;
     }
@@ -398,7 +452,7 @@
         <div class="rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 flex items-center justify-between gap-3">
           <div>
             <div class="font-bold text-slate-800">${car.name || ''}${car.isTemporary ? ' 🔄' : ''}</div>
-            <div class="text-slate-500">سيارة ${car.id} • ${car.category || 'ohne Kategorie'}</div>
+            <div class="text-slate-500">Fahrzeug ${car.id} • ${car.category || 'ohne Kategorie'}</div>
           </div>
           <button data-restore-id="${car.id}" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-bold">
             👁‍🗨 Wiederherstellen
@@ -409,7 +463,6 @@
       hiddenCarsList.querySelectorAll('[data-restore-id]').forEach((button) => {
         button.addEventListener('click', async () => {
           await restoreCar(button.getAttribute('data-restore-id'));
-          await loadCars();
         });
       });
     }
@@ -423,23 +476,17 @@
         return;
       }
 
-      syncFlagFieldNames(data || []);
-      supportsRemoteFlags = Array.isArray(data) && data.every((row) => {
-        const hasHidden = ['isHidden', 'ishidden', 'is_hidden'].some((key) => Object.prototype.hasOwnProperty.call(row || {}, key));
-        const hasTemporary = ['isTemporary', 'istemporary', 'is_temporary'].some((key) => Object.prototype.hasOwnProperty.call(row || {}, key));
-        return hasHidden && hasTemporary;
-      });
-      cars = applyRemoteStates(data || []);
-      renderSelect();
-      updateSummary();
-      renderHiddenCars();
+      supportsRemoteFlags = Array.isArray(data) && data.every((row) => (
+        Object.prototype.hasOwnProperty.call(row, 'isHidden') &&
+        Object.prototype.hasOwnProperty.call(row, 'isTemporary')
+      ));
 
-      if (cars.length) {
-        fillForm(carSelect.value || cars[0].id);
-      }
+      clearUnusedLocalFlags(data || []);
+      cars = supportsRemoteFlags ? applyRemoteStates(data || []) : applyLocalStates(data || []);
+      refreshUi(carSelect.value || cars[0]?.id);
 
       if (!supportsRemoteFlags) {
-        showMessage('Die Spalten isHidden und isTemporary fehlen in Supabase. Die Verstecken/Anzeigen-Funktion arbeitet jetzt lokal im Browser.', true);
+        showMessage('Die Spalten isHidden und isTemporary fehlen in Supabase. Verstecken/Anzeigen und Temporär-Markierung arbeiten aktuell lokal in diesem Browser.', true);
       } else {
         showMessage('Fahrzeuge erfolgreich geladen');
       }
@@ -492,13 +539,16 @@
           isHidden: Boolean(car.isHidden)
         };
 
-        const savePayload = { ...updated, ...remoteFlags };
-
+        const savePayload = supportsRemoteFlags ? { ...updated, ...remoteFlags } : updated;
         const { error } = await supabase.from('cars').upsert(savePayload, { onConflict: 'id' });
 
         if (error) throw error;
 
-        showMessage('Änderungen erfolgreich gespeichert');
+        if (!supportsRemoteFlags) {
+          setLocalFlags(id, remoteFlags);
+        }
+
+        showMessage(supportsRemoteFlags ? 'Änderungen erfolgreich gespeichert' : 'Änderungen gespeichert. Verstecken/Temporär bleiben lokal in diesem Browser aktiv.');
         await loadCars();
         carSelect.value = String(id);
         fillForm(id);
@@ -514,7 +564,9 @@
     async function hideCar(id) {
       try {
         await patchState(Number(id), { isHidden: true });
-        showMessage('Das Fahrzeug wurde gespeichert und auf der Website versteckt.');
+        showMessage(supportsRemoteFlags
+          ? 'Das Fahrzeug wurde gespeichert und auf der Website versteckt.'
+          : 'Das Fahrzeug wurde in diesem Browser versteckt. Für alle Besucher müssen die Supabase-Spalten isHidden und isTemporary angelegt werden.');
       } catch (error) {
         showMessage(error.message || 'Das Fahrzeug konnte nicht ausgeblendet werden.', false);
       }
@@ -523,7 +575,9 @@
     async function restoreCar(id) {
       try {
         await patchState(Number(id), { isHidden: false });
-        showMessage('Das Fahrzeug wurde gespeichert und auf der Website wieder angezeigt.');
+        showMessage(supportsRemoteFlags
+          ? 'Das Fahrzeug wurde gespeichert und auf der Website wieder angezeigt.'
+          : 'Das Fahrzeug wird in diesem Browser wieder angezeigt.');
       } catch (error) {
         showMessage(error.message || 'Das Fahrzeug konnte nicht wiederhergestellt werden.', false);
       }
@@ -562,7 +616,11 @@
       if (!car) return;
       try {
         await patchState(id, { isTemporary: isTemporaryInput.checked });
-        showMessage(isTemporaryInput.checked ? 'Das Fahrzeug wurde als temporär markiert 🔄' : 'Die temporäre Markierung wurde entfernt');
+        showMessage(
+          supportsRemoteFlags
+            ? (isTemporaryInput.checked ? 'Das Fahrzeug wurde als temporär markiert 🔄' : 'Die temporäre Markierung wurde entfernt')
+            : (isTemporaryInput.checked ? 'Temporär-Markierung lokal gespeichert 🔄' : 'Temporär-Markierung lokal entfernt')
+        );
         await loadCars();
       } catch (error) {
         isTemporaryInput.checked = Boolean(car.isTemporary);
