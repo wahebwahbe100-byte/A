@@ -150,7 +150,6 @@
     );
 
     const STORAGE_BUCKET = 'site-images';
-    const DASHBOARD_STATE_KEY = 'dashboard_car_states_v2';
 
     const fallbackImage = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
@@ -238,30 +237,43 @@
       msg.className = ok ? 'text-sm text-emerald-300' : 'text-sm text-red-300';
     }
 
-    function getStoredState() {
-      try {
-        return JSON.parse(localStorage.getItem(DASHBOARD_STATE_KEY) || '{}');
-      } catch (error) {
-        return {};
+    function normalizeImage(value) {
+      if (!value || typeof value !== 'string') return '';
+      const trimmed = value.trim();
+      if (!trimmed) return '';
+      if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith('data:')) return trimmed;
+      const cleanPath = trimmed.replace(/^\/+/, '');
+      const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(cleanPath);
+      return data?.publicUrl || trimmed;
+    }
+
+    function normalizeGallery(row, mainImage) {
+      let gallery = [];
+      if (Array.isArray(row.gallery)) {
+        gallery = row.gallery;
+      } else if (typeof row.gallery === 'string' && row.gallery.trim()) {
+        try {
+          const parsed = JSON.parse(row.gallery);
+          gallery = Array.isArray(parsed) ? parsed : [row.gallery];
+        } catch (error) {
+          gallery = [row.gallery];
+        }
       }
+
+      const normalized = gallery.map((item) => normalizeImage(item)).filter(Boolean);
+      if (mainImage && !normalized.includes(mainImage)) normalized.unshift(mainImage);
+      return normalized.length ? normalized : [fallbackImage];
     }
 
-    function saveStoredState(state) {
-      localStorage.setItem(DASHBOARD_STATE_KEY, JSON.stringify(state));
-    }
-
-    function applyLocalStates(rows) {
-      const state = getStoredState();
-      return rows.map((row) => {
-        const local = state[row.id] || {};
-        const hasRemoteHidden = Object.prototype.hasOwnProperty.call(row, 'isHidden');
-        const hasRemoteTemporary = Object.prototype.hasOwnProperty.call(row, 'isTemporary');
+    function normalizeCars(rows) {
+      return (rows || []).map((row) => {
+        const mainImage = normalizeImage(row.image) || fallbackImage;
         return {
           ...row,
-          isTemporary: hasRemoteTemporary ? Boolean(row.isTemporary) : Boolean(local.isTemporary),
-          isHidden: hasRemoteHidden ? Boolean(row.isHidden) : Boolean(local.isHidden),
-          image: row.image || fallbackImage,
-          gallery: Array.isArray(row.gallery) && row.gallery.length ? row.gallery : [row.image || fallbackImage]
+          isTemporary: Boolean(row.isTemporary),
+          isHidden: Boolean(row.isHidden),
+          image: mainImage,
+          gallery: normalizeGallery(row, mainImage)
         };
       });
     }
@@ -270,20 +282,18 @@
       const current = findCar(carId);
       if (!current) return false;
 
-      if (supportsRemoteFlags) {
-        const payload = {
-          id: current.id,
-          isTemporary: Object.prototype.hasOwnProperty.call(updates, 'isTemporary') ? Boolean(updates.isTemporary) : Boolean(current.isTemporary),
-          isHidden: Object.prototype.hasOwnProperty.call(updates, 'isHidden') ? Boolean(updates.isHidden) : Boolean(current.isHidden)
-        };
-
-        const { error } = await supabase.from('cars').upsert(payload, { onConflict: 'id' });
-        if (error) throw error;
-      } else {
-        const state = getStoredState();
-        state[carId] = { ...(state[carId] || {}), ...updates };
-        saveStoredState(state);
+      if (!supportsRemoteFlags) {
+        throw new Error('Die Spalten isHidden und isTemporary fehlen in Supabase. Führen Sie zuerst die SQL-Datei aus.');
       }
+
+      const payload = {
+        id: current.id,
+        isTemporary: Object.prototype.hasOwnProperty.call(updates, 'isTemporary') ? Boolean(updates.isTemporary) : Boolean(current.isTemporary),
+        isHidden: Object.prototype.hasOwnProperty.call(updates, 'isHidden') ? Boolean(updates.isHidden) : Boolean(current.isHidden)
+      };
+
+      const { error } = await supabase.from('cars').upsert(payload, { onConflict: 'id' });
+      if (error) throw error;
 
       cars = cars.map((car) => String(car.id) === String(carId) ? { ...car, ...updates } : car);
       renderSelect();
@@ -398,8 +408,10 @@
         return;
       }
 
-      supportsRemoteFlags = Array.isArray(data) && data.some((row) => Object.prototype.hasOwnProperty.call(row, 'isHidden') || Object.prototype.hasOwnProperty.call(row, 'isTemporary'));
-      cars = applyLocalStates(data || []);
+      supportsRemoteFlags = Array.isArray(data) && (data.length === 0 || data.every((row) => (
+        Object.prototype.hasOwnProperty.call(row, 'isHidden') && Object.prototype.hasOwnProperty.call(row, 'isTemporary')
+      )));
+      cars = normalizeCars(data || []);
       renderSelect();
       updateSummary();
       renderHiddenCars();
@@ -408,7 +420,9 @@
         fillForm(carSelect.value || cars[0].id);
       }
 
-      showMessage('Fahrzeuge erfolgreich geladen');
+      showMessage(supportsRemoteFlags
+        ? 'Fahrzeuge erfolgreich geladen'
+        : 'Fahrzeuge geladen. Hinweis: isHidden/isTemporary fehlen noch in Supabase, daher funktionieren globale Verstecken-/Temporär-Änderungen erst nach der SQL-Aktualisierung.');
     }
 
     async function uploadImageIfNeeded(carId) {
@@ -461,12 +475,12 @@
         const { error } = await supabase.from('cars').upsert(updated, { onConflict: 'id' });
         if (error) throw error;
 
-        await patchState(id, {
-          isTemporary: isTemporaryInput.checked,
-          isHidden: car.isHidden
-        });
+        if (!supportsRemoteFlags && (isTemporaryInput.checked !== Boolean(car.isTemporary) || Boolean(car.isHidden))) {
+          showMessage('Grunddaten wurden gespeichert, aber globale Status-Felder fehlen noch in Supabase. Führen Sie die SQL-Datei aus, damit Verstecken/Temporär für alle Besucher funktioniert.', false);
+        } else {
+          showMessage('Änderungen erfolgreich gespeichert');
+        }
 
-        showMessage('Änderungen erfolgreich gespeichert');
         await loadCars();
         carSelect.value = String(id);
         fillForm(id);
@@ -482,9 +496,7 @@
     async function hideCar(id) {
       try {
         await patchState(Number(id), { isHidden: true });
-        showMessage(supportsRemoteFlags
-          ? 'Das Fahrzeug wurde gespeichert und auf allen Geräten als versteckt markiert.'
-          : 'Das Fahrzeug wurde auf diesem Gerät vorübergehend ausgeblendet.');
+        showMessage('Das Fahrzeug wurde gespeichert und auf allen Geräten als versteckt markiert.');
       } catch (error) {
         showMessage(error.message || 'Das Fahrzeug konnte nicht ausgeblendet werden.', false);
       }
@@ -493,9 +505,7 @@
     async function restoreCar(id) {
       try {
         await patchState(Number(id), { isHidden: false });
-        showMessage(supportsRemoteFlags
-          ? 'Das Fahrzeug wurde gespeichert und auf allen Geräten wieder angezeigt.'
-          : 'Das Fahrzeug wurde auf diesem Gerät wieder angezeigt.');
+        showMessage('Das Fahrzeug wurde gespeichert und auf allen Geräten wieder angezeigt.');
       } catch (error) {
         showMessage(error.message || 'Das Fahrzeug konnte nicht wiederhergestellt werden.', false);
       }
@@ -522,12 +532,17 @@
       restoreCar(id);
     });
 
-    isTemporaryInput.addEventListener('change', () => {
+    isTemporaryInput.addEventListener('change', async () => {
       const id = Number(carSelect.value);
       const car = findCar(id);
       if (!car) return;
-      patchState(id, { isTemporary: isTemporaryInput.checked, isHidden: car.isHidden });
-      showMessage(isTemporaryInput.checked ? 'Das Fahrzeug wurde als temporär markiert 🔄' : 'Die temporäre Markierung wurde entfernt');
+      try {
+        await patchState(id, { isTemporary: isTemporaryInput.checked, isHidden: car.isHidden });
+        showMessage(isTemporaryInput.checked ? 'Das Fahrzeug wurde als temporär markiert 🔄' : 'Die temporäre Markierung wurde entfernt');
+      } catch (error) {
+        isTemporaryInput.checked = Boolean(car.isTemporary);
+        showMessage(error.message || 'Die temporäre Markierung konnte nicht gespeichert werden.', false);
+      }
     });
 
     imageInput.addEventListener('change', () => {
