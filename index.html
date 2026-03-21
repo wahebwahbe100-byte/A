@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Emotion Car</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, Arial, sans-serif; background: #f7f5ef; color: #0f172a; }
+    .wrap { max-width: 1260px; margin: 0 auto; padding: 24px; }
+    .top { display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; margin-bottom:28px; }
+    h1 { margin:0; font-size: clamp(34px, 5vw, 58px); font-weight:900; }
+    .sub { color:#64748b; margin-top:10px; line-height:1.7; max-width:720px; }
+    .toolbar { display:flex; gap:12px; flex-wrap:wrap; }
+    .input, .select { background:#fff; border:1px solid #d7dbe4; border-radius:18px; padding:14px 16px; font:inherit; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap:20px; }
+    .card { background:#fff; border:1px solid #e2e8f0; border-radius:28px; overflow:hidden; box-shadow:0 8px 26px rgba(15,23,42,.06); }
+    .imgwrap { aspect-ratio: 16 / 10; background:#e2e8f0; }
+    .imgwrap img { width:100%; height:100%; object-fit:cover; display:block; }
+    .content { padding:20px; }
+    .row { display:flex; justify-content:space-between; gap:14px; align-items:flex-start; }
+    .price { font-size:22px; font-weight:900; color:#0f172a; }
+    .name { margin:0; font-size:23px; font-weight:900; }
+    .cat { color:#64748b; margin-top:4px; }
+    .badge { display:inline-flex; margin-top:10px; padding:8px 12px; border-radius:999px; font-size:12px; font-weight:800; background:#fef3c7; color:#92400e; }
+    .meta { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; margin-top:18px; }
+    .meta div { background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:12px; }
+    .meta span { display:block; color:#64748b; font-size:12px; margin-bottom:6px; }
+    .meta strong { font-size:14px; }
+    .empty { background:#fff; border:1px dashed #cbd5e1; border-radius:28px; padding:48px 24px; text-align:center; color:#64748b; }
+    .toplink { text-decoration:none; color:#0f172a; font-weight:800; border:1px solid #d7dbe4; background:#fff; border-radius:18px; padding:14px 18px; }
+    @media (max-width: 700px) { .wrap { padding: 16px; } .row { flex-direction:column; } }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <h1>Emotion Car</h1>
+        <div class="sub">Verfügbare Fahrzeuge werden direkt aus Supabase geladen. Versteckte Fahrzeuge erscheinen hier nicht.</div>
+      </div>
+      <a class="toplink" href="login.html">Admin</a>
+    </div>
+
+    <div class="toolbar">
+      <input id="searchInput" class="input" type="text" placeholder="Fahrzeug suchen">
+      <select id="categoryFilter" class="select">
+        <option value="all">Alle Kategorien</option>
+      </select>
+    </div>
+
+    <div id="status" style="margin:18px 0;color:#64748b;">Fahrzeuge werden geladen...</div>
+    <div id="carsGrid" class="grid"></div>
+  </div>
+
+<script>
+const SUPABASE_URL = 'https://mbesnbkludynomgdzfhw.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_EfwicNkVNrNBXKBgoiMXjA_VqTcfnTm';
+const STORAGE_BUCKET = 'site-images';
+const fallbackImage = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+  <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+    <rect width="1200" height="700" fill="#e2e8f0"/>
+    <text x="600" y="350" fill="#334155" font-size="42" text-anchor="middle" font-family="Arial">No Image</text>
+  </svg>
+`);
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let cars = [];
+
+function rawToPublicImage(value) {
+  if (!value || typeof value !== 'string') return fallbackImage;
+  const trimmed = value.trim();
+  if (!trimmed) return fallbackImage;
+  if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith('data:')) return trimmed;
+  const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(trimmed.replace(/^\/+/, ''));
+  return data?.publicUrl || fallbackImage;
+}
+
+function normalizeCar(row, index) {
+  const name = row.name || `${row.brand || ''} ${row.model || ''}`.trim() || `Fahrzeug ${index + 1}`;
+  return {
+    ...row,
+    id: Number(row.id),
+    name,
+    brand: row.brand || name.split(' ')[0] || '',
+    model: row.model || name.split(' ').slice(1).join(' '),
+    category: row.category || '',
+    price: row.price || '',
+    year: row.year || '',
+    mileage: row.mileage || '',
+    condition: row.condition || '',
+    description: row.description || '',
+    image: rawToPublicImage(row.image),
+    isHidden: Boolean(row.is_hidden),
+    isTemporary: Boolean(row.is_temporary)
+  };
+}
+
+function filteredCars() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const cat = document.getElementById('categoryFilter').value;
+  return cars.filter((car) => {
+    if (car.isHidden) return false;
+    const hay = `${car.name} ${car.brand} ${car.model}`.toLowerCase();
+    if (q && !hay.includes(q)) return false;
+    if (cat !== 'all' && car.category !== cat) return false;
+    return true;
+  });
+}
+
+function renderCategories() {
+  const select = document.getElementById('categoryFilter');
+  const current = select.value;
+  const categories = [...new Set(cars.map((car) => car.category).filter(Boolean))].sort();
+  select.innerHTML = '<option value="all">Alle Kategorien</option>' + categories.map((cat) => `<option value="${cat}">${cat}</option>`).join('');
+  select.value = categories.includes(current) ? current : 'all';
+}
+
+function render() {
+  const list = filteredCars();
+  const grid = document.getElementById('carsGrid');
+  document.getElementById('status').textContent = `${list.length} Fahrzeuge sichtbar`;
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty">Keine Fahrzeuge gefunden.</div>';
+    return;
+  }
+  grid.innerHTML = list.map((car) => `
+    <article class="card">
+      <div class="imgwrap"><img src="${car.image}" alt="${car.name}" onerror="this.onerror=null;this.src='${fallbackImage}'"></div>
+      <div class="content">
+        <div class="row">
+          <div>
+            <h3 class="name">${car.name}</h3>
+            <div class="cat">${car.category || ''}</div>
+            ${car.isTemporary ? '<div class="badge">🔄 Temporär</div>' : ''}
+          </div>
+          <div class="price">${car.price || ''}</div>
+        </div>
+        <div class="meta">
+          <div><span>Marke</span><strong>${car.brand || ''}</strong></div>
+          <div><span>Modell</span><strong>${car.model || ''}</strong></div>
+          <div><span>Baujahr</span><strong>${car.year || ''}</strong></div>
+          <div><span>Kilometer</span><strong>${car.mileage || ''}</strong></div>
+          <div><span>Zustand</span><strong>${car.condition || ''}</strong></div>
+          <div><span>ID</span><strong>#${car.id}</strong></div>
+        </div>
+      </div>
+    </article>
+  `).join('');
+}
+
+async function loadCars() {
+  document.getElementById('status').textContent = 'Fahrzeuge werden geladen...';
+  const { data, error } = await supabase.from('cars').select('*').order('id', { ascending: true });
+  if (error) {
+    document.getElementById('status').textContent = error.message || 'Laden fehlgeschlagen';
+    document.getElementById('carsGrid').innerHTML = '<div class="empty">Die Daten konnten nicht geladen werden.</div>';
+    return;
+  }
+  cars = (data || []).map(normalizeCar);
+  renderCategories();
+  render();
+}
+
+document.getElementById('searchInput').addEventListener('input', render);
+document.getElementById('categoryFilter').addEventListener('change', render);
+loadCars();
+</script>
+</body>
+</html>

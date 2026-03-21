@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="de" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anmeldung</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; font-family:Inter, Arial, sans-serif; background:linear-gradient(135deg, #f7f5ef 0%, #f1eee6 52%, #ebe6dc 100%); color:#1f2937; }
+    .card { width:min(480px, 100%); background:rgba(255,255,255,.78); border:1px solid rgba(148,163,184,.18); border-radius:30px; box-shadow:0 20px 46px rgba(148,163,184,.16); padding:34px; }
+    h1 { margin:0; font-size:38px; font-weight:900; }
+    p { color:#64748b; line-height:1.8; }
+    label { display:grid; gap:8px; color:#475569; font-size:14px; font-weight:700; margin-top:14px; }
+    input { width:100%; border-radius:18px; border:1px solid rgba(148,163,184,.18); background:#fff; color:#1f2937; padding:15px 16px; font-size:16px; font-family:inherit; outline:none; }
+    button { margin-top:18px; width:100%; border:none; border-radius:18px; background:#22c55e; color:#04111f; padding:16px; font-size:18px; font-weight:900; font-family:inherit; cursor:pointer; }
+    button:disabled { opacity:.7; cursor:not-allowed; }
+    .msg { margin-top:16px; min-height:58px; padding:14px 16px; border-radius:18px; border:1px solid rgba(148,163,184,.18); background:#fff; color:#64748b; line-height:1.8; white-space:pre-wrap; font-size:14px; }
+    .links { display:flex; justify-content:space-between; gap:12px; margin-top:16px; }
+    a { color:#0f172a; text-decoration:none; font-weight:800; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Anmeldung</h1>
+    <p>Melden Sie sich an, um das Dashboard zu öffnen.</p>
+
+    <label>E-Mail
+      <input id="email" type="email" autocomplete="username" placeholder="E-Mail">
+    </label>
+    <label>Passwort
+      <input id="password" type="password" autocomplete="current-password" placeholder="Passwort">
+    </label>
+    <button id="loginBtn" type="button">Anmelden</button>
+    <div id="msg" class="msg">Bitte geben Sie Ihre Zugangsdaten ein.</div>
+    <div class="links">
+      <a href="index.html">Zur Website</a>
+      <a href="dashboard.html">Zum Dashboard</a>
+    </div>
+  </div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL = 'https://mbesnbkludynomgdzfhw.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_EfwicNkVNrNBXKBgoiMXjA_VqTcfnTm';
+const ADMIN_EMAIL = 'emotion.service@icloud.com';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const loginBtn = document.getElementById('loginBtn');
+const msg = document.getElementById('msg');
+
+function showMessage(text, ok = true) {
+  msg.textContent = text;
+  msg.style.color = ok ? '#166534' : '#b91c1c';
+  msg.style.background = ok ? '#f0fdf4' : '#fef2f2';
+  msg.style.borderColor = ok ? '#bbf7d0' : '#fecaca';
+}
+
+async function checkExistingSession() {
+  const { data } = await supabase.auth.getUser();
+  const user = data?.user;
+  if (user && user.email === ADMIN_EMAIL) {
+    window.location.href = 'dashboard.html';
+    return true;
+  }
+  if (user) await supabase.auth.signOut();
+  return false;
+}
+
+async function login() {
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+  if (!email || !password) {
+    showMessage('Bitte E-Mail und Passwort eingeben.', false);
+    return;
+  }
+  loginBtn.disabled = true;
+  loginBtn.textContent = 'Anmeldung läuft...';
+  showMessage('Zugangsdaten werden geprüft...', true);
+  try {
+    await supabase.auth.signOut();
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    const user = data?.user;
+    if (!user || user.email !== ADMIN_EMAIL) {
+      await supabase.auth.signOut();
+      throw new Error('Dieses Konto hat keinen Zugriff auf das Dashboard.');
+    }
+    showMessage('Anmeldung erfolgreich. Weiterleitung...', true);
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 600);
+  } catch (error) {
+    showMessage(error.message || 'Anmeldung fehlgeschlagen.', false);
+  } finally {
+    loginBtn.disabled = false;
+    loginBtn.textContent = 'Anmelden';
+  }
+}
+
+loginBtn.addEventListener('click', login);
+passwordInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') login(); });
+checkExistingSession();
+</script>
+</body>
+</html>
