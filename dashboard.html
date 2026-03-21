@@ -208,9 +208,7 @@
       name: `${item[0]} ${item[1]}`,
       description: 'Fahrzeug in ausgezeichnetem Zustand mit klaren Spezifikationen. Bilder, Preise und Informationen können später leicht angepasst werden.',
       image: fallbackImage,
-      gallery: [fallbackImage],
-      isHidden: false,
-      isTemporary: false
+      gallery: [fallbackImage]
     }));
 
     const msg = document.getElementById('msg');
@@ -240,26 +238,6 @@
       msg.className = ok ? 'text-sm text-emerald-300' : 'text-sm text-red-300';
     }
 
-    async function requireAdmin() {
-      const { data, error } = await supabase.auth.getUser();
-
-      if (error || !data?.user) {
-        window.location.href = './login.html';
-        return;
-      }
-
-      const { data: admin, error: adminError } = await supabase
-        .from('admin_users')
-        .select('user_id')
-        .eq('user_id', data.user.id)
-        .maybeSingle();
-
-      if (adminError || !admin) {
-        await supabase.auth.signOut();
-        window.location.href = './login.html';
-      }
-    }
-
     function getStoredState() {
       try {
         return JSON.parse(localStorage.getItem(DASHBOARD_STATE_KEY) || '{}');
@@ -272,32 +250,18 @@
       localStorage.setItem(DASHBOARD_STATE_KEY, JSON.stringify(state));
     }
 
-    function normalizeRow(row) {
-      return {
-        ...row,
-        isTemporary: Boolean(
-          Object.prototype.hasOwnProperty.call(row, 'is_temporary') ? row.is_temporary : row.isTemporary
-        ),
-        isHidden: Boolean(
-          Object.prototype.hasOwnProperty.call(row, 'is_hidden') ? row.is_hidden : row.isHidden
-        ),
-        image: row.image || fallbackImage,
-        gallery: Array.isArray(row.gallery) && row.gallery.length ? row.gallery : [row.image || fallbackImage]
-      };
-    }
-
     function applyLocalStates(rows) {
       const state = getStoredState();
       return rows.map((row) => {
-        const normalized = normalizeRow(row);
-        const local = state[normalized.id] || {};
-        const hasRemoteHidden = Object.prototype.hasOwnProperty.call(row, 'is_hidden') || Object.prototype.hasOwnProperty.call(row, 'isHidden');
-        const hasRemoteTemporary = Object.prototype.hasOwnProperty.call(row, 'is_temporary') || Object.prototype.hasOwnProperty.call(row, 'isTemporary');
-
+        const local = state[row.id] || {};
+        const hasRemoteHidden = Object.prototype.hasOwnProperty.call(row, 'isHidden');
+        const hasRemoteTemporary = Object.prototype.hasOwnProperty.call(row, 'isTemporary');
         return {
-          ...normalized,
-          isTemporary: hasRemoteTemporary ? normalized.isTemporary : Boolean(local.isTemporary),
-          isHidden: hasRemoteHidden ? normalized.isHidden : Boolean(local.isHidden)
+          ...row,
+          isTemporary: hasRemoteTemporary ? Boolean(row.isTemporary) : Boolean(local.isTemporary),
+          isHidden: hasRemoteHidden ? Boolean(row.isHidden) : Boolean(local.isHidden),
+          image: row.image || fallbackImage,
+          gallery: Array.isArray(row.gallery) && row.gallery.length ? row.gallery : [row.image || fallbackImage]
         };
       });
     }
@@ -309,12 +273,8 @@
       if (supportsRemoteFlags) {
         const payload = {
           id: current.id,
-          is_temporary: Object.prototype.hasOwnProperty.call(updates, 'isTemporary')
-            ? Boolean(updates.isTemporary)
-            : Boolean(current.isTemporary),
-          is_hidden: Object.prototype.hasOwnProperty.call(updates, 'isHidden')
-            ? Boolean(updates.isHidden)
-            : Boolean(current.isHidden)
+          isTemporary: Object.prototype.hasOwnProperty.call(updates, 'isTemporary') ? Boolean(updates.isTemporary) : Boolean(current.isTemporary),
+          isHidden: Object.prototype.hasOwnProperty.call(updates, 'isHidden') ? Boolean(updates.isHidden) : Boolean(current.isHidden)
         };
 
         const { error } = await supabase.from('cars').upsert(payload, { onConflict: 'id' });
@@ -333,16 +293,18 @@
       return true;
     }
 
+    async function requireLogin() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        window.location.href = './login.html';
+      }
+    }
+
     async function seedCarsIfEmpty() {
       const { data, error } = await supabase.from('cars').select('id').limit(1);
       if (error) return;
       if (Array.isArray(data) && data.length === 0) {
-        const seeded = defaultCars.map((car) => ({
-          ...car,
-          is_hidden: false,
-          is_temporary: false
-        }));
-        await supabase.from('cars').upsert(seeded, { onConflict: 'id' });
+        await supabase.from('cars').upsert(defaultCars, { onConflict: 'id' });
       }
     }
 
@@ -436,13 +398,7 @@
         return;
       }
 
-      supportsRemoteFlags = Array.isArray(data) && data.some((row) =>
-        Object.prototype.hasOwnProperty.call(row, 'is_hidden') ||
-        Object.prototype.hasOwnProperty.call(row, 'is_temporary') ||
-        Object.prototype.hasOwnProperty.call(row, 'isHidden') ||
-        Object.prototype.hasOwnProperty.call(row, 'isTemporary')
-      );
-
+      supportsRemoteFlags = Array.isArray(data) && data.some((row) => Object.prototype.hasOwnProperty.call(row, 'isHidden') || Object.prototype.hasOwnProperty.call(row, 'isTemporary'));
       cars = applyLocalStates(data || []);
       renderSelect();
       updateSummary();
@@ -464,12 +420,8 @@
       const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file, { upsert: true, contentType: file.type });
       if (error) throw error;
 
-      const { data, error: signedError } = await supabase.storage
-        .from(STORAGE_BUCKET)
-        .createSignedUrl(path, 60 * 60 * 24 * 7);
-
-      if (signedError) throw signedError;
-      return data.signedUrl;
+      const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+      return data.publicUrl;
     }
 
     async function saveCar() {
@@ -502,8 +454,8 @@
         };
 
         if (supportsRemoteFlags) {
-          updated.is_temporary = isTemporaryInput.checked;
-          updated.is_hidden = Boolean(car.isHidden);
+          updated.isTemporary = isTemporaryInput.checked;
+          updated.isHidden = Boolean(car.isHidden);
         }
 
         const { error } = await supabase.from('cars').upsert(updated, { onConflict: 'id' });
@@ -570,16 +522,12 @@
       restoreCar(id);
     });
 
-    isTemporaryInput.addEventListener('change', async () => {
+    isTemporaryInput.addEventListener('change', () => {
       const id = Number(carSelect.value);
       const car = findCar(id);
       if (!car) return;
-      try {
-        await patchState(id, { isTemporary: isTemporaryInput.checked, isHidden: car.isHidden });
-        showMessage(isTemporaryInput.checked ? 'Das Fahrzeug wurde als temporär markiert 🔄' : 'Die temporäre Markierung wurde entfernt');
-      } catch (error) {
-        showMessage(error.message || 'Die Markierung konnte nicht gespeichert werden.', false);
-      }
+      patchState(id, { isTemporary: isTemporaryInput.checked, isHidden: car.isHidden });
+      showMessage(isTemporaryInput.checked ? 'Das Fahrzeug wurde als temporär markiert 🔄' : 'Die temporäre Markierung wurde entfernt');
     });
 
     imageInput.addEventListener('change', () => {
@@ -588,7 +536,7 @@
       preview.src = URL.createObjectURL(file);
     });
 
-    await requireAdmin();
+    await requireLogin();
     await seedCarsIfEmpty();
     await loadCars();
   </script>
