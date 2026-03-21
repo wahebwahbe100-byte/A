@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
   <title>Dashboard - Fahrzeuge</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -120,7 +121,7 @@
           </div>
           <div class="md:col-span-2">
             <label class="block mb-2 text-sm text-white/80">Hauptbild</label>
-            <input id="imageFile" type="file" accept="image/png,image/jpeg,image/webp" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10">
+            <input id="imageFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10">
           </div>
         </div>
 
@@ -151,11 +152,7 @@
 
     const STORAGE_BUCKET = 'site-images';
     const DASHBOARD_STATE_KEY = 'dashboard_car_states_v2';
-    const ADMIN_IDS = [
-      'd697f90a-84e3-41b-b6e0-65bdb4e7ac50'
-    ];
-    const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-    const MAX_IMAGE_SIZE = 4 * 1024 * 1024;
+    const ADMIN_EMAIL = 'emotion.service@icloud.com';
 
     const fallbackImage = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
       <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
@@ -300,15 +297,21 @@
 
     async function requireLogin() {
       const { data } = await supabase.auth.getSession();
-      const session = data.session;
-      const userId = String(session?.user?.id || '');
-      const isAllowedAdmin = ADMIN_IDS.includes(userId);
+      const session = data?.session;
 
-      if (!session || !isAllowedAdmin) {
+      if (!session || !session.user) {
+        window.location.href = './login.html';
+        return false;
+      }
+
+      const currentEmail = String(session.user.email || '').toLowerCase();
+      if (currentEmail !== ADMIN_EMAIL.toLowerCase()) {
         await supabase.auth.signOut();
         window.location.href = './login.html';
-        throw new Error('Unberechtigter Zugriff');
+        return false;
       }
+
+      return true;
     }
 
     async function seedCarsIfEmpty() {
@@ -426,20 +429,19 @@
       const file = imageInput.files?.[0];
       if (!file) return null;
 
-      if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-        throw new Error('Nur PNG-, JPG- und WEBP-Dateien sind erlaubt.');
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      const maxSizeBytes = 4 * 1024 * 1024;
+
+      if (!allowedTypes.includes(file.type)) {
+        throw new Error('Nur JPG, PNG oder WEBP sind erlaubt.');
       }
 
-      if (file.size > MAX_IMAGE_SIZE) {
-        throw new Error('Die Bilddatei darf maximal 4 MB groß sein.');
+      if (file.size > maxSizeBytes) {
+        throw new Error('Die Bildgröße darf maximal 4 MB betragen.');
       }
 
-      const extensionMap = {
-        'image/jpeg': 'jpg',
-        'image/png': 'png',
-        'image/webp': 'webp'
-      };
-      const ext = extensionMap[file.type] || (file.name.split('.').pop() || 'jpg').toLowerCase();
+      const rawExt = (file.name.split('.').pop() || '').toLowerCase();
+      const ext = rawExt === 'jpeg' ? 'jpg' : rawExt;
       const path = `cars/car-${carId}-${Date.now()}.${ext}`;
       const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file, { upsert: true, contentType: file.type });
       if (error) throw error;
@@ -557,25 +559,14 @@
     imageInput.addEventListener('change', () => {
       const file = imageInput.files?.[0];
       if (!file) return;
-
-      if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-        imageInput.value = '';
-        showMessage('Nur PNG-, JPG- und WEBP-Dateien sind erlaubt.', false);
-        return;
-      }
-
-      if (file.size > MAX_IMAGE_SIZE) {
-        imageInput.value = '';
-        showMessage('Die Bilddatei darf maximal 4 MB groß sein.', false);
-        return;
-      }
-
       preview.src = URL.createObjectURL(file);
     });
 
-    await requireLogin();
-    await seedCarsIfEmpty();
-    await loadCars();
+    const isAllowed = await requireLogin();
+    if (isAllowed) {
+      await seedCarsIfEmpty();
+      await loadCars();
+    }
   </script>
 </body>
 </html>
