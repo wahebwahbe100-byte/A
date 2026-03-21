@@ -161,24 +161,40 @@
     .message {
       margin-top: 16px;
       min-height: 58px;
-      padding: 14px;
+      padding: 14px 16px;
       border-radius: 18px;
       border: 1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.04);
+      color: #cbd5e1;
     }
   </style>
 </head>
 
 <body>
   <div class="shell">
-    <!-- نفس تصميمك 100% -->
+    <section class="panel">
+      <!-- نفس تصميمك بالكامل -->
+    </section>
+
     <section class="login-card">
-      <h2>Anmeldung</h2>
+      <div class="card-head">
+        <h2>Anmeldung</h2>
+        <p>Geben Sie Ihre E-Mail-Adresse und Ihr Passwort ein, um zum Dashboard zu gelangen.</p>
+      </div>
 
-      <input id="email" type="email" placeholder="E-Mail">
-      <input id="password" type="password" placeholder="Passwort">
+      <div id="loginForm">
+        <label>
+          E-Mail
+          <input id="email" type="email" placeholder="E-Mail">
+        </label>
 
-      <button id="loginBtn" onclick="loginHandler()" class="submit-btn">Anmelden</button>
+        <label>
+          Passwort
+          <input id="password" type="password" placeholder="Passwort">
+        </label>
+
+        <button id="loginBtn" onclick="loginHandler()" class="submit-btn">Anmelden</button>
+      </div>
 
       <div id="msg" class="message"></div>
     </section>
@@ -196,17 +212,15 @@ async function init() {
 }
 init();
 
-async function loginHandler() {
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-  const msg = document.getElementById('msg');
+function showMessage(text){ document.getElementById('msg').textContent=text; }
+
+async function loginHandler(){
+  const email=document.getElementById('email').value;
+  const password=document.getElementById('password').value;
 
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-  if (error) {
-    msg.textContent = error.message;
-    return;
-  }
+  if(error){ showMessage(error.message); return; }
 
   // 🔐 ADMIN CHECK
   const { data: admin } = await supabase
@@ -217,11 +231,11 @@ async function loginHandler() {
 
   if (!admin) {
     await supabase.auth.signOut();
-    msg.textContent = "Kein Zugriff!";
+    showMessage("Kein Zugriff!");
     return;
   }
 
-  window.location.href = "dashboard.html";
+  window.location.href="dashboard.html";
 }
 </script>
 
