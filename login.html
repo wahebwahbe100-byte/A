@@ -27,7 +27,6 @@
       display: grid;
       grid-template-columns: 1.05fr .95fr;
       gap: 28px;
-      align-items: stretch;
     }
     .panel, .login-card {
       background: rgba(255,255,255,.05);
@@ -36,123 +35,9 @@
       box-shadow: 0 24px 70px rgba(0,0,0,.45);
       backdrop-filter: blur(12px);
     }
-    .panel {
-      padding: 34px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      margin-bottom: 22px;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-    .logo {
-      width: 110px;
-      height: 74px;
-      object-fit: cover;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      padding: 6px;
-    }
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 12px 16px;
-      border-radius: 16px;
-      background: rgba(255,255,255,.08);
-      color: #fff;
-      text-decoration: none;
-      border: 1px solid rgba(255,255,255,.12);
-      font-weight: 700;
-      white-space: nowrap;
-    }
-    h1 {
-      margin: 0;
-      font-size: clamp(32px, 4vw, 48px);
-      line-height: 1.1;
-      font-weight: 900;
-      background: linear-gradient(90deg, #fff, #93c5fd, #22c55e);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .lead {
-      color: #cbd5e1;
-      line-height: 1.9;
-      margin-top: 14px;
-      font-size: 16px;
-    }
-    .feature-list {
-      display: grid;
-      gap: 14px;
-      margin-top: 26px;
-    }
-    .feature {
-      padding: 18px;
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.03);
-      color: #e5e7eb;
-    }
-    .feature strong {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 17px;
-    }
-    .login-card {
-      padding: 34px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    .card-head h2 {
-      margin: 0;
-      font-size: 34px;
-      font-weight: 900;
-    }
-    .card-head p {
-      margin: 10px 0 0;
-      color: #cbd5e1;
-      line-height: 1.8;
-    }
-    form {
-      margin-top: 24px;
-      display: grid;
-      gap: 16px;
-    }
-    label {
-      display: grid;
-      gap: 8px;
-      color: #dbeafe;
-      font-size: 14px;
-      font-weight: 700;
-    }
-    input {
-      width: 100%;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: #020617;
-      color: #fff;
-      padding: 15px 16px;
-      font-size: 16px;
-      font-family: inherit;
-      outline: none;
-      transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
-    }
-    input:focus {
-      border-color: rgba(59,130,246,.7);
-      box-shadow: 0 0 0 4px rgba(59,130,246,.12);
-      transform: translateY(-1px);
-    }
+    .panel { padding: 34px; }
+    .login-card { padding: 34px; }
+
     .submit-btn {
       margin-top: 6px;
       border: none;
@@ -162,193 +47,105 @@
       padding: 16px;
       font-size: 18px;
       font-weight: 900;
-      font-family: inherit;
       cursor: pointer;
-      transition: transform .2s ease, opacity .2s ease, box-shadow .2s ease;
-      box-shadow: 0 14px 36px rgba(34,197,94,.25);
     }
-    .submit-btn:hover { transform: translateY(-1px); }
-    .submit-btn:disabled {
-      opacity: .7;
-      cursor: not-allowed;
-      transform: none;
-    }
+
     .message {
       margin-top: 16px;
-      min-height: 58px;
-      padding: 14px 16px;
+      padding: 14px;
       border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.04);
       color: #cbd5e1;
-      line-height: 1.8;
-      white-space: pre-wrap;
-      font-size: 14px;
-    }
-    .footer-note {
-      margin-top: 14px;
-      color: #94a3b8;
-      font-size: 13px;
-      text-align: center;
-    }
-    @media (max-width: 900px) {
-      .shell { grid-template-columns: 1fr; }
-      .panel, .login-card { padding: 24px; }
-      .topbar { flex-direction: column; align-items: flex-start; }
-      .logo { width: 96px; height: 68px; }
     }
   </style>
 </head>
+
 <body>
-  <div class="shell">
-    <section class="panel">
-      <div>
-        <div class="topbar">
-          <div class="brand">
-            <img src="images/logo.png" alt="logo" class="logo" onerror="this.style.display='none'">
-            <div>
-              <div style="font-size:22px;font-weight:900;">Emotion Car</div>
-              <div style="color:#93c5fd;font-size:14px;margin-top:4px;">Professionelles Admin-Portal</div>
-            </div>
-          </div>
-          <a href="index.html" class="back-link">Zur Website</a>
-        </div>
 
-        <h1>Willkommen im Admin-Bereich</h1>
-        <p class="lead">Melden Sie sich an, um auf das Dashboard zuzugreifen und Fahrzeuge, Bilder, Preise und Details direkt auf der Website zu bearbeiten.</p>
+<section class="login-card">
 
-        <div class="feature-list">
-          <div class="feature">
-            <strong>Fahrzeugdaten bearbeiten</strong>
-            Sie können Name, Preis, Zustand, Kilometerstand und Beschreibung ganz einfach aktualisieren.
-          </div>
-          <div class="feature">
-            <strong>Bilder direkt ändern</strong>
-            Laden Sie ein neues Bild hoch. Es wird im System gespeichert und dem ausgewählten Fahrzeug zugeordnet.
-          </div>
-          <div class="feature">
-            <strong>Sicherer und schneller Zugriff</strong>
-            Nach erfolgreicher Anmeldung werden Sie automatisch zum Dashboard weitergeleitet.
-          </div>
-        </div>
-      </div>
-    </section>
+  <h2>Admin Login</h2>
 
-    <section class="login-card">
-      <div class="card-head">
-        <h2>Anmeldung</h2>
-        <p>Geben Sie Ihre E-Mail-Adresse und Ihr Passwort ein, um zum Dashboard zu gelangen.</p>
-      </div>
+  <input id="email" type="email" placeholder="Email"><br><br>
+  <input id="password" type="password" placeholder="Password"><br><br>
 
-      <div id="loginForm">
-        <label>
-          E-Mail
-          <input id="email" name="email" type="email" autocomplete="username" placeholder="E-Mail">
-        </label>
+  <button id="loginBtn" class="submit-btn" onclick="loginHandler()">Login</button>
 
-        <label>
-          Passwort
-          <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Passwort">
-        </label>
+  <div id="msg" class="message">Bereit...</div>
 
-        <button id="loginBtn" type="button" class="submit-btn" onclick="loginHandler()">Anmelden</button>
-      </div>
+</section>
 
-      <div id="msg" class="message">Die Seite ist bereit. Bitte geben Sie Ihre Zugangsdaten ein.</div>
-      <div class="footer-note">Nach erfolgreicher Anmeldung werden Sie automatisch weitergeleitet.</div>
-    </section>
-  </div>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-  <script>
-    const SUPABASE_URL = 'https://mbesnbkludynomgdzfhw.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_EfwicNkVNrNBXKBgoiMXjA_VqTcfnTm';
+const SUPABASE_URL = 'https://mbesnbkludynomgdzfhw.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_EfwicNkVNrNBXKBgoiMXjA_VqTcfnTm';
 
-    const msg = document.getElementById('msg');
-    const btn = document.getElementById('loginBtn');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    let supabase = null;
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    function showMessage(text, type = 'neutral') {
-      msg.textContent = text;
-      if (type === 'success') {
-        msg.style.color = '#bbf7d0';
-        msg.style.borderColor = 'rgba(34,197,94,.28)';
-        msg.style.background = 'rgba(34,197,94,.12)';
-      } else if (type === 'error') {
-        msg.style.color = '#fecaca';
-        msg.style.borderColor = 'rgba(239,68,68,.28)';
-        msg.style.background = 'rgba(239,68,68,.12)';
-      } else {
-        msg.style.color = '#cbd5e1';
-        msg.style.borderColor = 'rgba(255,255,255,.10)';
-        msg.style.background = 'rgba(255,255,255,.04)';
-      }
-    }
+const msg = document.getElementById('msg');
+const btn = document.getElementById('loginBtn');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
 
-    async function initSupabase() {
-      try {
-        const mod = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
-        supabase = mod.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        showMessage('Die Seite ist bereit. Bitte geben Sie Ihre Zugangsdaten ein.', 'neutral');
-      } catch (e) {
-        showMessage('Verbindung konnte nicht initialisiert werden: ' + (e.message || 'Unbekannter Fehler'), 'error');
-      }
-    }
+function show(text, ok=false){
+  msg.textContent = text;
+  msg.style.color = ok ? '#22c55e' : '#f87171';
+}
 
-    async function loginHandler() {
-      const email = emailInput.value.trim();
-      const password = passwordInput.value;
+// 🔐 تحقق admin
+async function isAdmin(id){
+  const { data } = await supabase
+    .from('admin_users')
+    .select('*')
+    .eq('user_id', id)
+    .maybeSingle();
 
-      if (!email || !password) {
-        showMessage('Bitte geben Sie Ihre E-Mail-Adresse und Ihr Passwort ein.', 'error');
-        return;
-      }
+  return !!data;
+}
 
-      if (!supabase) {
-        showMessage('Die Verbindung ist momentan nicht bereit. Bitte laden Sie die Seite neu und versuchen Sie es erneut.', 'error');
-        return;
-      }
+// 🚀 تسجيل الدخول
+async function loginHandler(){
+  const email = emailInput.value;
+  const password = passwordInput.value;
 
-      btn.disabled = true;
-      btn.textContent = 'Anmeldung läuft...';
-      showMessage('Zugangsdaten werden überprüft...', 'neutral');
+  if(!email || !password){
+    show("Fill all fields");
+    return;
+  }
 
-      try {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  btn.disabled = true;
 
-        if (error) {
-          showMessage(error.message || 'Anmeldung nicht möglich.', 'error');
-          btn.disabled = false;
-          btn.textContent = 'Anmelden';
-          return;
-        }
-
-        if (!data || !data.user) {
-          showMessage('Es konnte keine Sitzung erstellt werden.', 'error');
-          btn.disabled = false;
-          btn.textContent = 'Anmelden';
-          return;
-        }
-
-        showMessage('Anmeldung erfolgreich. Sie werden jetzt weitergeleitet.', 'success');
-        setTimeout(() => {
-          window.location.href = 'dashboard.html';
-        }, 900);
-      } catch (err) {
-        showMessage('Unerwarteter Fehler: ' + (err.message || 'Unknown error'), 'error');
-        btn.disabled = false;
-        btn.textContent = 'Anmelden';
-      }
-    }
-
-    window.loginHandler = loginHandler;
-
-    passwordInput.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') loginHandler();
+  try{
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email, password
     });
 
-    initSupabase();
-  </script>
+    if(error) throw error;
+
+    const ok = await isAdmin(data.user.id);
+
+    if(!ok){
+      await supabase.auth.signOut();
+      throw new Error("Not admin");
+    }
+
+    show("Success", true);
+
+    setTimeout(()=>{
+      window.location.href = "dashboard.html";
+    }, 500);
+
+  }catch(e){
+    show(e.message);
+  }
+
+  btn.disabled = false;
+}
+
+window.loginHandler = loginHandler;
+
+</script>
+
 </body>
 </html>
