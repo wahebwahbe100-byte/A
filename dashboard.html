@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="de" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Dashboard - Fahrzeuge</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-950 text-white p-4 md:p-8">
+  <div class="max-w-7xl mx-auto space-y-8">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      <div>
+        <h1 class="text-3xl md:text-4xl font-black">Dashboard</h1>
+        <p class="text-white/70 mt-2">Verwalten Sie Ihre Fahrzeuge ganz einfach: Daten und Bilder bearbeiten und die Website mit aktuellen Informationen versorgen.</p>
+      </div>
+      <div class="flex gap-3 flex-wrap">
+        <a href="index.html" class="px-5 py-3 rounded-2xl bg-white/10 border border-white/10 hover:bg-white/15">Website öffnen</a>
+        <button id="logoutBtn" class="px-5 py-3 rounded-2xl bg-red-600 hover:bg-red-700">Abmelden</button>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-4">
+      <div class="rounded-3xl border border-white/10 bg-white/10 p-5">
+        <div class="text-white/60 text-sm mb-2">🚗 Fahrzeuge</div>
+        <div id="totalCount" class="text-3xl font-black">0</div>
+      </div>
+      <div class="rounded-3xl border border-white/10 bg-white/10 p-5">
+        <div class="text-white/60 text-sm mb-2">👁‍🗨 Sichtbar auf der Website</div>
+        <div id="visibleCount" class="text-3xl font-black text-emerald-300">0</div>
+      </div>
+      <div class="rounded-3xl border border-white/10 bg-white/10 p-5">
+        <div class="text-white/60 text-sm mb-2">👁‍🗨 Versteckt</div>
+        <div id="hiddenCount" class="text-3xl font-black text-amber-300">0</div>
+      </div>
+    </div>
+
+    <div class="rounded-2xl border border-sky-400/20 bg-sky-500/10 px-5 py-4 text-sm leading-7 text-sky-100">
+      <span id="summaryLine">🚗 Fahrzeuge: 0 | 👁‍🗨 Sichtbar: 0 | 🙈 Versteckt: 0 | 🔄 Temporär: 0</span>
+      <div class="text-sky-100/75 mt-1">Hinweis: Fahrzeugdaten und Bilder werden in der Datenbank gespeichert. So erscheinen echte Änderungen nach dem Speichern auf allen Geräten.</div>
+    </div>
+
+    <div id="msg" class="text-sm"></div>
+
+    <div class="grid xl:grid-cols-[370px,1fr] gap-8">
+      <div class="space-y-6">
+        <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+          <h2 class="text-2xl font-black mb-4">Fahrzeug auswählen</h2>
+          <div class="space-y-4">
+            <select id="carSelect" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10"></select>
+
+            <div class="grid grid-cols-2 gap-3">
+              <button id="toggleHiddenBtn" class="px-4 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black">🙈 Vorübergehend ausblenden</button>
+              <button id="restoreBtn" class="px-4 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black">👁‍🗨 Wieder anzeigen</button>
+            </div>
+
+            <div class="rounded-2xl border border-white/10 bg-slate-900/70 p-4 space-y-2 text-sm">
+              <div class="flex items-center justify-between gap-3">
+                <span class="text-white/60">Aktueller Status</span>
+                <span id="currentFlags" class="font-bold text-white">—</span>
+              </div>
+              <div class="text-white/60">🔄 Temporär = erscheint mit Kennzeichnung im Dashboard.</div>
+              <div class="text-white/60">🙈 Versteckt = erscheint nicht auf der Website.</div>
+            </div>
+
+            <div class="rounded-2xl border border-white/10 bg-slate-900/70 p-4">
+              <div class="text-sm text-white/60 mb-2">Aktuelles Bild</div>
+              <img id="preview" class="w-full h-60 object-cover rounded-2xl bg-slate-950" alt="preview">
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+          <h3 class="text-xl font-black mb-4">Versteckte Fahrzeuge</h3>
+          <div id="hiddenCarsList" class="space-y-3 text-sm text-white/70">
+            Aktuell gibt es keine versteckten Fahrzeuge.
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white/10 border border-white/10 rounded-3xl p-6">
+        <h2 class="text-2xl font-black mb-4">Fahrzeug bearbeiten</h2>
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <label class="block mb-2 text-sm text-white/80">Vollständiger Name</label>
+            <input id="name" type="text" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="Mercedes S-Class">
+          </div>
+          <div>
+            <label class="block mb-2 text-sm text-white/80">Kategorie</label>
+            <input id="category" list="categoryOptions" type="text" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="Beispiel: SUV, Sedan oder Luxury">
+            <datalist id="categoryOptions">
+              <option value="SUV"></option>
+              <option value="Sedan"></option>
+              <option value="Sport"></option>
+              <option value="Luxury"></option>
+              <option value="Electric"></option>
+              <option value="Coupe"></option>
+              <option value="Convertible"></option>
+              <option value="Offroad"></option>
+            </datalist>
+          </div>
+          <div>
+            <label class="block mb-2 text-sm text-white/80">Preis</label>
+            <input id="price" type="text" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="€128,000">
+          </div>
+          <div>
+            <label class="block mb-2 text-sm text-white/80">Baujahr</label>
+            <input id="year" type="number" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="2024">
+          </div>
+          <div>
+            <label class="block mb-2 text-sm text-white/80">Kilometerstand</label>
+            <input id="mileage" type="text" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="8,000 km">
+          </div>
+          <div>
+            <label class="block mb-2 text-sm text-white/80">Zustand</label>
+            <input id="condition" type="text" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="Ausgezeichnet">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block mb-2 text-sm text-white/80">Beschreibung</label>
+            <textarea id="description" rows="6" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10" placeholder="Fahrzeugbeschreibung hier eingeben..."></textarea>
+          </div>
+          <div class="md:col-span-2">
+            <label class="block mb-2 text-sm text-white/80">Hauptbild</label>
+            <input id="imageFile" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="w-full rounded-2xl p-4 bg-slate-900 border border-white/10">
+          </div>
+        </div>
+
+        <div class="mt-6 rounded-3xl border border-white/10 bg-slate-900/60 p-5">
+          <div class="font-bold mb-3">Zusätzliche Optionen</div>
+          <label class="flex items-center gap-3 text-white/90">
+            <input id="isTemporary" type="checkbox" class="h-5 w-5 rounded accent-lime-400">
+            <span>🔄 Temporäres Fahrzeug</span>
+          </label>
+          <p class="text-sm text-white/60 mt-2">Wenn aktiviert, erscheint das Symbol 🔄 neben dem Fahrzeug im Dashboard, damit Sie es schnell erkennen.</p>
+        </div>
+
+        <div class="flex gap-4 flex-wrap mt-6">
+          <button id="saveBtn" class="px-6 py-4 rounded-2xl bg-lime-500 hover:bg-lime-600 font-black text-slate-950">Änderungen speichern</button>
+          <button id="reloadBtn" class="px-6 py-4 rounded-2xl bg-white/10 border border-white/10 font-black">Daten neu laden</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const supabase = createClient(
+      'https://mbesnbkludynomgdzfhw.supabase.co',
+      'sb_publishable_EfwicNkVNrNBXKBgoiMXjA_VqTcfnTm'
+    );
+
+    const STORAGE_BUCKET = 'site-images';
+    const ADMIN_EMAIL = 'emotion.service@icloud.com';
+    const DASHBOARD_STATE_KEY = 'dashboard_car_states_v2';
+
+    const fallbackImage = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+        <defs>
+          <linearGradient id="g" x1="0" x2="1">
+            <stop offset="0%" stop-color="#0f172a"/>
+            <stop offset="100%" stop-color="#1e293b"/>
+          </linearGradient>
+        </defs>
+        <rect width="1200" height="700" fill="url(#g)"/>
+        <text x="600" y="350" fill="#cbd5e1" font-size="42" text-anchor="middle" font-family="Arial">No Image Available</text>
+      </svg>
+    `);
+
+    const defaultCars = [
+      ['Mercedes', 'S-Class', 'Sedan', '€128,000', 2024, '8,000 km', 'Ausgezeichnet'],
+      ['BMW', 'X7', 'SUV', '€102,500', 2023, '14,500 km', 'Ausgezeichnet'],
+      ['Audi', 'RS7', 'Sport', '€119,900', 2024, '5,200 km', 'Ausgezeichnet'],
+      ['Range Rover', 'Sport', 'SUV', '€115,300', 2023, '18,100 km', 'Ausgezeichnet'],
+      ['Porsche', 'Taycan', 'Sport', '€134,800', 2024, '3,700 km', 'Ausgezeichnet'],
+      ['Lexus', 'LX', 'SUV', '€92,000', 2022, '21,000 km', 'Sehr gut'],
+      ['Cadillac', 'Escalade', 'SUV', '€97,000', 2021, '26,000 km', 'Sehr gut'],
+      ['Bentley', 'Bentayga', 'SUV', '€154,000', 2022, '19,500 km', 'Ausgezeichnet'],
+      ['Rolls-Royce', 'Ghost', 'Sedan', '€210,000', 2021, '17,800 km', 'Ausgezeichnet'],
+      ['Tesla', 'Model S', 'Sedan', '€88,000', 2023, '12,300 km', 'Ausgezeichnet'],
+      ['Ferrari', 'Roma', 'Sport', '€199,000', 2022, '7,400 km', 'Ausgezeichnet'],
+      ['Lamborghini', 'Urus', 'SUV', '€239,000', 2023, '6,900 km', 'Ausgezeichnet'],
+      ['Maserati', 'Levante', 'SUV', '€83,500', 2021, '29,000 km', 'Sehr gut'],
+      ['Jaguar', 'F-Pace', 'SUV', '€59,900', 2020, '41,000 km', 'Sehr gut'],
+      ['Genesis', 'G90', 'Sedan', '€66,400', 2022, '24,100 km', 'Ausgezeichnet'],
+      ['Volvo', 'XC90', 'SUV', '€57,800', 2021, '33,000 km', 'Sehr gut'],
+      ['Toyota', 'Land Cruiser', 'SUV', '€74,000', 2022, '27,000 km', 'Ausgezeichnet'],
+      ['GMC', 'Yukon Denali', 'SUV', '€79,500', 2023, '15,000 km', 'Ausgezeichnet'],
+      ['Jeep', 'Grand Wagoneer', 'SUV', '€82,700', 2022, '22,200 km', 'Sehr gut'],
+      ['Aston Martin', 'DBX', 'SUV', '€167,000', 2023, '9,800 km', 'Ausgezeichnet'],
+      ['Mercedes', 'GLE 450', 'SUV', '€71,000', 2021, '28,400 km', 'Sehr gut'],
+      ['BMW', '740i', 'Sedan', '€69,900', 2022, '18,900 km', 'Ausgezeichnet'],
+      ['Audi', 'Q8', 'SUV', '€73,600', 2023, '11,400 km', 'Ausgezeichnet'],
+      ['Porsche', 'Cayenne', 'SUV', '€95,200', 2022, '20,700 km', 'Ausgezeichnet'],
+      ['Volkswagen', 'Touareg', 'SUV', '€49,500', 2021, '34,100 km', 'Sehr gut'],
+      ['Land Rover', 'Defender', 'SUV', '€77,300', 2023, '14,200 km', 'Ausgezeichnet'],
+      ['Kia', 'EV9', 'SUV', '€63,400', 2024, '4,800 km', 'Ausgezeichnet'],
+      ['Hyundai', 'Palisade', 'SUV', '€46,800', 2022, '25,600 km', 'Sehr gut'],
+      ['Nissan', 'Patrol', 'SUV', '€68,900', 2021, '37,700 km', 'Sehr gut'],
+      ['Chevrolet', 'Tahoe', 'SUV', '€61,500', 2022, '23,900 km', 'Sehr gut']
+    ].map((item, index) => ({
+      id: index + 1,
+      brand: item[0],
+      model: item[1],
+      category: item[2],
+      price: item[3],
+      year: item[4],
+      mileage: item[5],
+      condition: item[6],
+      name: `${item[0]} ${item[1]}`,
+      description: 'Fahrzeug in ausgezeichnetem Zustand mit klaren Spezifikationen. Bilder, Preise und Informationen können später leicht angepasst werden.',
+      image: fallbackImage,
+      gallery: [fallbackImage]
+    }));
+
+    const msg = document.getElementById('msg');
+    const carSelect = document.getElementById('carSelect');
+    const preview = document.getElementById('preview');
+    const nameInput = document.getElementById('name');
+    const categoryInput = document.getElementById('category');
+    const priceInput = document.getElementById('price');
+    const yearInput = document.getElementById('year');
+    const mileageInput = document.getElementById('mileage');
+    const conditionInput = document.getElementById('condition');
+    const descriptionInput = document.getElementById('description');
+    const imageInput = document.getElementById('imageFile');
+    const saveBtn = document.getElementById('saveBtn');
+    const reloadBtn = document.getElementById('reloadBtn');
+    const isTemporaryInput = document.getElementById('isTemporary');
+    const toggleHiddenBtn = document.getElementById('toggleHiddenBtn');
+    const restoreBtn = document.getElementById('restoreBtn');
+    const currentFlags = document.getElementById('currentFlags');
+    const hiddenCarsList = document.getElementById('hiddenCarsList');
+
+    let cars = [];
+    let supportsRemoteFlags = false;
+
+    function showMessage(text, ok = true) {
+      msg.textContent = text;
+      msg.className = ok ? 'text-sm text-emerald-300' : 'text-sm text-red-300';
+    }
+
+    function getStoredState() {
+      try {
+        return JSON.parse(localStorage.getItem(DASHBOARD_STATE_KEY) || '{}');
+      } catch (error) {
+        return {};
+      }
+    }
+
+    function saveStoredState(state) {
+      localStorage.setItem(DASHBOARD_STATE_KEY, JSON.stringify(state));
+    }
+
+    function applyLocalStates(rows) {
+      const state = getStoredState();
+      return rows.map((row) => {
+        const local = state[row.id] || {};
+        const localHidden = Object.prototype.hasOwnProperty.call(local, 'is_hidden') ? local.is_hidden : local.isHidden;
+        const localTemporary = Object.prototype.hasOwnProperty.call(local, 'is_temporary') ? local.is_temporary : local.isTemporary;
+        const hasRemoteHidden = Object.prototype.hasOwnProperty.call(row, 'is_hidden');
+        const hasRemoteTemporary = Object.prototype.hasOwnProperty.call(row, 'is_temporary');
+        return {
+          ...row,
+          is_temporary: hasRemoteTemporary ? Boolean(row.is_temporary) : Boolean(localTemporary),
+          is_hidden: hasRemoteHidden ? Boolean(row.is_hidden) : Boolean(localHidden),
+          image: row.image || fallbackImage,
+          gallery: Array.isArray(row.gallery) && row.gallery.length ? row.gallery : [row.image || fallbackImage]
+        };
+      });
+    }
+
+    async function patchState(carId, updates) {
+      const current = findCar(carId);
+      if (!current) return false;
+
+      if (supportsRemoteFlags) {
+        const payload = {
+          id: current.id,
+          is_temporary: Object.prototype.hasOwnProperty.call(updates, 'is_temporary') ? Boolean(updates.is_temporary) : Boolean(current.is_temporary),
+          is_hidden: Object.prototype.hasOwnProperty.call(updates, 'is_hidden') ? Boolean(updates.is_hidden) : Boolean(current.is_hidden)
+        };
+
+        const { error } = await supabase.from('cars').upsert(payload, { onConflict: 'id' });
+        if (error) throw error;
+      } else {
+        const state = getStoredState();
+        state[carId] = { ...(state[carId] || {}), ...updates };
+        saveStoredState(state);
+      }
+
+      cars = cars.map((car) => String(car.id) === String(carId) ? { ...car, ...updates } : car);
+      renderSelect();
+      updateSummary();
+      renderHiddenCars();
+      fillForm(carId);
+      return true;
+    }
+
+    function wait(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function getAuthorizedUser(retries = 10, delay = 350) {
+      for (let attempt = 0; attempt < retries; attempt += 1) {
+        const { data, error } = await supabase.auth.getUser();
+        const user = data?.user;
+        if (!error && user) {
+          return user;
+        }
+        await wait(delay);
+      }
+      return null;
+    }
+
+    async function requireLogin() {
+      const user = await getAuthorizedUser(10, 350);
+
+      if (!user) {
+        window.location.href = './login.html';
+        return false;
+      }
+
+      if (String(user.email || '').toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+        await supabase.auth.signOut();
+        window.location.href = './login.html';
+        return false;
+      }
+
+      return true;
+    }
+
+    async function seedCarsIfEmpty() {
+      const { data, error } = await supabase.from('cars').select('id').limit(1);
+      if (error) return;
+      if (Array.isArray(data) && data.length === 0) {
+        await supabase.from('cars').upsert(defaultCars, { onConflict: 'id' });
+      }
+    }
+
+    function optionLabel(car) {
+      const temp = car.is_temporary ? ' 🔄' : '';
+      const hidden = car.is_hidden ? ' 🙈' : '';
+      return `Fahrzeug ${car.id} - ${car.name || ''}${temp}${hidden}`;
+    }
+
+    function renderSelect() {
+      const currentId = carSelect.value || String(cars[0]?.id || '');
+      carSelect.innerHTML = cars.map((car) => `<option value="${car.id}">${optionLabel(car)}</option>`).join('');
+      if (cars.length) {
+        const exists = cars.some((car) => String(car.id) === String(currentId));
+        carSelect.value = exists ? currentId : String(cars[0].id);
+      }
+    }
+
+    function findCar(id) {
+      return cars.find((car) => String(car.id) === String(id));
+    }
+
+    function fillForm(id) {
+      const car = findCar(id);
+      if (!car) return;
+
+      nameInput.value = car.name || '';
+      categoryInput.value = car.category || '';
+      priceInput.value = car.price || '';
+      yearInput.value = car.year || '';
+      mileageInput.value = car.mileage || '';
+      conditionInput.value = car.condition || '';
+      descriptionInput.value = car.description || '';
+      isTemporaryInput.checked = Boolean(car.is_temporary);
+      preview.src = car.image || fallbackImage;
+      preview.onerror = () => { preview.src = fallbackImage; };
+
+      const flags = [
+        car.is_temporary ? '🔄 Temporär' : '✅ Standard',
+        car.is_hidden ? '🙈 Auf Website versteckt' : '👁‍🗨 Auf Website sichtbar'
+      ];
+      currentFlags.textContent = flags.join(' | ');
+
+      toggleHiddenBtn.textContent = car.is_hidden ? '🙈 Fahrzeug ist jetzt versteckt' : '🙈 Vorübergehend ausblenden';
+      restoreBtn.disabled = !car.is_hidden;
+      restoreBtn.className = `px-4 py-3 rounded-2xl font-black text-slate-950 ${car.is_hidden ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-emerald-500/40 cursor-not-allowed'}`;
+    }
+
+    function updateSummary() {
+      const total = cars.length;
+      const hidden = cars.filter((car) => car.is_hidden).length;
+      const visible = total - hidden;
+      const temporary = cars.filter((car) => car.is_temporary).length;
+
+      document.getElementById('totalCount').textContent = total;
+      document.getElementById('visibleCount').textContent = visible;
+      document.getElementById('hiddenCount').textContent = hidden;
+      document.getElementById('summaryLine').textContent = `🚗 Fahrzeuge: ${total} | 👁‍🗨 Sichtbar: ${visible} | 🙈 Versteckt: ${hidden} | 🔄 Temporär: ${temporary}`;
+    }
+
+    function renderHiddenCars() {
+      const hiddenCars = cars.filter((car) => car.is_hidden);
+      if (!hiddenCars.length) {
+        hiddenCarsList.innerHTML = '<div class="text-white/60">Aktuell gibt es keine versteckten Fahrzeuge.</div>';
+        return;
+      }
+
+      hiddenCarsList.innerHTML = hiddenCars.map((car) => `
+        <div class="rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 flex items-center justify-between gap-3">
+          <div>
+            <div class="font-bold text-white">${car.name || ''}${car.is_temporary ? ' 🔄' : ''}</div>
+            <div class="text-white/60">سيارة ${car.id} • ${car.category || 'ohne Kategorie'}</div>
+          </div>
+          <button data-restore-id="${car.id}" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold">
+            👁‍🗨 Wiederherstellen
+          </button>
+        </div>
+      `).join('');
+
+      hiddenCarsList.querySelectorAll('[data-restore-id]').forEach((button) => {
+        button.addEventListener('click', () => restoreCar(button.getAttribute('data-restore-id')));
+      });
+    }
+
+    async function loadCars() {
+      showMessage('Fahrzeuge werden geladen...');
+      const { data, error } = await supabase.from('cars').select('*').order('id', { ascending: true });
+
+      if (error) {
+        showMessage(error.message || 'Fahrzeuge konnten nicht geladen werden', false);
+        return;
+      }
+
+      supportsRemoteFlags = Array.isArray(data) && data.some((row) => Object.prototype.hasOwnProperty.call(row, 'is_hidden') || Object.prototype.hasOwnProperty.call(row, 'is_temporary'));
+      cars = applyLocalStates(data || []);
+      renderSelect();
+      updateSummary();
+      renderHiddenCars();
+
+      if (cars.length) {
+        fillForm(carSelect.value || cars[0].id);
+      }
+
+      showMessage('Fahrzeuge erfolgreich geladen');
+    }
+
+    async function uploadImageIfNeeded(carId) {
+      const file = imageInput.files?.[0];
+      if (!file) return null;
+
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      const allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+      const ext = (file.name.split('.').pop() || '').toLowerCase();
+
+      if (!allowedTypes.includes(file.type) || !allowedExtensions.includes(ext)) {
+        throw new Error('Nur JPG, JPEG, PNG oder WEBP sind erlaubt.');
+      }
+
+      if (file.size > 4 * 1024 * 1024) {
+        throw new Error('Die Bilddatei darf maximal 4 MB groß sein.');
+      }
+
+      const path = `cars/car-${carId}-${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file, { upsert: true, contentType: file.type });
+      if (error) throw error;
+
+      const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+      return data.publicUrl;
+    }
+
+    async function saveCar() {
+      const id = Number(carSelect.value);
+      const car = findCar(id);
+      if (!car) return;
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Wird gespeichert...';
+      showMessage('Änderungen werden gespeichert...');
+
+      try {
+        const uploadedImage = await uploadImageIfNeeded(id);
+        const fullName = nameInput.value.trim();
+        const parts = fullName.split(' ').filter(Boolean);
+
+        const updated = {
+          id,
+          name: fullName,
+          brand: parts[0] || car.brand,
+          model: parts.slice(1).join(' ') || car.model,
+          category: categoryInput.value.trim(),
+          price: priceInput.value.trim(),
+          year: Number(yearInput.value) || car.year,
+          mileage: mileageInput.value.trim(),
+          condition: conditionInput.value.trim(),
+          description: descriptionInput.value.trim(),
+          image: uploadedImage || car.image,
+          gallery: uploadedImage ? [uploadedImage] : (Array.isArray(car.gallery) && car.gallery.length ? car.gallery : [car.image || fallbackImage])
+        };
+
+        if (supportsRemoteFlags) {
+          updated.is_temporary = isTemporaryInput.checked;
+          updated.is_hidden = Boolean(car.is_hidden);
+        }
+
+        const { error } = await supabase.from('cars').upsert(updated, { onConflict: 'id' });
+        if (error) throw error;
+
+        await patchState(id, {
+          is_temporary: isTemporaryInput.checked,
+          is_hidden: car.is_hidden
+        });
+
+        showMessage('Änderungen erfolgreich gespeichert');
+        await loadCars();
+        carSelect.value = String(id);
+        fillForm(id);
+        imageInput.value = '';
+      } catch (error) {
+        showMessage(error.message || 'Beim Speichern ist ein Fehler aufgetreten', false);
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Änderungen speichern';
+      }
+    }
+
+    async function hideCar(id) {
+      try {
+        await patchState(Number(id), { is_hidden: true });
+        showMessage(supportsRemoteFlags
+          ? 'Das Fahrzeug wurde gespeichert und auf allen Geräten als versteckt markiert.'
+          : 'Das Fahrzeug wurde auf diesem Gerät vorübergehend ausgeblendet.');
+      } catch (error) {
+        showMessage(error.message || 'Das Fahrzeug konnte nicht ausgeblendet werden.', false);
+      }
+    }
+
+    async function restoreCar(id) {
+      try {
+        await patchState(Number(id), { is_hidden: false });
+        showMessage(supportsRemoteFlags
+          ? 'Das Fahrzeug wurde gespeichert und auf allen Geräten wieder angezeigt.'
+          : 'Das Fahrzeug wurde auf diesem Gerät wieder angezeigt.');
+      } catch (error) {
+        showMessage(error.message || 'Das Fahrzeug konnte nicht wiederhergestellt werden.', false);
+      }
+    }
+
+    supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') {
+        window.location.href = './login.html';
+      }
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      window.location.href = './login.html';
+    });
+
+    carSelect.addEventListener('change', (e) => fillForm(e.target.value));
+    reloadBtn.addEventListener('click', loadCars);
+    saveBtn.addEventListener('click', saveCar);
+
+    toggleHiddenBtn.addEventListener('click', () => {
+      const id = Number(carSelect.value);
+      const car = findCar(id);
+      if (!car) return;
+      hideCar(id);
+    });
+
+    restoreBtn.addEventListener('click', () => {
+      const id = Number(carSelect.value);
+      restoreCar(id);
+    });
+
+    isTemporaryInput.addEventListener('change', () => {
+      const id = Number(carSelect.value);
+      const car = findCar(id);
+      if (!car) return;
+      patchState(id, { is_temporary: isTemporaryInput.checked, is_hidden: car.is_hidden });
+      showMessage(isTemporaryInput.checked ? 'Das Fahrzeug wurde als temporär markiert 🔄' : 'Die temporäre Markierung wurde entfernt');
+    });
+
+    imageInput.addEventListener('change', () => {
+      const file = imageInput.files?.[0];
+      if (!file) return;
+      preview.src = URL.createObjectURL(file);
+    });
+
+    const allowed = await requireLogin();
+    if (!allowed) {
+      throw new Error('Not authorized');
+    }
+
+    await seedCarsIfEmpty();
+    await loadCars();
+  </script>
+</body>
+</html>
