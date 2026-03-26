@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="de" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fahrzeugverwaltung</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-100 text-slate-800">
+  <div class="max-w-7xl mx-auto p-4 md:p-8 space-y-6">
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 md:p-8 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+      <div>
+        <div class="inline-flex items-center gap-2 rounded-full bg-sky-50 text-sky-700 px-4 py-2 text-sm font-bold">Klare und einfache Verwaltung</div>
+        <h1 class="text-3xl md:text-4xl font-black mt-4">Fahrzeuge verwalten</h1>
+        <p class="text-slate-500 mt-2 leading-8">Die Seite wurde komplett neu geordnet. Beim Öffnen erscheinen nur die drei Hauptbereiche: Fahrzeug hinzufügen, Fahrzeug bearbeiten und Fahrzeug ausblenden. Ausblenden bedeutet hier kein endgültiges Löschen.</p>
+      </div>
+      <div class="flex flex-wrap gap-3">
+        <a href="index.html" class="px-5 py-3 rounded-2xl bg-white border border-slate-300 hover:bg-slate-50 font-bold">Website öffnen</a>
+        <button id="logoutBtn" class="px-5 py-3 rounded-2xl bg-red-600 text-white hover:bg-red-700 font-bold">Abmelden</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
+        <div class="text-slate-500 text-sm mb-2">Gesamtzahl Fahrzeuge</div>
+        <div id="totalCount" class="text-3xl font-black">0</div>
+      </div>
+      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
+        <div class="text-slate-500 text-sm mb-2">Sichtbare Fahrzeuge</div>
+        <div id="visibleCount" class="text-3xl font-black text-emerald-700">0</div>
+      </div>
+      <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm">
+        <div class="text-slate-500 text-sm mb-2">Ausgeblendete Fahrzeuge</div>
+        <div id="hiddenCount" class="text-3xl font-black text-amber-700">0</div>
+      </div>
+    </div>
+
+    <div id="msg" class="min-h-[52px] rounded-2xl px-4 py-3 text-sm bg-white border border-slate-200 shadow-sm flex items-center"></div>
+
+    <section id="homeSection" class="space-y-5">
+      <div class="grid md:grid-cols-3 gap-5">
+        <button data-open-section="add" class="section-card text-left bg-white rounded-3xl border border-slate-200 shadow-sm p-6 hover:border-sky-300 hover:-translate-y-1 transition">
+          <div class="text-4xl mb-4">➕</div>
+          <h2 class="text-2xl font-black">Fahrzeug hinzufügen</h2>
+          <p class="text-slate-500 mt-3 leading-7">Nur die Felder für ein neues Fahrzeug werden angezeigt.</p>
+        </button>
+        <button data-open-section="edit" class="section-card text-left bg-white rounded-3xl border border-slate-200 shadow-sm p-6 hover:border-sky-300 hover:-translate-y-1 transition">
+          <div class="text-4xl mb-4">✏️</div>
+          <h2 class="text-2xl font-black">Fahrzeug bearbeiten</h2>
+          <p class="text-slate-500 mt-3 leading-7">Wähle ein sichtbares Fahrzeug und ändere nur dessen Daten und Bilder.</p>
+        </button>
+        <button data-open-section="delete" class="section-card text-left bg-white rounded-3xl border border-slate-200 shadow-sm p-6 hover:border-sky-300 hover:-translate-y-1 transition">
+          <div class="text-4xl mb-4">🗂️</div>
+          <h2 class="text-2xl font-black">Fahrzeug ausblenden</h2>
+          <p class="text-slate-500 mt-3 leading-7">Fahrzeuge werden nur verborgen und können später wiederhergestellt werden.</p>
+        </button>
+      </div>
+    </section>
+
+    <section id="addSection" class="hidden space-y-6">
+      <div class="flex items-center justify-between gap-3 flex-wrap">
+        <h2 class="text-2xl font-black">Neues Fahrzeug hinzufügen</h2>
+        <button data-back-home class="px-4 py-3 rounded-2xl bg-white border border-slate-300 font-bold">Zurück zur Startseite</button>
+      </div>
+      <div class="grid xl:grid-cols-[1.1fr,0.9fr] gap-6">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-5">
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="block mb-2 text-sm font-bold text-slate-600">Fahrzeugname</label>
+              <input id="addName" type="text" class="w-full rounded-2xl p-4 bg-slate-50 border border-slate-200" placeholder="Zum Beispiel: Mercedes S-Class">
+            </div>
+            <div>
+              <label class="block mb-2 text-sm font-bold text-slate-600">Kategorie</label>
+              <input id="addCategory" type="text" class="w-full rounded-2xl p-4 bg-slate-50 border border-slate-200" placeholder="SUV oder Sedan">
+            </div>
+            <div>
+              <label class="block mb-2 text-sm font-bold text-slate-600">Preis</label>
+              <input id="addPrice" type="text" class="w-full rounded-2xl p-4 bg-slate-50 border border-slate-200" placeholder="€120,000">
+            </div>
+            <div>
+              <label class="block mb-2 text-sm font-bold text-slate-600">Baujahr</label>
+              <input id="addYear" type="number" class="w-full rounded-2xl p-4 bg-slate-50 border border-slate-200" placeholder="2024">
+            </div>
+            <div>
+              <label class="block mb-2 text-sm font-bold text-slate-600">Kilometerstand</label>
+              <input id="addMileage" type="text" class="w-full rounded-2xl p-4 bg-slate-50 border border-slate-200" placeholder="8,000 km">
+            </div>
+            <div>
+              <label class="block mb-2 text-sm font-bold text-slate-600">Zustand</label>
+              <input id="addCondition" type="text" class="w-full rounded-2xl p-4 bg-slate-50 border border-slate-200" placeholder="Ausgezeichnet">
+            </div>
+            <div class="md:col-span-2">
+              <label class="block mb-2 text-sm font-bold text-slate-600">Beschreibung</label>
+              <textarea id="addDescription" rows="5" class="w-full rounded-2xl p-4 bg-slate-50 border border-slate-200" placeholder="Fahrzeugbeschreibung hier eingeben"></textarea>
+            </div>
+            <div class="md:col-span-2">
+              <label class="block mb-2 text-sm font-bold text-slate-600">Fahrzeugbilder (bis zu 10 Bilder)</label>
+              <input id="addImages" type="file" accept="image/*" multiple class="w-full rounded-2xl p-4 bg-slate-50 border border-slate-200">
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-3">
+            <button id="createBtn" class="px-6 py-4 rounded-2xl bg-sky-600 text-white hover:bg-sky-700 font-black">Neues Fahrzeug speichern</button>
+            <button id="clearAddBtn" class="px-6 py-4 rounded-2xl bg-white border border-slate-300 font-black">Felder leeren</button>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
+          <div class="flex items-center justify-between gap-3 mb-4">
+            <h3 class="text-xl font-black">Vorschau der neuen Bilder</h3>
+            <div id="addGalleryCounter" class="text-sm font-bold text-slate-500">0 / 10</div>
+          </div>
+          <img id="addPreview" class="w-full h-72 object-cover rounded-2xl bg-slate-200" alt="Vorschau">
+          <div id="addGalleryPreview" class="grid grid-cols-5 gap-2 mt-4"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="editSection" class="hidden space-y-6">
+      <div class="flex items-center justify-between gap-3 flex-wrap">
+        <h2 class="text-2xl font-black">Fahrzeug bearbeiten</h2>
+        <button data-back-home class="px-4 py-3 rounded-2xl bg-white border border-slate-300 font-bold">Zurück zur Startseite</button>
+      </div>
+      <div class="grid xl:grid-cols-[360px,1fr] gap-6">
+        <div class="space-y-6">
+          <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-4">
+            <div>
+              <label class="block mb-2 text-sm font-bold text-slate-600">Fahrzeug zum Bearbeiten auswählen</label>
+              <select id="carSelect" class="w-full rounded-2xl p-4 bg-slate-50 border border-slate-200"></select>
+            </div>
+            <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4 text-sm">
+              <div class="flex items-center justify-between gap-3">
+                <span class="text-slate-500">Aktueller Status</span>
+                <span id="currentFlags" class="font-bold">—</span>
+              </div>
+            </div>
+            <div class="rounded-2xl bg-slate-50 border border-slate-200 p-4">
+              <div class="flex items-center justify-between gap-3 mb-3">
+                <div class="font-bold">Hauptbild</div>
+                <div id="galleryCounter" class="text-sm text-slate-500 font-bold">0 / 10</div>
+              </div>
+              <img id="preview" class="w-full h-64 object-cover rounded-2xl bg-slate-200" alt="Vorschau">
+              <div id="galleryPreview" class="grid grid-cols-5 gap-2 mt-4"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-5">
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label class="block mb-2 text-sm font-bold text-slate-600">Fahrzeugname</label>
+              <input id="name" type="text" class="w-full rounded-2xl p-4 bg-slate-50 border border-slate-200">
+            </div>
+            <div>
+              <label class="block mb-2 text-sm font-bold text-slate-600">Kategorie</label>
+              <input id="category" type="text" class="w-full rounded-2xl p-4 bg-slate-50 border border-slate-200">
+            </div>
+            <div>
+              <label class="block mb-2 text-sm font-bold text-slate-600">Preis</label>
+              <input id="price" type="text" class="w-full rounded-2xl p-4 bg-slate-50 border border-slate-200">
+            </div>
+            <div>
+              <label class="block mb-2 text-sm font-bold text-slate-600">Baujahr</label>
+              <input id="year" type="number" class="w-full rounded-2xl p-4 bg-slate-50 border border-slate-200">
+            </div>
+            <div>
+              <label class="block mb-2 text-sm font-bold text-slate-600">Kilometerstand</label>
+              <input id="mileage" type="text" class="w-full rounded-2xl p-4 bg-slate-50 border border-slate-200">
+            </div>
+            <div>
+              <label class="block mb-2 text-sm font-bold text-slate-600">Zustand</label>
+              <input id="condition" type="text" class="w-full rounded-2xl p-4 bg-slate-50 border border-slate-200">
+            </div>
+            <div class="md:col-span-2">
+              <label class="block mb-2 text-sm font-bold text-slate-600">Beschreibung</label>
+              <textarea id="description" rows="5" class="w-full rounded-2xl p-4 bg-slate-50 border border-slate-200"></textarea>
+            </div>
+            <div class="md:col-span-2">
+              <label class="block mb-2 text-sm font-bold text-slate-600">Bilder ändern (bis zu 10 Bilder)</label>
+              <input id="imageFiles" type="file" accept="image/*" multiple class="w-full rounded-2xl p-4 bg-slate-50 border border-slate-200">
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-3">
+            <button id="saveBtn" class="px-6 py-4 rounded-2xl bg-emerald-600 text-white hover:bg-emerald-700 font-black">Änderungen speichern</button>
+            <button id="reloadBtn" class="px-6 py-4 rounded-2xl bg-white border border-slate-300 font-black">Neu laden</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="deleteSection" class="hidden space-y-6">
+      <div class="flex items-center justify-between gap-3 flex-wrap">
+        <h2 class="text-2xl font-black">Fahrzeuge ausblenden oder wiederherstellen</h2>
+        <button data-back-home class="px-4 py-3 rounded-2xl bg-white border border-slate-300 font-bold">Zurück zur Startseite</button>
+      </div>
+
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-6">
+        <div>
+          <div class="rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 p-4 text-sm leading-7 mb-5">Wenn du ein Fahrzeug hier ausblendest, wird es nicht endgültig gelöscht. Es wird nur auf der Website verborgen und kann weiter unten wiederhergestellt werden.</div>
+          <h3 class="text-xl font-black mb-4">Sichtbare Fahrzeuge</h3>
+          <div id="deleteCarsList" class="grid md:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+        </div>
+
+        <div>
+          <h3 class="text-xl font-black mb-4">Ausgeblendete Fahrzeuge wiederherstellen</h3>
+          <div id="hiddenCarsList" class="space-y-3"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const supabase = createClient(
+      'https://beyxyvibqzhtyawqrhbv.supabase.co',
+      'sb_publishable_iMt3G9iAvXawW3QN6vGWjw_BOw8qLFK'
+    );
+
+    const STORAGE_BUCKET = 'site-images';
+    const fallbackImage = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+      <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="700" viewBox="0 0 1200 700">
+        <defs>
+          <linearGradient id="g" x1="0" x2="1">
+            <stop offset="0%" stop-color="#0f172a"/>
+            <stop offset="100%" stop-color="#1e293b"/>
+          </linearGradient>
+        </defs>
+        <rect width="1200" height="700" fill="url(#g)"/>
+        <text x="600" y="350" fill="#cbd5e1" font-size="40" text-anchor="middle" font-family="Arial">No Image Available</text>
+      </svg>
+    `);
+
+    const defaultCars = [
+      ['Mercedes', 'S-Class', 'Sedan', '€128,000', 2024, '8,000 km', 'Ausgezeichnet'],
+      ['BMW', 'X7', 'SUV', '€102,500', 2023, '14,500 km', 'Ausgezeichnet'],
+      ['Audi', 'RS7', 'Sport', '€119,900', 2024, '5,200 km', 'Ausgezeichnet'],
+      ['Range Rover', 'Sport', 'SUV', '€115,300', 2023, '18,100 km', 'Ausgezeichnet']
+    ].map((item, index) => ({
+      id: index + 1,
+      brand: item[0],
+      model: item[1],
+      category: item[2],
+      price: item[3],
+      year: item[4],
+      mileage: item[5],
+      condition: item[6],
+      name: `${item[0]} ${item[1]}`,
+      description: 'Fahrzeug in sehr gutem Zustand. Alle Daten können im Dashboard bearbeitet werden.',
+      image: fallbackImage,
+      gallery: [fallbackImage],
+      isHidden: false,
+      isTemporary: false
+    }));
+
+    const msg = document.getElementById('msg');
+    const sections = {
+      home: document.getElementById('homeSection'),
+      add: document.getElementById('addSection'),
+      edit: document.getElementById('editSection'),
+      delete: document.getElementById('deleteSection')
+    };
+
+    const carSelect = document.getElementById('carSelect');
+    const preview = document.getElementById('preview');
+    const galleryPreview = document.getElementById('galleryPreview');
+    const galleryCounter = document.getElementById('galleryCounter');
+    const currentFlags = document.getElementById('currentFlags');
+    const imageInput = document.getElementById('imageFiles');
+    const saveBtn = document.getElementById('saveBtn');
+    const reloadBtn = document.getElementById('reloadBtn');
+    const hiddenCarsList = document.getElementById('hiddenCarsList');
+    const deleteCarsList = document.getElementById('deleteCarsList');
+    const createBtn = document.getElementById('createBtn');
+    const clearAddBtn = document.getElementById('clearAddBtn');
+    const addImagesInput = document.getElementById('addImages');
+    const addPreview = document.getElementById('addPreview');
+    const addGalleryPreview = document.getElementById('addGalleryPreview');
+    const addGalleryCounter = document.getElementById('addGalleryCounter');
+
+    const addFields = {
+      name: document.getElementById('addName'),
+      category: document.getElementById('addCategory'),
+      price: document.getElementById('addPrice'),
+      year: document.getElementById('addYear'),
+      mileage: document.getElementById('addMileage'),
+      condition: document.getElementById('addCondition'),
+      description: document.getElementById('addDescription')
+    };
+
+    const editFields = {
+      name: document.getElementById('name'),
+      category: document.getElementById('category'),
+      price: document.getElementById('price'),
+      year: document.getElementById('year'),
+      mileage: document.getElementById('mileage'),
+      condition: document.getElementById('condition'),
+      description: document.getElementById('description')
+    };
+
+    let cars = [];
+
+    function showMessage(text, ok = true) {
+      msg.textContent = text;
+      msg.className = `min-h-[52px] rounded-2xl px-4 py-3 text-sm bg-white border shadow-sm flex items-center ${ok ? 'border-emerald-200 text-emerald-700' : 'border-red-200 text-red-700'}`;
+    }
+
+    function readFlag(row, ...keys) {
+      for (const key of keys) {
+        if (Object.prototype.hasOwnProperty.call(row || {}, key)) return Boolean(row[key]);
+      }
+      return false;
+    }
+
+    function normalizeGalleryValue(value) {
+      if (Array.isArray(value)) return value.filter(Boolean);
+      if (typeof value === 'string' && value.trim()) {
+        try {
+          const parsed = JSON.parse(value);
+          if (Array.isArray(parsed)) return parsed.filter(Boolean);
+        } catch (_) {}
+        return [value.trim()];
+      }
+      return [];
+    }
+
+    function applyRemoteStates(rows) {
+      return (rows || []).map((row) => {
+        const gallery = normalizeGalleryValue(row.gallery);
+        const mainImage = row.image || gallery[0] || fallbackImage;
+        return {
+          ...row,
+          isTemporary: readFlag(row, 'isTemporary', 'istemporary', 'is_temporary'),
+          isHidden: readFlag(row, 'isHidden', 'ishidden', 'is_hidden'),
+          image: mainImage,
+          gallery: gallery.length ? gallery.slice(0, 10) : [mainImage]
+        };
+      });
+    }
+
+    function renderThumbs(container, counterEl, images, mainImage, previewTarget) {
+      const gallery = Array.isArray(images) ? images.filter(Boolean).slice(0, 10) : [];
+      if (counterEl) counterEl.textContent = `${gallery.length} / 10`;
+      if (!gallery.length) {
+        container.innerHTML = '<div class="col-span-5 text-sm text-slate-400">Aktuell sind keine Bilder vorhanden.</div>';
+        if (previewTarget) previewTarget.src = fallbackImage;
+        return;
+      }
+      container.innerHTML = gallery.map((image, index) => `
+        <button type="button" data-image="${image}" class="relative overflow-hidden rounded-xl border ${image === mainImage ? 'border-sky-500 ring-2 ring-sky-200' : 'border-slate-200'} bg-slate-100 aspect-square">
+          <img src="${image}" class="w-full h-full object-cover" alt="Bild ${index + 1}" onerror="this.onerror=null;this.src='${fallbackImage}'">
+          <span class="absolute top-1 left-1 bg-slate-900/80 text-white text-[10px] px-1.5 py-0.5 rounded-md">${index + 1}</span>
+        </button>
+      `).join('');
+      container.querySelectorAll('[data-image]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const image = btn.getAttribute('data-image') || fallbackImage;
+          previewTarget.src = image;
+          previewTarget.onerror = () => { previewTarget.src = fallbackImage; };
+          renderThumbs(container, counterEl, gallery, image, previewTarget);
+        });
+      });
+      if (previewTarget) {
+        previewTarget.src = mainImage || gallery[0] || fallbackImage;
+        previewTarget.onerror = () => { previewTarget.src = fallbackImage; };
+      }
+    }
+
+    function getNextId() {
+      return cars.reduce((max, car) => Math.max(max, Number(car.id) || 0), 0) + 1;
+    }
+
+    function findCar(id) {
+      return cars.find((car) => String(car.id) === String(id));
+    }
+
+    function showSection(key) {
+      Object.entries(sections).forEach(([name, section]) => {
+        section.classList.toggle('hidden', name !== key);
+      });
+      if (key === 'edit' && cars.some((car) => !car.isHidden)) renderEditSelect();
+      if (key === 'delete') {
+        renderDeleteCars();
+        renderHiddenCars();
+      }
+    }
+
+    function updateSummary() {
+      const total = cars.length;
+      const hidden = cars.filter((car) => car.isHidden).length;
+      const visible = total - hidden;
+      document.getElementById('totalCount').textContent = total;
+      document.getElementById('visibleCount').textContent = visible;
+      document.getElementById('hiddenCount').textContent = hidden;
+    }
+
+    function optionLabel(car) {
+      return car.name || `Fahrzeug ${car.id}`;
+    }
+
+    function renderEditSelect() {
+      const visibleCars = cars.filter((car) => !car.isHidden);
+      if (!visibleCars.length) {
+        carSelect.innerHTML = '<option value="">Keine sichtbaren Fahrzeuge zum Bearbeiten vorhanden</option>';
+        preview.src = fallbackImage;
+        currentFlags.textContent = 'Keine Daten vorhanden';
+        return;
+      }
+      const currentId = visibleCars.some((car) => String(car.id) === String(carSelect.value)) ? carSelect.value : String(visibleCars[0].id);
+      carSelect.innerHTML = visibleCars.map((car) => `<option value="${car.id}">${optionLabel(car)}</option>`).join('');
+      carSelect.value = currentId;
+      fillEditForm(currentId);
+    }
+
+    function fillEditForm(id) {
+      const car = findCar(id);
+      if (!car) return;
+      editFields.name.value = car.name || '';
+      editFields.category.value = car.category || '';
+      editFields.price.value = car.price || '';
+      editFields.year.value = car.year || '';
+      editFields.mileage.value = car.mileage || '';
+      editFields.condition.value = car.condition || '';
+      editFields.description.value = car.description || '';
+      currentFlags.textContent = car.isHidden ? 'Ausgeblendet' : 'Sichtbar';
+      renderThumbs(galleryPreview, galleryCounter, car.gallery, car.image, preview);
+      imageInput.value = '';
+    }
+
+    function renderHiddenCars() {
+      const hiddenCars = cars.filter((car) => car.isHidden);
+      if (!hiddenCars.length) {
+        hiddenCarsList.innerHTML = '<div class="rounded-2xl bg-slate-50 border border-slate-200 p-4 text-slate-500">Aktuell gibt es keine ausgeblendeten Fahrzeuge.</div>';
+        return;
+      }
+      hiddenCarsList.innerHTML = hiddenCars.map((car) => `
+        <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4 flex items-center justify-between gap-3">
+          <div>
+            <div class="font-bold">${car.name || `Fahrzeug ${car.id}`}</div>
+            <div class="text-sm text-slate-500">${car.category || 'Ohne Kategorie'}</div>
+          </div>
+          <button data-restore-id="${car.id}" class="px-4 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 font-bold">Wiederherstellen</button>
+        </div>
+      `).join('');
+      hiddenCarsList.querySelectorAll('[data-restore-id]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          await restoreCar(btn.getAttribute('data-restore-id'));
+        });
+      });
+    }
+
+    function renderDeleteCars() {
+      const visibleCars = cars.filter((car) => !car.isHidden);
+      if (!visibleCars.length) {
+        deleteCarsList.innerHTML = '<div class="md:col-span-2 xl:col-span-3 rounded-2xl bg-slate-50 border border-slate-200 p-5 text-slate-500">Aktuell gibt es keine sichtbaren Fahrzeuge zum Ausblenden.</div>';
+        return;
+      }
+      deleteCarsList.innerHTML = visibleCars.map((car) => `
+        <div class="rounded-3xl border border-slate-200 bg-slate-50 p-4 space-y-4">
+          <img src="${car.image || fallbackImage}" class="w-full h-44 object-cover rounded-2xl bg-slate-200" alt="${car.name || ''}" onerror="this.onerror=null;this.src='${fallbackImage}'">
+          <div>
+            <div class="text-xl font-black">${car.name || `Fahrzeug ${car.id}`}</div>
+            <div class="text-sm text-slate-500 mt-1">${car.category || 'Ohne Kategorie'} • ${car.price || 'Kein Preis'}</div>
+          </div>
+          <button data-hide-id="${car.id}" class="w-full px-4 py-3 rounded-2xl bg-red-600 text-white hover:bg-red-700 font-black">Fahrzeug ausblenden</button>
+        </div>
+      `).join('');
+      deleteCarsList.querySelectorAll('[data-hide-id]').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          const id = btn.getAttribute('data-hide-id');
+          const car = findCar(id);
+          const ok = confirm(`Möchtest du das Fahrzeug wirklich ausblenden: ${car?.name || id}?`);
+          if (!ok) return;
+          await hideCar(id);
+        });
+      });
+    }
+
+    async function requireLogin() {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) window.location.href = './login.html';
+    }
+
+    async function seedCarsIfEmpty() {
+      const { data, error } = await supabase.from('cars').select('id').limit(1);
+      if (error) return;
+      if (Array.isArray(data) && data.length === 0) {
+        await supabase.from('cars').upsert(defaultCars, { onConflict: 'id' });
+      }
+    }
+
+    async function patchState(carId, updates) {
+      const { data, error } = await supabase
+        .from('cars')
+        .update(updates)
+        .eq('id', Number(carId))
+        .select('*')
+        .single();
+      if (error) throw error;
+      cars = cars.map((car) => String(car.id) === String(carId) ? applyRemoteStates([data])[0] : car);
+      renderAll();
+      return true;
+    }
+
+    async function loadCars() {
+      showMessage('Fahrzeuge werden geladen...');
+      const { data, error } = await supabase.from('cars').select('*').order('id', { ascending: true });
+      if (error) {
+        showMessage(error.message || 'Fahrzeuge konnten nicht geladen werden.', false);
+        return;
+      }
+      cars = applyRemoteStates(data || []);
+      renderAll();
+      showMessage('Die Daten wurden erfolgreich geladen.');
+    }
+
+    function renderAll() {
+      updateSummary();
+      renderDeleteCars();
+      renderHiddenCars();
+      renderEditSelect();
+    }
+
+    async function uploadImages(files, carId) {
+      const list = Array.from(files || []).filter(Boolean);
+      if (!list.length) return [];
+      if (list.length > 10) throw new Error('Maximal 10 Bilder sind erlaubt.');
+
+      const uploadedUrls = [];
+      for (const [index, file] of list.entries()) {
+        const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+        const path = `cars/car-${carId}-${Date.now()}-${index + 1}.${ext}`;
+        const { error } = await supabase.storage.from(STORAGE_BUCKET).upload(path, file, { upsert: true, contentType: file.type || `image/${ext}` });
+        if (error) throw error;
+        const { data } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+        if (data?.publicUrl) uploadedUrls.push(data.publicUrl);
+      }
+      return uploadedUrls.slice(0, 10);
+    }
+
+    async function createCar() {
+      const name = addFields.name.value.trim();
+      if (!name) {
+        showMessage('Bitte gib den Namen des neuen Fahrzeugs ein.', false);
+        return;
+      }
+
+      const id = getNextId();
+      createBtn.disabled = true;
+      createBtn.textContent = 'Wird gespeichert...';
+      showMessage('Das neue Fahrzeug wird gespeichert...');
+
+      try {
+        const gallery = await uploadImages(addImagesInput.files, id);
+        const parts = name.split(' ').filter(Boolean);
+        const payload = {
+          id,
+          name,
+          brand: parts[0] || name,
+          model: parts.slice(1).join(' ') || '',
+          category: addFields.category.value.trim(),
+          price: addFields.price.value.trim(),
+          year: Number(addFields.year.value) || new Date().getFullYear(),
+          mileage: addFields.mileage.value.trim(),
+          condition: addFields.condition.value.trim(),
+          description: addFields.description.value.trim(),
+          image: gallery[0] || fallbackImage,
+          gallery: gallery.length ? gallery : [fallbackImage],
+          isTemporary: false,
+          isHidden: false
+        };
+
+        const { error } = await supabase.from('cars').upsert(payload, { onConflict: 'id' });
+        if (error) throw error;
+
+        clearAddForm();
+        await loadCars();
+        showMessage('Das neue Fahrzeug wurde erfolgreich hinzugefügt.');
+        showSection('add');
+      } catch (error) {
+        showMessage(error.message || 'Beim Hinzufügen des Fahrzeugs ist ein Fehler aufgetreten.', false);
+      } finally {
+        createBtn.disabled = false;
+        createBtn.textContent = 'Neues Fahrzeug speichern';
+      }
+    }
+
+    async function saveCar() {
+      const id = Number(carSelect.value);
+      const car = findCar(id);
+      if (!car) {
+        showMessage('Es wurde kein Fahrzeug zum Bearbeiten ausgewählt.', false);
+        return;
+      }
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Wird gespeichert...';
+      showMessage('Die Änderungen werden gespeichert...');
+
+      try {
+        const uploadedGallery = await uploadImages(imageInput.files, id);
+        const finalGallery = uploadedGallery.length ? uploadedGallery : (car.gallery?.length ? car.gallery.slice(0, 10) : [car.image || fallbackImage]);
+        const name = editFields.name.value.trim();
+        const parts = name.split(' ').filter(Boolean);
+
+        const payload = {
+          id,
+          name,
+          brand: parts[0] || car.brand || name,
+          model: parts.slice(1).join(' ') || car.model || '',
+          category: editFields.category.value.trim(),
+          price: editFields.price.value.trim(),
+          year: Number(editFields.year.value) || car.year,
+          mileage: editFields.mileage.value.trim(),
+          condition: editFields.condition.value.trim(),
+          description: editFields.description.value.trim(),
+          image: finalGallery[0] || car.image || fallbackImage,
+          gallery: finalGallery,
+          isTemporary: false,
+          isHidden: Boolean(car.isHidden)
+        };
+
+        const { error } = await supabase.from('cars').upsert(payload, { onConflict: 'id' });
+        if (error) throw error;
+
+        await loadCars();
+        carSelect.value = String(id);
+        fillEditForm(id);
+        showMessage('Die Änderungen wurden erfolgreich gespeichert.');
+      } catch (error) {
+        showMessage(error.message || 'Beim Speichern der Änderungen ist ein Fehler aufgetreten.', false);
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Änderungen speichern';
+      }
+    }
+
+    async function hideCar(id) {
+      try {
+        await patchState(id, { isHidden: true, isTemporary: false });
+        showMessage('Das Fahrzeug wurde erfolgreich ausgeblendet.');
+        showSection('delete');
+      } catch (error) {
+        showMessage(error.message || 'Das Fahrzeug konnte nicht ausgeblendet werden.', false);
+      }
+    }
+
+    async function restoreCar(id) {
+      try {
+        await patchState(id, { isHidden: false, isTemporary: false });
+        showMessage('Das Fahrzeug wurde erfolgreich wiederhergestellt und ist wieder sichtbar.');
+        showSection('delete');
+      } catch (error) {
+        showMessage(error.message || 'Das Fahrzeug konnte nicht wiederhergestellt werden.', false);
+      }
+    }
+
+    function clearAddForm() {
+      Object.values(addFields).forEach((field) => {
+        field.value = '';
+      });
+      addImagesInput.value = '';
+      renderThumbs(addGalleryPreview, addGalleryCounter, [], fallbackImage, addPreview);
+    }
+
+    document.querySelectorAll('[data-open-section]').forEach((btn) => {
+      btn.addEventListener('click', () => showSection(btn.getAttribute('data-open-section')));
+    });
+
+    document.querySelectorAll('[data-back-home]').forEach((btn) => {
+      btn.addEventListener('click', () => showSection('home'));
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await supabase.auth.signOut();
+      window.location.href = './login.html';
+    });
+
+    carSelect.addEventListener('change', (e) => fillEditForm(e.target.value));
+    reloadBtn.addEventListener('click', loadCars);
+    saveBtn.addEventListener('click', saveCar);
+    createBtn.addEventListener('click', createCar);
+    clearAddBtn.addEventListener('click', clearAddForm);
+
+    imageInput.addEventListener('change', () => {
+      const files = Array.from(imageInput.files || []);
+      if (!files.length) {
+        const car = findCar(carSelect.value);
+        renderThumbs(galleryPreview, galleryCounter, car?.gallery || [], car?.image || fallbackImage, preview);
+        return;
+      }
+      if (files.length > 10) {
+        showMessage('Maximal 10 Bilder sind erlaubt.', false);
+        imageInput.value = '';
+        return;
+      }
+      const urls = files.map((file) => URL.createObjectURL(file));
+      renderThumbs(galleryPreview, galleryCounter, urls, urls[0], preview);
+      showMessage(`${files.length} Bild${files.length === 1 ? '' : 'er'} ausgewählt. Die Bilder werden beim Speichern hochgeladen.`);
+    });
+
+    addImagesInput.addEventListener('change', () => {
+      const files = Array.from(addImagesInput.files || []);
+      if (!files.length) {
+        renderThumbs(addGalleryPreview, addGalleryCounter, [], fallbackImage, addPreview);
+        return;
+      }
+      if (files.length > 10) {
+        showMessage('Maximal 10 Bilder sind erlaubt.', false);
+        addImagesInput.value = '';
+        return;
+      }
+      const urls = files.map((file) => URL.createObjectURL(file));
+      renderThumbs(addGalleryPreview, addGalleryCounter, urls, urls[0], addPreview);
+      showMessage(`${files.length} Bild${files.length === 1 ? '' : 'er'} für das neue Fahrzeug ausgewählt.`);
+    });
+
+    await requireLogin();
+    await seedCarsIfEmpty();
+    renderThumbs(addGalleryPreview, addGalleryCounter, [], fallbackImage, addPreview);
+    await loadCars();
+    showSection('home');
+  </script>
+</body>
+</html>
