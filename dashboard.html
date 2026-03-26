@@ -39,6 +39,24 @@
       <div class="text-sky-800/80 mt-1">Hinweis: Fahrzeugdaten und Bilder werden in der Datenbank gespeichert. So erscheinen echte Änderungen nach dem Speichern auf allen Geräten.</div>
     </div>
 
+    <div class="grid md:grid-cols-3 gap-4">
+      <button id="newCarBtn" class="text-left rounded-3xl border border-emerald-300/60 bg-white/80 p-5 hover:bg-emerald-50 transition">
+        <div class="text-sm text-emerald-700 font-bold mb-2">➕ Schnellaktion</div>
+        <div class="text-2xl font-black">سيارة جديدة</div>
+        <div class="text-slate-500 mt-2">ابدأ بإضافة سيارة جديدة مباشرة عند الدخول.</div>
+      </button>
+      <button id="editCarBtn" class="text-left rounded-3xl border border-sky-300/60 bg-white/80 p-5 hover:bg-sky-50 transition">
+        <div class="text-sm text-sky-700 font-bold mb-2">✏️ Schnellaktion</div>
+        <div class="text-2xl font-black">تعديل سيارة</div>
+        <div class="text-slate-500 mt-2">اختر سيارة من القائمة ثم افتح التعديل بسرعة.</div>
+      </button>
+      <button id="deleteCarBtn" class="text-left rounded-3xl border border-red-300/60 bg-white/80 p-5 hover:bg-red-50 transition">
+        <div class="text-sm text-red-700 font-bold mb-2">🗑️ Schnellaktion</div>
+        <div class="text-2xl font-black">حذف سيارة</div>
+        <div class="text-slate-500 mt-2">احذف السيارة المحددة من قاعدة البيانات.</div>
+      </button>
+    </div>
+
     <div id="msg" class="text-sm"></div>
 
     <div class="grid xl:grid-cols-[370px,1fr] gap-8">
@@ -82,7 +100,7 @@
       </div>
 
       <div class="bg-white/70 border border-slate-300/60 rounded-3xl p-6">
-        <h2 class="text-2xl font-black mb-4">Fahrzeug bearbeiten</h2>
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4"><h2 id="formTitle" class="text-2xl font-black">Fahrzeug bearbeiten</h2><span id="formModeBadge" class="inline-flex items-center px-4 py-2 rounded-2xl bg-slate-100 text-slate-700 font-bold text-sm">Modus: Bearbeiten</span></div>
         <div class="grid md:grid-cols-2 gap-4">
           <div>
             <label class="block mb-2 text-sm text-slate-600">Vollständiger Name</label>
@@ -140,6 +158,7 @@
 
         <div class="flex gap-4 flex-wrap mt-6">
           <button id="saveBtn" class="px-6 py-4 rounded-2xl bg-lime-500 hover:bg-lime-600 font-black text-slate-900">Änderungen speichern</button>
+          <button id="cancelCreateBtn" class="px-6 py-4 rounded-2xl bg-amber-100 border border-amber-300/60 font-black text-amber-900 hidden">Neues Fahrzeug abbrechen</button>
           <button id="reloadBtn" class="px-6 py-4 rounded-2xl bg-white/70 border border-slate-300/60 font-black">Daten neu laden</button>
         </div>
       </div>
@@ -253,8 +272,15 @@
     const restoreBtn = document.getElementById('restoreBtn');
     const currentFlags = document.getElementById('currentFlags');
     const hiddenCarsList = document.getElementById('hiddenCarsList');
+    const newCarBtn = document.getElementById('newCarBtn');
+    const editCarBtn = document.getElementById('editCarBtn');
+    const deleteCarBtn = document.getElementById('deleteCarBtn');
+    const cancelCreateBtn = document.getElementById('cancelCreateBtn');
+    const formTitle = document.getElementById('formTitle');
+    const formModeBadge = document.getElementById('formModeBadge');
 
     let cars = [];
+    let formMode = 'edit';
     let supportsRemoteFlags = true;
 
     function showMessage(text, ok = true) {
@@ -351,6 +377,53 @@
 
     function findCar(id) {
       return cars.find((car) => String(car.id) === String(id));
+    }
+
+    function scrollToEditor() {
+      document.getElementById('formTitle')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function setFormMode(mode) {
+      formMode = mode;
+      const isCreate = mode === 'create';
+      formTitle.textContent = isCreate ? 'Neue Fahrzeug hinzufügen' : 'Fahrzeug bearbeiten';
+      formModeBadge.textContent = isCreate ? 'Modus: Hinzufügen' : 'Modus: Bearbeiten';
+      saveBtn.textContent = isCreate ? 'Neue Fahrzeug speichern' : 'Änderungen speichern';
+      cancelCreateBtn.classList.toggle('hidden', !isCreate);
+    }
+
+    function startCreateMode() {
+      setFormMode('create');
+      carSelect.value = '';
+      nameInput.value = '';
+      categoryInput.value = '';
+      priceInput.value = '';
+      yearInput.value = '';
+      mileageInput.value = '';
+      conditionInput.value = '';
+      descriptionInput.value = '';
+      isTemporaryInput.checked = false;
+      imageInput.value = '';
+      preview.src = fallbackImage;
+      renderGalleryPreview([], fallbackImage);
+      currentFlags.textContent = '➕ Neues Fahrzeug';
+      toggleHiddenBtn.disabled = true;
+      toggleHiddenBtn.className = 'px-4 py-3 rounded-2xl bg-amber-500/40 cursor-not-allowed text-slate-900 font-black';
+      restoreBtn.disabled = true;
+      restoreBtn.className = 'px-4 py-3 rounded-2xl font-black text-slate-900 bg-emerald-500/40 cursor-not-allowed';
+      showMessage('إضافة سيارة جديدة: املأ البيانات ثم اضغط حفظ.');
+      scrollToEditor();
+    }
+
+    function exitCreateMode(selectLast = false) {
+      setFormMode('edit');
+      toggleHiddenBtn.disabled = false;
+      toggleHiddenBtn.className = 'px-4 py-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-slate-900 font-black';
+      if (cars.length) {
+        const targetId = selectLast ? cars[cars.length - 1].id : (carSelect.value || cars[0].id);
+        carSelect.value = String(targetId);
+        fillForm(targetId);
+      }
     }
 
     function renderGalleryPreview(images, mainImage = '') {
@@ -493,13 +566,25 @@
     }
 
     async function saveCar() {
-      const id = Number(carSelect.value);
-      const car = findCar(id);
+      const isCreate = formMode === 'create';
+      const selectedId = Number(carSelect.value);
+      const existingCar = findCar(selectedId);
+      const id = isCreate ? ((Math.max(0, ...cars.map((item) => Number(item.id) || 0))) + 1) : selectedId;
+      const car = isCreate ? {
+        id,
+        brand: '',
+        model: '',
+        image: fallbackImage,
+        gallery: [fallbackImage],
+        isHidden: false,
+        isTemporary: false,
+        year: new Date().getFullYear()
+      } : existingCar;
       if (!car) return;
 
       saveBtn.disabled = true;
       saveBtn.textContent = 'Wird gespeichert...';
-      showMessage('Änderungen werden gespeichert...');
+      showMessage(isCreate ? 'Die neue Fahrzeug wird gespeichert...' : 'Änderungen werden gespeichert...');
 
       try {
         const currentGallery = Array.isArray(car.gallery) && car.gallery.length ? car.gallery : [car.image || fallbackImage];
@@ -526,7 +611,7 @@
 
         const remoteFlags = {
           isTemporary: Boolean(isTemporaryInput.checked),
-          isHidden: Boolean(car.isHidden)
+          isHidden: isCreate ? false : Boolean(car.isHidden)
         };
 
         const savePayload = { ...updated, ...remoteFlags };
@@ -535,17 +620,34 @@
 
         if (error) throw error;
 
-        showMessage('Änderungen erfolgreich gespeichert');
+        showMessage(isCreate ? 'تمت إضافة السيارة الجديدة بنجاح' : 'Änderungen erfolgreich gespeichert');
         await loadCars();
         carSelect.value = String(id);
-        fillForm(id);
         imageInput.value = '';
+        exitCreateMode();
+        fillForm(id);
         renderGalleryPreview(findCar(id)?.gallery || finalGallery, findCar(id)?.image || primaryImage);
       } catch (error) {
         showMessage(error.message || 'Beim Speichern ist ein Fehler aufgetreten', false);
       } finally {
         saveBtn.disabled = false;
-        saveBtn.textContent = 'Änderungen speichern';
+        saveBtn.textContent = formMode === 'create' ? 'Neue Fahrzeug speichern' : 'Änderungen speichern';
+      }
+    }
+
+    async function deleteCar(id) {
+      const car = findCar(id);
+      if (!car) return;
+      const confirmed = window.confirm(`Soll das Fahrzeug "${car.name || `#${id}`}" wirklich gelöscht werden?`);
+      if (!confirmed) return;
+      try {
+        const { error } = await supabase.from('cars').delete().eq('id', id);
+        if (error) throw error;
+        showMessage('تم حذف السيارة بنجاح');
+        await loadCars();
+        exitCreateMode();
+      } catch (error) {
+        showMessage(error.message || 'Das Fahrzeug konnte nicht gelöscht werden.', false);
       }
     }
 
@@ -572,11 +674,30 @@
       window.location.href = './login.html';
     });
 
-    carSelect.addEventListener('change', (e) => fillForm(e.target.value));
-    reloadBtn.addEventListener('click', loadCars);
+    carSelect.addEventListener('change', (e) => {
+      setFormMode('edit');
+      fillForm(e.target.value);
+    });
+    reloadBtn.addEventListener('click', async () => {
+      setFormMode('edit');
+      await loadCars();
+    });
     saveBtn.addEventListener('click', saveCar);
+    newCarBtn.addEventListener('click', startCreateMode);
+    editCarBtn.addEventListener('click', () => {
+      setFormMode('edit');
+      if (cars.length) fillForm(carSelect.value || cars[0].id);
+      scrollToEditor();
+    });
+    deleteCarBtn.addEventListener('click', async () => {
+      const id = Number(carSelect.value);
+      if (!id) return;
+      await deleteCar(id);
+    });
+    cancelCreateBtn.addEventListener('click', () => exitCreateMode());
 
     toggleHiddenBtn.addEventListener('click', async () => {
+      if (formMode === 'create') return;
       const id = Number(carSelect.value);
       const car = findCar(id);
       if (!car) return;
@@ -589,6 +710,7 @@
     });
 
     restoreBtn.addEventListener('click', async () => {
+      if (formMode === 'create') return;
       const id = Number(carSelect.value);
       await restoreCar(id);
       await loadCars();
